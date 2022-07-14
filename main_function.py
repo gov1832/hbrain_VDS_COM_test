@@ -2,6 +2,7 @@ from PyQt5.QtCore   import QTimer
 from PyQt5.QtWidgets import *
 
 import time
+from multiprocessing import Process
 
 from db import DB_function
 from Socket import Socket_function
@@ -79,13 +80,22 @@ class main_function(QWidget):
                 self.ui.status_bar.setText("err socket connect: ", e)
             self.ui.status_bar.setText("Socket server '" + sock_ip + "', '" + str(sock_port) + "' connect !")
             # read 스레드 시작 while
+            # read_socket = Process(target=self.read_socket_msg)
+            # read_socket.start()
 
     def db_connect_btn_click(self):
         print("db..")
         self.db.test()
 
+    def read_socket_msg(self):
+        while 1:
+            self.sock.socket_read()
+    # endregion
+
+    # region test send msg
     def op_FF_btn_click(self):
         print("btn_click")
+        self.sock.send_FF_msg()
 
     def op_FE_btn_click(self):
         print("btn_click")
@@ -140,6 +150,5 @@ class main_function(QWidget):
 
     def op_1E_btn_click(self):
         print("btn_click")
-
 
     # endregion
