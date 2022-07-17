@@ -26,6 +26,7 @@ class main_function(QWidget):
 
         # value setting
         self.local_ip = '127.0.0.1'
+        self.frame_number_set = None
 
     def time_bar_timeout(self):
         now = time.localtime()
@@ -150,7 +151,6 @@ class main_function(QWidget):
                 self.parsing_msg(recv_msg)
 
     def parsing_msg(self, recv_msg):
-        print("recv_msg: ", recv_msg)
         print("d_recv_msg: ", recv_msg.decode('utf-16'))
         d_recv_msg = recv_msg.decode('utf-16')
 
@@ -159,12 +159,52 @@ class main_function(QWidget):
         # print(msg_op)
         if len(d_recv_msg) > 40:
             msg_op = d_recv_msg[43]
+            sender_ip = d_recv_msg[0:15]
             if msg_op == chr(0xFF):
-                sender_ip = d_recv_msg[0:15]
                 self.sock.send_FF_res_msg(self.local_ip, sender_ip)
-
+            elif msg_op == chr(0xFE):
+                self.sock.send_FE_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x01):
+                self.device_sync(d_recv_msg)
+                # self.sock.send_01_res_msg(self.local_ip, sender_ip)
+                print("not ack")
+            elif msg_op == chr(0x04):
+                self.sock.send_04_res_msg(self.local_ip, sender_ip, self.frame_number_set)
+            elif msg_op == chr(0x05):
+                self.sock.send_05_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x07):
+                self.sock.send_07_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x0C):
+                self.sock.send_0C_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x0D):
+                self.sock.send_0D_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x0E):
+                self.sock.send_0E_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x0F):
+                self.sock.send_0F_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x11):
+                self.sock.send_11_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x12):
+                self.sock.send_12_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x13):
+                self.sock.send_13_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x15):
+                self.sock.send_15_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x16):
+                self.sock.send_16_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x17):
+                self.sock.send_17_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x18):
+                self.sock.send_18_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x19):
+                self.sock.send_19_res_msg(self.local_ip, sender_ip)
+            elif msg_op == chr(0x1E):
+                self.sock.send_1E_res_msg(self.local_ip, sender_ip)
 
     # endregion
+
+    def device_sync(self, msg):
+        self.frame_number_set = msg[44]
 
     # region test send msg
     def op_FF_btn_click(self):
