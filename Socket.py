@@ -64,7 +64,7 @@ class Socket_function:
     def send_04_res_msg(self, sender_ip, destination_ip, frame_number):
         controller_kind = 'VD'
         controller_number = '12345'
-        length = '0002'
+        length = '0010'
         point = chr(0x2D)
         opcode = chr(0x04)
         frame_num = frame_number
@@ -82,7 +82,7 @@ class Socket_function:
         controller_number = '12345'
         length = '0002'
         point = chr(0x2D)
-        opcode = chr(0xFE)
+        opcode = chr(0x05)
         data = chr(0x06) # ack
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         print(send_msg)
