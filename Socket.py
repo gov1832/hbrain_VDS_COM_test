@@ -117,8 +117,6 @@ class Socket_function:
             else:
                 temp[1] = ord(chr(num))
 
-        print("1: ", lane_1)
-        print("2: ", lane_2)
         data = ''
         for cg_data in lane_1:
             data = data + chr(cg_data[0])
@@ -130,18 +128,35 @@ class Socket_function:
         length = chr(1 + len(data))
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         print(send_msg)
+        self.socket_send_msg(send_msg)
 
-        for i in range(len(send_msg)):
-            print(i, "   ", send_msg[i])
-        # self.socket_send_msg(send_msg)
+        # for i in range(len(send_msg)):
+        #     print(i, "   ", send_msg[i])
 
     def send_07_res_msg(self, sender_ip, destination_ip):
         controller_kind = 'VD'
         controller_number = '12345'
-        length = '0002'
         point = chr(0x2D)
-        opcode = chr(0xFE)
-        data = chr(0x06) # ack
+        opcode = chr(0x07)
+
+        lane_1 = bytearray(2)
+        lane_2 = bytearray(2)
+
+        # num = random.randrange(0, 65535)
+        num1 = random.randrange(0, 300)
+        num1_high = num1 >> 8
+        num1_low = num1 & 0xFF
+        lane_1[0] = ord(chr(num1_high))
+        lane_1[1] = ord(chr(num1_low))
+
+        num2 = random.randrange(0, 300)
+        num2_high = num2 >> 8
+        num2_low = num2 & 0xFF
+        lane_2[0] = ord(chr(num2_high))
+        lane_2[1] = ord(chr(num2_low))
+
+        data = chr(lane_1[0]) + chr(lane_1[1]) + chr(lane_2[0]) + chr(lane_2[1])
+        length = chr(1 + len(data))
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         print(send_msg)
         self.socket_send_msg(send_msg)
@@ -149,9 +164,9 @@ class Socket_function:
     def send_0C_res_msg(self, sender_ip, destination_ip):
         controller_kind = 'VD'
         controller_number = '12345'
-        length = '0002'
+        length = '0003'
         point = chr(0x2D)
-        opcode = chr(0xFE)
+        opcode = chr(0x0C)
         data = chr(0x06) # ack
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         print(send_msg)
@@ -160,9 +175,9 @@ class Socket_function:
     def send_0D_res_msg(self, sender_ip, destination_ip):
         controller_kind = 'VD'
         controller_number = '12345'
-        length = '0002'
+        length = '0003'
         point = chr(0x2D)
-        opcode = chr(0xFE)
+        opcode = chr(0x0D)
         data = chr(0x06) # ack
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         print(send_msg)
@@ -173,20 +188,21 @@ class Socket_function:
         controller_number = '12345'
         length = '0002'
         point = chr(0x2D)
-        opcode = chr(0xFE)
+        opcode = chr(0x0E)
         data = chr(0x06) # ack
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         print(send_msg)
         self.socket_send_msg(send_msg)
 
-    def send_0F_res_msg(self, sender_ip, destination_ip):
+    def send_0F_res_msg(self, sender_ip, destination_ip, index):
         controller_kind = 'VD'
         controller_number = '12345'
         length = '0002'
         point = chr(0x2D)
-        opcode = chr(0xFE)
-        data = chr(0x06) # ack
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
+        opcode = chr(0x0F)
+
+        # if index == 0x
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode #+ data
         print(send_msg)
         self.socket_send_msg(send_msg)
 
@@ -407,3 +423,41 @@ class Socket_function:
         # send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
         # self.socket_send_msg(send_msg)
 
+    def send_0F_msg(self):
+        point = chr(0x2D)
+        opcode = chr(0x0F)
+        sender_ip = '123.456.789.123'
+        destination_ip = '127.000.000.001'
+        controller_kind = 'VD'
+        controller_number = '12345'
+        length = '0002'
+        index_list = [1, 3, 5, 7, 9, 21]
+        index = chr(random.choice(index_list))
+
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + index
+        self.socket_send_msg(send_msg)
+
+    def send_11_msg(self):
+        point = chr(0x2D)
+        opcode = chr(0x11)
+        sender_ip = '123.456.789.123'
+        destination_ip = '127.000.000.001'
+        controller_kind = 'VD'
+        controller_number = '12345'
+        length = '0001'
+
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
+        self.socket_send_msg(send_msg)
+
+    def send_13_msg(self):
+        point = chr(0x2D)
+        opcode = chr(0x13)
+        sender_ip = '123.456.789.123'
+        destination_ip = '127.000.000.001'
+        controller_kind = 'VD'
+        controller_number = '12345'
+        echo_msg = 'test!echo!hi'
+        length = '0001'
+
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
+        self.socket_send_msg(send_msg)

@@ -181,7 +181,8 @@ class main_function(QWidget):
             elif msg_op == chr(0x0E):
                 self.sock.send_0E_res_msg(self.local_ip, sender_ip)
             elif msg_op == chr(0x0F):
-                self.sock.send_0F_res_msg(self.local_ip, sender_ip)
+                index = d_recv_msg[44]
+                self.sock.send_0F_res_msg(self.local_ip, sender_ip, index)
             elif msg_op == chr(0x11):
                 self.sock.send_11_res_msg(self.local_ip, sender_ip)
             elif msg_op == chr(0x12):
