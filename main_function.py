@@ -25,7 +25,7 @@ class main_function(QWidget):
         self.btn_event()
 
         # value setting
-        self.local_ip = '127.0.0.1'
+        self.local_ip = '127.000.000.001'
         self.frame_number_set = None
 
     def time_bar_timeout(self):
@@ -154,8 +154,8 @@ class main_function(QWidget):
         print("d_recv_msg: ", recv_msg.decode('utf-16'))
         d_recv_msg = recv_msg.decode('utf-16')
 
-        for i in range(len(d_recv_msg)):
-            print(i, "   ", d_recv_msg[i])
+        # for i in range(len(d_recv_msg)):
+        #     print(i, "   ", d_recv_msg[i])
         # print(msg_op)
         if len(d_recv_msg) > 40:
             msg_op = d_recv_msg[43]

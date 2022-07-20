@@ -1,4 +1,7 @@
+
 import socket
+
+import random
 
 class Socket_function:
     def __init__(self):
@@ -64,6 +67,7 @@ class Socket_function:
     def send_04_res_msg(self, sender_ip, destination_ip, frame_number):
         controller_kind = 'VD'
         controller_number = '12345'
+        # length 변경 해야함
         length = '0010'
         point = chr(0x2D)
         opcode = chr(0x04)
@@ -80,13 +84,56 @@ class Socket_function:
     def send_05_res_msg(self, sender_ip, destination_ip):
         controller_kind = 'VD'
         controller_number = '12345'
-        length = '0002'
         point = chr(0x2D)
         opcode = chr(0x05)
-        data = chr(0x06) # ack
+        lane = '2' # 2차선
+        lane_1 = [bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2),
+                  bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2)]
+        lane_2 = [bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2),
+                  bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2)]
+        for i in range(len(lane_1)):
+            temp = lane_1[i]
+
+            # num = random.randrange(0, 65535)
+            num = random.randrange(0, 300)
+            if num > 255:
+                num_high = num >> 8
+                num_low = num & 0xFF
+                temp[0] = ord(chr(num_high))
+                temp[1] = ord(chr(num_low))
+            else:
+                temp[1] = ord(chr(num))
+
+        for i in range(len(lane_2)):
+            temp = lane_2[i]
+
+            # num = random.randrange(0, 65535)
+            num = random.randrange(0, 300)
+            if num > 255:
+                num_high = num >> 8
+                num_low = num & 0xFF
+                temp[0] = ord(chr(num_high))
+                temp[1] = ord(chr(num_low))
+            else:
+                temp[1] = ord(chr(num))
+
+        print("1: ", lane_1)
+        print("2: ", lane_2)
+        data = ''
+        for cg_data in lane_1:
+            data = data + chr(cg_data[0])
+            data = data + chr(cg_data[1])
+        for cg_data in lane_2:
+            data = data + chr(cg_data[0])
+            data = data + chr(cg_data[1])
+
+        length = chr(1 + len(data))
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         print(send_msg)
-        self.socket_send_msg(send_msg)
+
+        for i in range(len(send_msg)):
+            print(i, "   ", send_msg[i])
+        # self.socket_send_msg(send_msg)
 
     def send_07_res_msg(self, sender_ip, destination_ip):
         controller_kind = 'VD'
