@@ -25,19 +25,42 @@ class main_function(QWidget):
         self.btn_event()
 
         # value setting
-        self.local_ip = '127.000.000.001'
-        self.center_ip = '123.456.789.123'
+        self.local_ip = None
+        self.center_ip = None
+        self.client_socket = None
         self.frame_number_set = None
         self.connect_time = None
+        self.lane_num = None
+        self.collect_cycle = None
+        self.category_num = None
+        self.acc_speed = None
+        self.calc_speed = None
+        self.use_reverse = None
+        self.value_setting()
+
+    def value_setting(self):
+        # self.local_ip = '192.168.000.007'
+        self.local_ip = '127.0.0.1'
+        self.local_ex_ip = '183.99.41.239'
+        self.center_ip = '123.456.789.123'
+        self.lane_num = 2
+        self.collect_cycle = 30
+        self.category_num = 10
+        self.acc_speed = 1
+        self.calc_speed = 1
+        self.use_reverse = 0
+
+
 
     def time_bar_timeout(self):
         now = time.localtime()
-        self.ui.time_bar.setText(str("%04d/%02d/%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)))
+        self.ui.time_bar.setText(str("%04d/%02d/%02d %02d:%02d:%02d" %
+                                     (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)))
 
     def set_ui(self):
         # socket
-        self.ui.sock_ip_input.setText("127.0.0.1")
-        self.ui.sock_port_input.setText("3333")
+        self.ui.sock_ip_input.setText("127.0.0.7")
+        self.ui.sock_port_input.setText("30100")
 
         self.ui.op_FF_btn.setEnabled(False)
         self.ui.op_FE_btn.setEnabled(False)
@@ -100,41 +123,45 @@ class main_function(QWidget):
         if sock_ip == '' or sock_port == '':
             self.ui.status_bar.setText("Socket IP, PORT를 입력해주세요!")
         else:
-            self.ui.status_bar.setText("Socket server 연결중...")
+            self.ui.status_bar.setText("Socket server open..")
             try:
-                self.sock.socket_connect(sock_ip, sock_port)
+                self.sock.socket_server_open(sock_ip, sock_port)
             except Exception as e:
-                self.ui.status_bar.setText("err socket connect: ", e)
-            self.ui.status_bar.setText("Socket server '" + sock_ip + "', '" + str(sock_port) + "' connect !")
+                self.ui.status_bar.setText("err socket open: ", e)
+            self.ui.status_bar.setText("Socket server '" + sock_ip + "', '" + str(sock_port) + "' open !")
 
             # region test btn true
-            self.ui.op_FF_btn.setEnabled(True)
+            self.ui.op_FF_btn.setEnabled(False)
             self.ui.op_FE_btn.setEnabled(True)
-            self.ui.op_01_btn.setEnabled(True)
-            self.ui.op_04_btn.setEnabled(True)
-            self.ui.op_05_btn.setEnabled(True)
-            self.ui.op_07_btn.setEnabled(True)
-            self.ui.op_0C_btn.setEnabled(True)
-            self.ui.op_0D_btn.setEnabled(True)
-            self.ui.op_0D_btn.setEnabled(True)
-            self.ui.op_0E_btn.setEnabled(True)
-            self.ui.op_0F_btn.setEnabled(True)
-            self.ui.op_11_btn.setEnabled(True)
-            self.ui.op_12_btn.setEnabled(True)
-            self.ui.op_13_btn.setEnabled(True)
-            self.ui.op_15_btn.setEnabled(True)
-            self.ui.op_16_btn.setEnabled(True)
-            self.ui.op_17_btn.setEnabled(True)
-            self.ui.op_18_btn.setEnabled(True)
+            self.ui.op_01_btn.setEnabled(False)
+            self.ui.op_04_btn.setEnabled(False)
+            self.ui.op_05_btn.setEnabled(False)
+            self.ui.op_07_btn.setEnabled(False)
+            self.ui.op_0C_btn.setEnabled(False)
+            self.ui.op_0D_btn.setEnabled(False)
+            self.ui.op_0D_btn.setEnabled(False)
+            self.ui.op_0E_btn.setEnabled(False)
+            self.ui.op_0F_btn.setEnabled(False)
+            self.ui.op_11_btn.setEnabled(False)
+            self.ui.op_12_btn.setEnabled(False)
+            self.ui.op_13_btn.setEnabled(False)
+            self.ui.op_15_btn.setEnabled(False)
+            self.ui.op_16_btn.setEnabled(False)
+            self.ui.op_17_btn.setEnabled(False)
+            self.ui.op_18_btn.setEnabled(False)
             self.ui.op_19_btn.setEnabled(True)
-            self.ui.op_1E_btn.setEnabled(True)
+            self.ui.op_1E_btn.setEnabled(False)
             # endregion
 
             # read 스레드 시작 while
-            t = threading.Thread(target=self.read_socket_msg, args=())
-            t.start()
+            # t = threading.Thread(target=self.read_socket_msg, args=())
+            # t.start()
             # read_socket = Process(target=self.read_socket_msg, args=())
             # read_socket.start()
+            self.sock.client_accept()
+
+            t = threading.Thread(target=self.read_socket_msg, args=())
+            t.start()
 
     def db_connect_btn_click(self):
         print("db..")
@@ -158,66 +185,78 @@ class main_function(QWidget):
         # for i in range(len(d_recv_msg)):
         #     print(i, "   ", d_recv_msg[i])
         # print(msg_op)
-        if len(d_recv_msg) > 40:
+        if len(d_recv_msg) > 42:
             # print("recv_msg: ", end=' ')
             # for data in d_recv_msg:
             #     print(hex(ord(data)), end='/')
             # print('')
+            print("---------------------------------------------------------------------------")
             msg_op = d_recv_msg[43]
-            sender_ip = d_recv_msg[0:15]
+            msg_sender_ip = d_recv_msg[0:15]
             destination_ip = d_recv_msg[16:31]
-
+            self.center_ip = msg_sender_ip
 
             # 수신메시지의 목적지IP == local IP
             if destination_ip == self.local_ip:
-                print("RX_msg: /", recv_msg.decode('utf-16'), "/")
+                print("RX_msg: [", recv_msg.decode('utf-16'), "]")
                 if msg_op == chr(0xFF):
-                    self.sock.send_FF_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_FF_res_msg(self.local_ip, self.center_ip)
                     self.connect_time = time.time()
                 elif msg_op == chr(0xFE):
-                    self.sock.send_FE_res_msg(self.local_ip, sender_ip)
+                    # self.sock.send_FE_res_msg(self.local_ip, self.center_ip)
+                    print('0xFE response')
                 elif msg_op == chr(0x01):
-                    self.device_sync(d_recv_msg)
+                    self.device_sync(msg_op, d_recv_msg)
                     # self.sock.send_01_res_msg(self.local_ip, sender_ip)
                     print("not ack")
                 elif msg_op == chr(0x04):
-                    self.sock.send_04_res_msg(self.local_ip, sender_ip, self.frame_number_set)
+                    self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.collect_cycle)
                 elif msg_op == chr(0x05):
-                    self.sock.send_05_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_05_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x07):
-                    self.sock.send_07_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_07_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x0C):
-                    self.sock.send_0C_res_msg(self.local_ip, sender_ip)
+                    self.device_sync(msg_op, d_recv_msg)
+                    self.sock.send_0C_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x0D):
-                    self.sock.send_0D_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_0D_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x0E):
-                    self.sock.send_0E_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_0E_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x0F):
-                    index = d_recv_msg[44]
-                    self.sock.send_0F_res_msg(self.local_ip, sender_ip, index)
+                    index = int(ord(d_recv_msg[44]))
+                    self.sock.send_0F_res_msg(self.local_ip, self.center_ip, index,
+                                              self.lane_num, self.collect_cycle, self.category_num, self.acc_speed, self.calc_speed, self.use_reverse)
                 elif msg_op == chr(0x11):
                     request_time = time.time()
-                    self.sock.send_11_res_msg(self.local_ip, sender_ip, self.connect_time, request_time)
+                    self.sock.send_11_res_msg(self.local_ip, self.center_ip, self.connect_time, request_time)
                 elif msg_op == chr(0x13):
-                    self.sock.send_13_res_msg(self.local_ip, sender_ip, d_recv_msg)
+                    self.sock.send_13_res_msg(self.local_ip, self.center_ip, d_recv_msg)
                 elif msg_op == chr(0x15):
-                    self.sock.send_15_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_15_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x16):
-                    self.sock.send_16_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_16_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x17):
-                    self.sock.send_17_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_17_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x18):
-                    self.sock.send_18_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_18_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x19):
-                    self.sock.send_19_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_19_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x1E):
-                    self.sock.send_1E_res_msg(self.local_ip, sender_ip)
+                    self.sock.send_1E_res_msg(self.local_ip, self.center_ip)
             else:
                 print("TX_msg: /", recv_msg.decode('utf-16'), "/")
     # endregion
 
-    def device_sync(self, msg):
-        self.frame_number_set = msg[44]
+    def device_sync(self, op, msg):
+        if op == chr(0x01):
+            self.frame_number_set = msg[44]
+        elif op == chr(0x0C):
+            self.lane_num = 2
+            self.collect_cycle = 30
+            self.category_num = 10
+            # 이외의 설정값 등 리셋
+
+
 
     # region test send msg
     def op_FF_btn_click(self):
@@ -226,7 +265,7 @@ class main_function(QWidget):
 
     def op_FE_btn_click(self):
         print("FE btn_click")
-        self.sock.send_FE_msg()
+        self.sock.send_FE_res_msg(self.local_ip, self.center_ip)
 
     def op_01_btn_click(self):
         print("01 btn_click")

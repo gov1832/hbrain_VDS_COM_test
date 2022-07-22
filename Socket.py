@@ -1,5 +1,6 @@
 
 import socket
+from time import localtime
 
 import random
 
@@ -7,7 +8,18 @@ class Socket_function:
     def __init__(self):
         super().__init__()
 
+        self.server_socket = None
         self.client_socket = None
+
+    def socket_server_open(self, ip, port):
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server_socket.bind((ip, port))
+        self.server_socket.listen()
+
+    def client_accept(self):
+        self.client_socket, addr = self.server_socket.accept()
+        return self.client_socket
 
     def socket_connect(self, ip, port):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -15,6 +27,7 @@ class Socket_function:
 
     def socket_send_msg(self, send_msg):
         self.client_socket.send(send_msg.encode('utf-16'))
+        print("TX_msg: /", send_msg, "/")
         # recv
         # recv_msg = self.client_socket.recv(1024)
         # d_recv_msg = recv_msg.decode()
@@ -45,10 +58,9 @@ class Socket_function:
         controller_number = '12345'
         point = chr(0x2D)
         opcode = chr(0xFE)
-        data = chr(0x06) # ack
-        length = self.length_calc(1 + len(data))
+        length = self.length_calc(1)
 
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
         self.socket_send_msg(send_msg)
 
     # def send_01_res_msg(self, sender_ip, destination_ip):
@@ -61,15 +73,25 @@ class Socket_function:
     #     send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
     #     self.socket_send_msg(send_msg)
 
-    def send_04_res_msg(self, sender_ip, destination_ip, frame_number):
+    def send_04_res_msg(self, sender_ip, destination_ip, collect_cycle):
         controller_kind = 'VD'
         controller_number = '12345'
         point = chr(0x2D)
         opcode = chr(0x04)
-        frame_num = frame_number
+        now_t = localtime()
+        sec = now_t.tm_min * 60 + now_t.tm_sec
+        print(sec)
+        if collect_cycle != 0:
+            frame_num = chr(int(sec / collect_cycle) + 1)
+        else:
+            frame_num = chr(0)
         lane_err = '0000'
         lane_num = '2'
-        lane_data = chr(0x0A) + chr(0x2B) + chr(0x09) + chr(0x2C)
+        lane_1_1 = chr(random.randrange(50, 100))
+        lane_1_2 = chr(random.randrange(50, 100))
+        lane_2_1 = chr(random.randrange(50, 100))
+        lane_2_2 = chr(random.randrange(50, 100))
+        lane_data = lane_1_1 + lane_1_2 + lane_2_1 + lane_2_2
         data = frame_num + lane_err + lane_num + lane_data
         length = self.length_calc(1 + len(data))
 
@@ -169,7 +191,6 @@ class Socket_function:
         self.socket_send_msg(send_msg)
 
     def send_0D_res_msg(self, sender_ip, destination_ip):
-        print("0dddddddddd")
         controller_kind = 'VD'
         controller_number = '54321'
         point = chr(0x2D)
@@ -190,15 +211,57 @@ class Socket_function:
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         self.socket_send_msg(send_msg)
 
-    def send_0F_res_msg(self, sender_ip, destination_ip, index):
+    def send_0F_res_msg(self, sender_ip, destination_ip, index,
+                        lane_num, collect_cycle, category_num, acc_speed, calc_speed, use_reverse):
         controller_kind = 'VD'
         controller_number = '12345'
         length = '0002'
         point = chr(0x2D)
         opcode = chr(0x0F)
 
-        # if index == 0x
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode #+ data
+        data = ''
+        if index == 1:
+            # 차로 계산 (1 << 차로-1)
+            byte_1 = chr(1 << (lane_num - 1))
+            byte_2 = chr(0)
+            data = byte_1 + byte_2
+        elif index == 3:
+            # 수집주기 기본 30, 변경값 60
+            byte_1 = chr(collect_cycle)
+            data = byte_1
+        elif index == 5:
+            # 차량 속도 category 단위 기본 10
+            byte_1 = chr(category_num)
+            byte_2 = chr(category_num)
+            byte_3 = chr(category_num)
+            byte_4 = chr(category_num)
+            byte_5 = chr(category_num)
+            byte_6 = chr(category_num)
+            byte_7 = chr(category_num)
+            byte_8 = chr(category_num)
+            byte_9 = chr(category_num)
+            byte_10 = chr(category_num)
+            byte_11 = chr(category_num)
+            byte_12 = chr(category_num)
+            data = byte_1 + byte_2 + byte_3 + byte_4 + byte_5 + byte_5 + byte_6 + \
+                   byte_7 + byte_8 + byte_9 + byte_10 + byte_11 + byte_12
+        elif index == 7:
+            data = chr(index)
+            # 속도별 누적치 계산 기본 1(사용)
+            byte_1 = chr(acc_speed)
+            data = data + byte_1
+        elif index == 9:
+            data = chr(index)
+            # 속도 계산 가능 여부 기본 1(사용)
+            byte_1 = chr(calc_speed)
+            data = data + byte_1
+        elif index == 21:
+            data = chr(index)
+            # 속도 계산 가능 여부 기본 0(사용안함)
+            byte_1 = chr(use_reverse)
+            data = data + byte_1
+
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         self.socket_send_msg(send_msg)
 
     def send_11_res_msg(self, sender_ip, destination_ip, connect_time, request_time):
@@ -208,12 +271,10 @@ class Socket_function:
         opcode = chr(0x11)
         if connect_time != None and request_time != None:
             time_cha = int(request_time - connect_time)
-            print("time_delay: ", str(time_cha))
             time_1 = time_cha & 0xFF
             time_2 = (time_cha >> 8) & 0xFF
             time_3 = (time_cha >> 16) & 0xFF
             time_4 = (time_cha >> 24) & 0xFF
-            print(time_4, time_3, time_2, time_1)
             data = chr(time_3) + chr(time_3) + chr(time_2) + chr(time_1)
             length = self.length_calc(1 + len(data))
 
@@ -250,6 +311,7 @@ class Socket_function:
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         self.socket_send_msg(send_msg)
 
+    # 개별 차량 데이터 응답
     def send_16_res_msg(self, sender_ip, destination_ip):
         controller_kind = 'VD'
         controller_number = '12345'
@@ -261,6 +323,7 @@ class Socket_function:
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         self.socket_send_msg(send_msg)
 
+    # 정지 영상 응답
     def send_17_res_msg(self, sender_ip, destination_ip):
         controller_kind = 'VD'
         controller_number = '12345'
@@ -272,17 +335,19 @@ class Socket_function:
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         self.socket_send_msg(send_msg)
 
+    # RTC 변경 응답
     def send_18_res_msg(self, sender_ip, destination_ip):
         controller_kind = 'VD'
         controller_number = '12345'
         point = chr(0x2D)
-        opcode = chr(0xFE)
+        opcode = chr(0x18)
         data = chr(0x06)  # ack
         length = self.length_calc(1 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         self.socket_send_msg(send_msg)
 
+    # 돌발 상황 정보
     def send_19_res_msg(self, sender_ip, destination_ip):
         controller_kind = 'VD'
         controller_number = '12345'
@@ -340,7 +405,7 @@ class Socket_function:
         opcode = chr(0x01)
         data_frame = chr(120)
         length = self.length_calc(2)
-        print(length)
+
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data_frame
         self.socket_send_msg(send_msg)
 
@@ -416,12 +481,58 @@ class Socket_function:
         # index = 3 -> 수집주기
         # index = 5 -> 차량 속도 구분
         # index = 7 -> 속도별 누적치 계산
-        index = '1'
-        # data = '40'
+        index_list = [1, 3, 5, 7, 9, 21]
+        index = random.choice(index_list)
 
+        data = ''
+        if index == 1:
+            data = chr(index)
+            # 차로 계산 (1 << 차로-1)
+            byte_1 = chr(1 << (2-1))
+            byte_2 = chr(0)
+            data = data + byte_1 + byte_2
+        elif index == 3:
+            data = chr(index)
+            # 수집주기 기본 30, 변경값 60
+            byte_1 = chr(60)
+            data = data + byte_1
+        elif index == 5:
+            data = chr(index)
+            # 차량 속도 category 단위 기본 10
+            byte_1 = chr(10)
+            byte_2 = chr(10)
+            byte_3 = chr(10)
+            byte_4 = chr(10)
+            byte_5 = chr(10)
+            byte_6 = chr(10)
+            byte_7 = chr(10)
+            byte_8 = chr(10)
+            byte_9 = chr(10)
+            byte_10 = chr(10)
+            byte_11 = chr(10)
+            byte_12 = chr(10)
+            data = data + byte_1 + byte_2 + byte_3 + byte_4 + byte_5 + byte_5 + byte_6 + \
+                   byte_7 + byte_8 + byte_9 + byte_10 + byte_11 + byte_12
+        elif index == 7:
+            data = chr(index)
+            # 속도별 누적치 계산 기본 1(사용)
+            byte_1 = chr(0)
+            data = data + byte_1
+        elif index == 9:
+            data = chr(index)
+            # 속도 계산 가능 여부 기본 1(사용)
+            byte_1 = chr(0)
+            data = data + byte_1
+        elif index == 21:
+            data = chr(index)
+            # 속도 계산 가능 여부 기본 0(사용안함)
+            byte_1 = chr(1)
+            data = data + byte_1
 
-        # send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
-        # self.socket_send_msg(send_msg)
+        length = self.length_calc(1 + data)
+
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
+        self.socket_send_msg(send_msg)
 
     def send_0F_msg(self):
         point = chr(0x2D)

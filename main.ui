@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1773</width>
-    <height>1105</height>
+    <width>1019</width>
+    <height>827</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>1741</width>
-     <height>1071</height>
+     <width>1001</width>
+     <height>811</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="main_layout" stretch="5,1">
@@ -27,7 +27,7 @@
      <number>10</number>
     </property>
     <item>
-     <layout class="QGridLayout" name="gridLayout_2" rowstretch="4,4,1,7,0">
+     <layout class="QGridLayout" name="gridLayout_2" rowstretch="3,0,0,5,0" columnstretch="5,5">
       <property name="leftMargin">
        <number>20</number>
       </property>
@@ -86,7 +86,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>40</height>
+              <height>30</height>
              </size>
             </property>
            </widget>
@@ -118,7 +118,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>40</height>
+              <height>30</height>
              </size>
             </property>
            </widget>
@@ -173,6 +173,12 @@
       </item>
       <item row="4" column="0">
        <widget class="QLabel" name="status_bar">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Status bar</string>
         </property>
@@ -230,7 +236,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>40</height>
+              <height>30</height>
              </size>
             </property>
             <property name="font">
@@ -258,7 +264,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>40</height>
+              <height>30</height>
              </size>
             </property>
             <property name="font">
@@ -296,7 +302,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>40</height>
+              <height>30</height>
              </size>
             </property>
             <property name="font">
@@ -334,7 +340,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>40</height>
+              <height>30</height>
              </size>
             </property>
             <property name="font">
@@ -372,7 +378,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>40</height>
+              <height>30</height>
              </size>
             </property>
             <property name="font">
@@ -450,6 +456,12 @@
       </item>
       <item row="4" column="1">
        <widget class="QLabel" name="time_bar">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Time</string>
         </property>
@@ -458,7 +470,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="btn_layout" stretch="2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1">
+     <layout class="QVBoxLayout" name="btn_layout" stretch="3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1">
       <property name="bottomMargin">
        <number>30</number>
       </property>
