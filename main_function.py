@@ -132,7 +132,8 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
-        self.sock.socket_send_msg("/end")
+        # self.sock.socket_send_msg("/end")
+        self.db.get_version_num()
 
     # region btn click function
     def socket_connect_btn_click(self):

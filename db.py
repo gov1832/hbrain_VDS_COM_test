@@ -15,6 +15,10 @@ class DB_function:
             sql = 'SELECT time FROM vds_version'
             cur.execute(sql)
 
+            result = 0
+            for i in cur:
+                result = i[0]
+
 
         except Exception as e:
             print("err: ", e)
