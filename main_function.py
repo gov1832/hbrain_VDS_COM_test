@@ -234,8 +234,7 @@ class main_function(QWidget):
                 elif msg_op == chr(0x04):
                     self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.collect_cycle)
                 elif msg_op == chr(0x05):
-                    self.db.get_speed()
-                    self.sock.send_05_res_msg(self.local_ip, self.center_ip, sdsdfs)
+                    self.sock.send_05_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x07):
                     self.sock.send_07_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x0C):
