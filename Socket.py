@@ -53,7 +53,7 @@ class Socket_function:
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         self.socket_send_msg(send_msg)
 
-    def send_FE_res_msg(self, sender_ip, destination_ip):
+    def send_FE_msg(self, sender_ip, destination_ip):
         controller_kind = 'VD'
         controller_number = '12345'
         point = chr(0x2D)
@@ -85,14 +85,13 @@ class Socket_function:
             frame_num = chr(int(sec / collect_cycle) + 1)
         else:
             frame_num = chr(0)
-        lane_err = '0000'
         lane_num = '2'
         lane_1_1 = chr(random.randrange(50, 100))
         lane_1_2 = chr(random.randrange(50, 100))
         lane_2_1 = chr(random.randrange(50, 100))
         lane_2_2 = chr(random.randrange(50, 100))
         lane_data = lane_1_1 + lane_1_2 + lane_2_1 + lane_2_2
-        data = frame_num + lane_err + lane_num + lane_data
+        data = frame_num + lane_num + lane_data
         length = self.length_calc(1 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
@@ -212,7 +211,7 @@ class Socket_function:
         self.socket_send_msg(send_msg)
 
     def send_0F_res_msg(self, sender_ip, destination_ip, index,
-                        lane_num, collect_cycle, category_num, acc_speed, calc_speed, use_reverse):
+                        lane_num, collect_cycle, category_num, acc_speed, calc_speed, use_unexpected):
         controller_kind = 'VD'
         controller_number = '12345'
         length = '0002'
@@ -231,18 +230,18 @@ class Socket_function:
             data = byte_1
         elif index == 5:
             # 차량 속도 category 단위 기본 10
-            byte_1 = chr(category_num)
-            byte_2 = chr(category_num)
-            byte_3 = chr(category_num)
-            byte_4 = chr(category_num)
-            byte_5 = chr(category_num)
-            byte_6 = chr(category_num)
-            byte_7 = chr(category_num)
-            byte_8 = chr(category_num)
-            byte_9 = chr(category_num)
-            byte_10 = chr(category_num)
-            byte_11 = chr(category_num)
-            byte_12 = chr(category_num)
+            byte_1 = chr(category_num[0])
+            byte_2 = chr(category_num[1])
+            byte_3 = chr(category_num[2])
+            byte_4 = chr(category_num[3])
+            byte_5 = chr(category_num[4])
+            byte_6 = chr(category_num[5])
+            byte_7 = chr(category_num[6])
+            byte_8 = chr(category_num[7])
+            byte_9 = chr(category_num[8])
+            byte_10 = chr(category_num[9])
+            byte_11 = chr(category_num[10])
+            byte_12 = chr(category_num[11])
             data = byte_1 + byte_2 + byte_3 + byte_4 + byte_5 + byte_5 + byte_6 + \
                    byte_7 + byte_8 + byte_9 + byte_10 + byte_11 + byte_12
         elif index == 7:
@@ -255,10 +254,10 @@ class Socket_function:
             # 속도 계산 가능 여부 기본 1(사용)
             byte_1 = chr(calc_speed)
             data = data + byte_1
-        elif index == 21:
+        elif index == 19:
             data = chr(index)
-            # 속도 계산 가능 여부 기본 0(사용안함)
-            byte_1 = chr(use_reverse)
+            # 돌발 사용 여부 기본 0(사용안함)
+            byte_1 = chr(use_unexpected)
             data = data + byte_1
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
@@ -383,18 +382,18 @@ class Socket_function:
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
         self.socket_send_msg(send_msg)
-
-    def send_FE_msg(self):
-        sender_ip = '123.456.789.123'
-        destination_ip = '127.000.000.001'
-        controller_kind = 'VD'
-        controller_number = '12345'
-        length = self.length_calc(1)
-        point = chr(0x2D)
-        opcode = chr(0xFE)
-
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
-        self.socket_send_msg(send_msg)
+    #
+    # def send_FE_msg(self):
+    #     sender_ip = '123.456.789.123'
+    #     destination_ip = '127.000.000.001'
+    #     controller_kind = 'VD'
+    #     controller_number = '12345'
+    #     length = self.length_calc(1)
+    #     point = chr(0x2D)
+    #     opcode = chr(0xFE)
+    #
+    #     send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
+    #     self.socket_send_msg(send_msg)
 
     def send_01_msg(self):
         sender_ip = '123.456.789.123'

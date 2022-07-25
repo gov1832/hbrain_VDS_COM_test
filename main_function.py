@@ -24,7 +24,18 @@ class main_function(QWidget):
         self.set_ui()
         self.btn_event()
 
-        # value setting
+        # system scenario value
+        self.client_connect = None
+        self.client_request_time = None
+        self.recv_count = None
+        self.fe_send_time = None
+        self.fe_check = None
+        self.fe_num = None
+        self.request_timer = QTimer()
+        self.request_timer.start(5000)
+        self.request_timer.timeout.connect(self.request_check_timer)
+
+        # S/W value
         self.local_ip = None
         self.center_ip = None
         self.client_socket = None
@@ -35,20 +46,29 @@ class main_function(QWidget):
         self.category_num = None
         self.acc_speed = None
         self.calc_speed = None
-        self.use_reverse = None
+        self.use_unexpected = None
+
         self.value_setting()
 
     def value_setting(self):
-        # self.local_ip = '192.168.000.007'
-        self.local_ip = '127.0.0.1'
+        # system scenario value
+        self.fe_check = True
+        self.fe_num = 0
+
+        # S/W value
+        self.client_connect = False
+        # self.local_ip = '192.168.000.001'
+        self.local_ip = '127.000.000.001'
         self.local_ex_ip = '183.99.41.239'
         self.center_ip = '123.456.789.123'
         self.lane_num = 2
-        self.collect_cycle = 30
-        self.category_num = 10
+        self.collect_cycle = 10
+        self.category_num = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
         self.acc_speed = 1
         self.calc_speed = 1
-        self.use_reverse = 0
+        self.use_unexpected = 1
+
+
 
 
 
@@ -59,7 +79,7 @@ class main_function(QWidget):
 
     def set_ui(self):
         # socket
-        self.ui.sock_ip_input.setText("127.0.0.7")
+        self.ui.sock_ip_input.setText("127.0.0.1")
         self.ui.sock_port_input.setText("30100")
 
         self.ui.op_FF_btn.setEnabled(False)
@@ -110,7 +130,6 @@ class main_function(QWidget):
         # test
         self.ui.test_btn.clicked.connect(self.test_btn_click)
         # endregion
-
 
     def test_btn_click(self):
         self.sock.socket_send_msg("/end")
@@ -196,14 +215,17 @@ class main_function(QWidget):
             destination_ip = d_recv_msg[16:31]
             self.center_ip = msg_sender_ip
 
-            # 수신메시지의 목적지IP == local IP
+            # 수신메시지의 목적지 IP == local IP
             if destination_ip == self.local_ip:
+                self.client_request_time = time.time()
                 print("RX_msg: [", recv_msg.decode('utf-16'), "]")
                 if msg_op == chr(0xFF):
                     self.sock.send_FF_res_msg(self.local_ip, self.center_ip)
+                    self.client_connect = True
                     self.connect_time = time.time()
                 elif msg_op == chr(0xFE):
                     # self.sock.send_FE_res_msg(self.local_ip, self.center_ip)
+                    self.fe_check = True
                     print('0xFE response')
                 elif msg_op == chr(0x01):
                     self.device_sync(msg_op, d_recv_msg)
@@ -212,7 +234,8 @@ class main_function(QWidget):
                 elif msg_op == chr(0x04):
                     self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.collect_cycle)
                 elif msg_op == chr(0x05):
-                    self.sock.send_05_res_msg(self.local_ip, self.center_ip)
+                    self.db.get_speed()
+                    self.sock.send_05_res_msg(self.local_ip, self.center_ip, sdsdfs)
                 elif msg_op == chr(0x07):
                     self.sock.send_07_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x0C):
@@ -221,17 +244,19 @@ class main_function(QWidget):
                 elif msg_op == chr(0x0D):
                     self.sock.send_0D_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x0E):
+                    self.device_sync(msg_op, d_recv_msg)
                     self.sock.send_0E_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x0F):
                     index = int(ord(d_recv_msg[44]))
                     self.sock.send_0F_res_msg(self.local_ip, self.center_ip, index,
-                                              self.lane_num, self.collect_cycle, self.category_num, self.acc_speed, self.calc_speed, self.use_reverse)
+                                              self.lane_num, self.collect_cycle, self.category_num, self.acc_speed, self.calc_speed, self.use_unexpected)
                 elif msg_op == chr(0x11):
                     request_time = time.time()
                     self.sock.send_11_res_msg(self.local_ip, self.center_ip, self.connect_time, request_time)
                 elif msg_op == chr(0x13):
                     self.sock.send_13_res_msg(self.local_ip, self.center_ip, d_recv_msg)
                 elif msg_op == chr(0x15):
+                    self.db.get_version_num()
                     self.sock.send_15_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x16):
                     self.sock.send_16_res_msg(self.local_ip, self.center_ip)
@@ -243,20 +268,81 @@ class main_function(QWidget):
                     self.sock.send_19_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x1E):
                     self.sock.send_1E_res_msg(self.local_ip, self.center_ip)
+            elif destination_ip == self.center_ip:
+                print("msg   : [", recv_msg.decode('utf-16'), "]")
             else:
-                print("TX_msg: /", recv_msg.decode('utf-16'), "/")
+                print("TX_msg: [", recv_msg.decode('utf-16'), "]")
     # endregion
 
+    def request_check_timer(self):
+        if self.client_connect:
+            now_time = time.time()
+            time_delay = now_time - self.client_request_time
+            # print("delay: ", time_delay)
+
+            if (time_delay > 300) & self.fe_check:
+                self.sock.send_FE_msg(self.local_ip, self.center_ip)
+                self.fe_send_time = time.time()
+                self.fe_check = False
+
+            if not self.fe_check:
+                fe_delay = now_time - self.fe_send_time
+                if (fe_delay > 5) & (self.fe_num < 2):
+                    self.sock.send_FE_msg(self.local_ip, self.center_ip)
+                    self.fe_send_time = time.time()
+                    self.fe_num += 1
+                else:
+                    self.client_connect = False
+                    self.fe_num = 0
+
+        else:
+            print("client not connect")
+
     def device_sync(self, op, msg):
+        lane = 1
         if op == chr(0x01):
             self.frame_number_set = msg[44]
         elif op == chr(0x0C):
             self.lane_num = 2
             self.collect_cycle = 30
-            self.category_num = 10
+            self.category_num = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+            self.acc_speed = 1
+            self.calc_speed = 1
+            self.use_unexpected = 1
             # 이외의 설정값 등 리셋
-
-
+        elif op == chr(0x0E):
+            index = int(ord(msg[44]))
+            # 차로 지정
+            if index == 1:
+                data = msg[45:]
+                data_1 = int(ord(data[0]))
+                data_2 = int(ord(data[1]))
+                if data_1 != 0:   # 1byte
+                    for i in range(0, 8):
+                        if (data_1 >> i) & 0x01 == 0x01:
+                            self.lane_num = i + 1
+                else: # 2 byte
+                    for i in range(0, 8):
+                        if (data_2 >> i) & 0x01 == 0x01:
+                            self.lane_num = (i + 1) + 8
+            # 수집 주기
+            elif index == 3:
+                data = int(ord(msg[45]))
+                self.collect_cycle = data
+            # 차량 속도 구분
+            elif index == 5:
+                data = msg[45:]
+                for i in range(len(data)):
+                    self.category_num[i] = int(ord(data[i]))
+            elif index == 7:
+                data = int(ord(msg[45]))
+                self.acc_speed = data
+            elif index == 9:
+                data = int(ord(msg[45]))
+                self.calc_speed = data
+            elif index == 19:
+                data = int(ord(msg[45]))
+                self.use_unexpected = data
 
     # region test send msg
     def op_FF_btn_click(self):
@@ -265,7 +351,7 @@ class main_function(QWidget):
 
     def op_FE_btn_click(self):
         print("FE btn_click")
-        self.sock.send_FE_res_msg(self.local_ip, self.center_ip)
+        self.sock.send_FE_msg(self.local_ip, self.center_ip)
 
     def op_01_btn_click(self):
         print("01 btn_click")
