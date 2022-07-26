@@ -1,6 +1,6 @@
 import sys
 import os
-import win32api
+# import win32api
 import datetime
 
 class Other_function:
@@ -19,7 +19,7 @@ class Other_function:
             minute = int(daylist[5])
             sec = int(daylist[6])
 
-            win32api.SetSystemTime(year, month, dayOfWeek, day, hour, minute, sec, 0)
+            # win32api.SetSystemTime(year, month, dayOfWeek, day, hour, minute, sec, 0)
 
     def length_calc(self, length):
         length_1 = length & 0xFF

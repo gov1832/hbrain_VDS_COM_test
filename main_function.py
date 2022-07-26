@@ -5,7 +5,7 @@ import time
 import datetime
 from multiprocessing import Process
 import threading
-import win32api
+# import win32api
 
 from db import DB_function
 from Socket import Socket_function
@@ -70,7 +70,7 @@ class main_function(QWidget):
         self.controller_type = 'VD'
         self.controller_index = 1
         self.lane_num = 2
-        self.collect_cycle = 10
+        self.collect_cycle = 30
         self.category_num = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
         self.acc_speed = 1
         self.calc_speed = 1
@@ -143,7 +143,8 @@ class main_function(QWidget):
         # t2.start()
         # t3.start()
         # self.sock.socket_send_msg("/end")
-        self.db.get_version_num()
+        # self.db.get_version_num()
+        self.db.get_traffic_data(cycle=self.collect_cycle)
         # print(win32api.GetSystemTime())
         # dayOfWeek = datetime.date(2022, 7, 25).weekday()
         # print(dayOfWeek)
