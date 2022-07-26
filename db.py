@@ -15,11 +15,17 @@ class DB_function:
             sql = 'SELECT time FROM vds_version'
             cur.execute(sql)
 
-            result = 0
+            result = []
             for i in cur:
-                result = i[0]
+                result.append(i[0])
+            result.sort(reverse=True)
 
+            sql = "SELECT * FROM vds_version WHERE time='" + result[0] + "';"
+            cur.execute(sql)
+            for i in cur:
+                version_list.append(i)
 
+            db_connect.close()
         except Exception as e:
             print("err: ", e)
 

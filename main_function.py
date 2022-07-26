@@ -2,11 +2,14 @@ from PyQt5.QtCore   import QTimer
 from PyQt5.QtWidgets import *
 
 import time
+import datetime
 from multiprocessing import Process
 import threading
+import win32api
 
 from db import DB_function
 from Socket import Socket_function
+from other import Other_function
 
 class main_function(QWidget):
     def __init__(self, ui):
@@ -16,6 +19,7 @@ class main_function(QWidget):
 
         self.db = DB_function()
         self.sock = Socket_function()
+        self.ot = Other_function()
 
         self.timer = QTimer()
         self.timer.start(1000)
@@ -71,10 +75,6 @@ class main_function(QWidget):
         self.acc_speed = 1
         self.calc_speed = 1
         self.use_unexpected = 1
-
-
-
-
 
     def time_bar_timeout(self):
         now = time.localtime()
@@ -143,22 +143,25 @@ class main_function(QWidget):
         # t2.start()
         # t3.start()
         # self.sock.socket_send_msg("/end")
-        # self.db.get_version_num()
-        data = list()
-        data.append(chr(0x20))
-        data.append(chr(0x22))
-        data.append(chr(0x07))
-        data.append(chr(0x26))
-        data.append(chr(0x13))
-        data.append(chr(0x44))
-        data.append(chr(0x30))
-        day = ''
-        for i in data:
-            day = day+i
-        print(day)
-        for i in day:
-            temp = hex(ord(i))
-            print(temp[2:])
+        self.db.get_version_num()
+        # print(win32api.GetSystemTime())
+        # dayOfWeek = datetime.date(2022, 7, 25).weekday()
+        # print(dayOfWeek)
+        # data = list()
+        # data.append(chr(0x20))
+        # data.append(chr(0x22))
+        # data.append(chr(0x07))
+        # data.append(chr(0x26))
+        # data.append(chr(0x13))
+        # data.append(chr(0x44))
+        # data.append(chr(0x30))
+        # day = ''
+        # for i in data:
+        #     day = day+i
+        # print(day)
+        # for i in day:
+        #     temp = hex(ord(i))
+        #     print(temp[2:])
 
     def test1(self):
         start = time.time()
@@ -290,8 +293,8 @@ class main_function(QWidget):
                 elif msg_op == chr(0x13):
                     self.sock.send_13_res_msg(self.local_ip, self.center_ip, d_recv_msg)
                 elif msg_op == chr(0x15):
-                    self.db.get_version_num()
-                    self.sock.send_15_res_msg(self.local_ip, self.center_ip)
+                    version_list = self.db.get_version_num()
+                    self.sock.send_15_res_msg(self.local_ip, self.center_ip, version_list)
                 elif msg_op == chr(0x16):
                     self.sock.send_16_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x17):
@@ -300,7 +303,8 @@ class main_function(QWidget):
                     self.device_sync(msg_op, d_recv_msg)
                     self.sock.send_18_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x19):
-                    self.sock.send_19_res_msg(self.local_ip, self.center_ip)
+                    if self.use_unexpected == 1:
+                        self.sock.send_19_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x1E):
                     self.sock.send_1E_res_msg(self.local_ip, self.center_ip)
             elif destination_ip == self.center_ip:
@@ -382,14 +386,12 @@ class main_function(QWidget):
                 data = int(ord(msg[45]))
                 self.use_unexpected = data
         elif op == chr(0x18):
-            data = msg[45:]
-
+            data = msg[44:]
+            day_list = list()
             for i in data:
-                day = day + i
-            print(day)
-            for i in day:
                 temp = hex(ord(i))
-                print(temp[2:])
+                day_list.append(temp[2:])
+            self.ot.win_set_time(day_list)
 
     # region test send msg
     def op_FF_btn_click(self):
