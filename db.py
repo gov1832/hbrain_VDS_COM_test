@@ -24,6 +24,7 @@ class DB_function:
             cur.execute(sql)
             for i in cur:
                 version_list.append(i)
+            print('test')
 
             db_connect.close()
         except Exception as e:
