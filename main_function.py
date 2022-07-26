@@ -38,6 +38,8 @@ class main_function(QWidget):
         # S/W value
         self.local_ip = None
         self.center_ip = None
+        self.controller_type = None
+        self.controller_index = None
         self.client_socket = None
         self.frame_number_set = None
         self.connect_time = None
@@ -61,6 +63,8 @@ class main_function(QWidget):
         self.local_ip = '127.000.000.001'
         self.local_ex_ip = '183.99.41.239'
         self.center_ip = '123.456.789.123'
+        self.controller_type = 'VD'
+        self.controller_index = 1
         self.lane_num = 2
         self.collect_cycle = 10
         self.category_num = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
@@ -132,8 +136,38 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
+        # t1 = threading.Thread(target=self.test1, args=())
+        # t2 = threading.Thread(target=self.test1, args=())
+        # t3 = threading.Thread(target=self.test1, args=())
+        # t1.start()
+        # t2.start()
+        # t3.start()
         # self.sock.socket_send_msg("/end")
-        self.db.get_version_num()
+        # self.db.get_version_num()
+        data = list()
+        data.append(chr(0x20))
+        data.append(chr(0x22))
+        data.append(chr(0x07))
+        data.append(chr(0x26))
+        data.append(chr(0x13))
+        data.append(chr(0x44))
+        data.append(chr(0x30))
+        day = ''
+        for i in data:
+            day = day+i
+        print(day)
+        for i in day:
+            temp = hex(ord(i))
+            print(temp[2:])
+
+    def test1(self):
+        start = time.time()
+        s = 0
+        for i in range(100000):
+            s += i
+        end = time.time()
+        print("1-----------cha:", end-start)
+
 
     # region btn click function
     def socket_connect_btn_click(self):
@@ -263,6 +297,7 @@ class main_function(QWidget):
                 elif msg_op == chr(0x17):
                     self.sock.send_17_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x18):
+                    self.device_sync(msg_op, d_recv_msg)
                     self.sock.send_18_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x19):
                     self.sock.send_19_res_msg(self.local_ip, self.center_ip)
@@ -334,15 +369,27 @@ class main_function(QWidget):
                 data = msg[45:]
                 for i in range(len(data)):
                     self.category_num[i] = int(ord(data[i]))
+            # 누적 속도
             elif index == 7:
                 data = int(ord(msg[45]))
                 self.acc_speed = data
+            # 속도 계산
             elif index == 9:
                 data = int(ord(msg[45]))
                 self.calc_speed = data
+            # 돌발 사용 여부
             elif index == 19:
                 data = int(ord(msg[45]))
                 self.use_unexpected = data
+        elif op == chr(0x18):
+            data = msg[45:]
+
+            for i in data:
+                day = day + i
+            print(day)
+            for i in day:
+                temp = hex(ord(i))
+                print(temp[2:])
 
     # region test send msg
     def op_FF_btn_click(self):
