@@ -77,18 +77,18 @@ class Socket_function:
     #     send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
     #     self.socket_send_msg(send_msg)
 
-    def send_04_res_msg(self, sender_ip, destination_ip, frame, lane):
+    def send_04_res_msg(self, sender_ip, destination_ip, frame, lane, traffic_data):
         controller_kind = 'VD'
         controller_number = '12345'
         point = chr(0x2D)
         opcode = chr(0x04)
         frame_num = chr(frame)
         lane_num = chr(lane)
-        lane_1_1 = chr(random.randrange(50, 100))
-        lane_1_2 = chr(random.randrange(50, 100))
-        lane_2_1 = chr(random.randrange(50, 100))
-        lane_2_2 = chr(random.randrange(50, 100))
-        lane_data = lane_1_1 + lane_1_2 + lane_2_1 + lane_2_2
+
+        # traffic data => [[차량수, 속도],[차량수, 속도]]
+        lane_data = ''
+        for i in traffic_data:
+            lane_data = lane_data + chr(i[0]) + chr(i[1])
         data = frame_num + lane_num + lane_data
         length = self.ot.length_calc(1 + len(data))
 

@@ -40,15 +40,14 @@ class DB_function:
         traffic_data = []
 
         try:
-            if sync_time == 0:
+            if sync_time is None:
                 print('nack')
             else:
                 db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
                 cur = db_connect.cursor()
-                # temp = time.localtime(sync_time - cycle)
-                # data_start = time.strftime("%Y-%m-%d %H:%M:%S", temp)
-                data_start = '2022-07-25 20:17:00'
-                traffic_temp = []
+                temp = time.localtime(sync_time - cycle)
+                data_start = time.strftime("%Y-%m-%d %H:%M:%S", temp)
+                # data_start = '2022-07-25 20:17:00'
 
                 sql = "SELECT * FROM obj_info WHERE time >='" + data_start + "' ORDER BY ID asc, time asc;"
                 cur.execute(sql)
@@ -89,15 +88,6 @@ class DB_function:
                 traffic_data.append(traffic_temp)
                 traffic_temp = [temp_2[0], round(temp_2[1] / num_2)]
                 traffic_data.append(traffic_temp)
-
-                # time_list.sort(reverse=True)
-                # for i in range(len(time_list)):
-                #     sql = "SELECT * FROM obj_info WHERE time='" + time_list[i][:23] + "';"
-                #     cur.execute(sql)
-                #     for data in cur:
-                #         traffic_temp.append(data)
-                print(traffic_data)
-
 
                 db_connect.close()
         except Exception as e:

@@ -277,7 +277,7 @@ class main_function(QWidget):
                 elif msg_op == chr(0x04):
                     self.traffic_data = self.db.get_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
                     if self.traffic_data != '':
-                        self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.frame_number_set, self.lane_num)
+                        self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.frame_number_set, self.lane_num, self.traffic_data)
                 elif msg_op == chr(0x05):
                     self.sock.send_05_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x07):
