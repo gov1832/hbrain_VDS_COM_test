@@ -49,12 +49,6 @@ class DB_function:
                 # data_start = time.strftime("%Y-%m-%d %H:%M:%S", temp)
                 data_start = '2022-07-25 20:17:00'
                 traffic_temp = []
-                sql = "SELECT distinct Zone FROM obj_info ORDER BY Zone asc;"
-                cur.execute(sql)
-                zone_list = []
-                for i in cur:
-                    zone_list.append(i[0])
-                print(zone_list)
 
                 sql = "SELECT * FROM obj_info WHERE time >='" + data_start + "' ORDER BY ID asc, time asc;"
                 cur.execute(sql)
@@ -85,10 +79,16 @@ class DB_function:
                         else:
                             temp_2[0] += 1
                             temp_2[1] += result[i][4]
+                    if (i+1) == (len(result)-1):
+                        if result[i+1][12] % lane == 1:
+                            num_1 += 1
+                        if result[i+1][12] % lane == 0:
+                            num_2 += 1
 
-                temp_1[1] / num_1
-                traffic_temp.append(temp_1)
-                traffic_data.append(temp_2)
+                traffic_temp = [temp_1[0], round(temp_1[1] / num_1)]
+                traffic_data.append(traffic_temp)
+                traffic_temp = [temp_2[0], round(temp_2[1] / num_2)]
+                traffic_data.append(traffic_temp)
 
                 # time_list.sort(reverse=True)
                 # for i in range(len(time_list)):
@@ -96,7 +96,7 @@ class DB_function:
                 #     cur.execute(sql)
                 #     for data in cur:
                 #         traffic_temp.append(data)
-                print(traffic_temp)
+                print(traffic_data)
 
 
                 db_connect.close()
