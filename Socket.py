@@ -77,19 +77,13 @@ class Socket_function:
     #     send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
     #     self.socket_send_msg(send_msg)
 
-    def send_04_res_msg(self, sender_ip, destination_ip, collect_cycle):
+    def send_04_res_msg(self, sender_ip, destination_ip, frame, lane):
         controller_kind = 'VD'
         controller_number = '12345'
         point = chr(0x2D)
         opcode = chr(0x04)
-        now_t = localtime()
-        sec = now_t.tm_min * 60 + now_t.tm_sec
-        print(sec)
-        if collect_cycle != 0:
-            frame_num = chr(int(sec / collect_cycle) + 1)
-        else:
-            frame_num = chr(0)
-        lane_num = '2'
+        frame_num = chr(frame)
+        lane_num = chr(lane)
         lane_1_1 = chr(random.randrange(50, 100))
         lane_1_2 = chr(random.randrange(50, 100))
         lane_2_1 = chr(random.randrange(50, 100))
@@ -318,24 +312,37 @@ class Socket_function:
             self.socket_send_msg(send_msg)
 
     # 개별 차량 데이터 응답
-    def send_16_res_msg(self, sender_ip, destination_ip):
+    def send_16_res_msg(self, sender_ip, destination_ip, sync_time):
         controller_kind = 'VD'
         controller_number = '12345'
         point = chr(0x2D)
-        opcode = chr(0xFE)
-        data = chr(0x06)  # ack
+        opcode = chr(0x16)
+        # data = chr(0x06)  # ack
+        frame = chr(0x01)
+        car_count = chr(0x00) + chr(0x02)
+        lane_num_1 = chr(0x01)
+        time_1 = chr(10)
+        speed_1 = chr(75)
+        lane_num_2 = chr(0x01)
+        time_2 = chr(10)
+        speed_2 = chr(70)
+        data = frame + car_count + lane_num_1 + time_1 + speed_1 + lane_num_2 + time_2 + speed_2
+
         length = self.ot.length_calc(1 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         self.socket_send_msg(send_msg)
 
     # 정지 영상 응답
-    def send_17_res_msg(self, sender_ip, destination_ip):
+    def send_17_res_msg(self, sender_ip, destination_ip, cam):
         controller_kind = 'VD'
         controller_number = '12345'
         point = chr(0x2D)
-        opcode = chr(0xFE)
-        data = chr(0x06)  # ack
+        opcode = chr(0x17)
+        image_count = chr(1)
+        image_info = '1111' + '122334454524ofkcdo'
+        data = cam + image_count + image_info
+
         length = self.ot.length_calc(1 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
@@ -359,7 +366,7 @@ class Socket_function:
         controller_number = '12345'
         point = chr(0x2D)
         opcode = chr(0xFE)
-        data = chr(0x06)  # ack
+        data = '100000001233444444444455555555556666'
         length = self.ot.length_calc(1 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
@@ -369,8 +376,8 @@ class Socket_function:
         controller_kind = 'VD'
         controller_number = '12345'
         point = chr(0x2D)
-        opcode = chr(0xFE)
-        data = chr(0x06)  # ack
+        opcode = chr(0x1E)
+        data = chr(0x00) + chr(0x00) + chr(0x01) + chr(0x09) + chr(0x09) + chr(0x09) + chr(0x09) + chr(0x09) + chr(0x01) + chr(40) + chr(220) + chr(220)
         length = self.ot.length_calc(1 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
