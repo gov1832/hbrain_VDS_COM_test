@@ -47,15 +47,15 @@ class main_function(QWidget):
         self.client_socket = None
         self.frame_number_set = None
         self.connect_time = None
-        self.sync_time =None
+        self.sync_time = None
         self.lane_num = None
         self.collect_cycle = None
         self.category_num = None
         self.acc_speed = None
         self.calc_speed = None
         self.use_unexpected = None
-        self.speed_request_time = None
         self.individual_traffic_data = None
+        self.traffic_data = None
         self.value_setting()
 
     def value_setting(self):
@@ -73,8 +73,7 @@ class main_function(QWidget):
         self.controller_index = 1
         self.lane_num = 2
         self.collect_cycle = 30
-        self.speed_request_time = 30
-        self.category_num = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+        self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
         self.acc_speed = 1
         self.calc_speed = 1
         self.use_unexpected = 1
@@ -147,7 +146,8 @@ class main_function(QWidget):
         # t3.start()
         # self.sock.socket_send_msg("/end")
         # self.db.get_version_num()
-        self.db.get_individual_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)        # print(win32api.GetSystemTime())
+        self.db.get_traffic_data(cycle=self.collect_cycle, lane=2)
+        # print(win32api.GetSystemTime())
         # dayOfWeek = datetime.date(2022, 7, 25).weekday()
         # print(dayOfWeek)
         # data = list()
@@ -275,7 +275,9 @@ class main_function(QWidget):
                     # self.sock.send_01_res_msg(self.local_ip, sender_ip)
                     print("not ack")
                 elif msg_op == chr(0x04):
-                    self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.collect_cycle)
+                    self.traffic_data = self.db.get_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
+                    if self.traffic_data != '':
+                        self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.frame_number_set, self.lane_num)
                 elif msg_op == chr(0x05):
                     self.sock.send_05_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x07):
@@ -304,7 +306,8 @@ class main_function(QWidget):
                     self.individual_traffic_data = self.db.get_individual_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
                     self.sock.send_16_res_msg(self.local_ip, self.center_ip, self.frame_number_set)
                 elif msg_op == chr(0x17):
-                    self.sock.send_17_res_msg(self.local_ip, self.center_ip)
+                    cam = d_recv_msg[44]
+                    self.sock.send_17_res_msg(self.local_ip, self.center_ip, cam)
                 elif msg_op == chr(0x18):
                     self.device_sync(msg_op, d_recv_msg)
                     self.sock.send_18_res_msg(self.local_ip, self.center_ip)
@@ -345,12 +348,12 @@ class main_function(QWidget):
 
     def device_sync(self, op, msg):
         lane = 1
-        if op == chr(0x01):
-            self.frame_number_set = msg[44]
-        elif op == chr(0x0C):
+        # if op == chr(0x01):
+        #     self.frame_number_set = msg[44]
+        if op == chr(0x0C):
             self.lane_num = 2
             self.collect_cycle = 30
-            self.category_num = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+            self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
             self.acc_speed = 1
             self.calc_speed = 1
             self.use_unexpected = 1
