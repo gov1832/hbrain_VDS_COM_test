@@ -318,12 +318,12 @@ class Socket_function:
             self.socket_send_msg(send_msg)
 
     # 개별 차량 데이터 응답
-    def send_16_res_msg(self, sender_ip, destination_ip):
+    def send_16_res_msg(self, sender_ip, destination_ip, frame):
         controller_kind = 'VD'
         controller_number = '12345'
         point = chr(0x2D)
-        opcode = chr(0xFE)
-        data = chr(0x06)  # ack
+        opcode = chr(0x16)
+        data = frame
         length = self.ot.length_calc(1 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data

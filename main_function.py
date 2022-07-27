@@ -47,13 +47,15 @@ class main_function(QWidget):
         self.client_socket = None
         self.frame_number_set = None
         self.connect_time = None
+        self.sync_time =None
         self.lane_num = None
         self.collect_cycle = None
         self.category_num = None
         self.acc_speed = None
         self.calc_speed = None
         self.use_unexpected = None
-
+        self.speed_request_time = None
+        self.individual_traffic_data = None
         self.value_setting()
 
     def value_setting(self):
@@ -71,6 +73,7 @@ class main_function(QWidget):
         self.controller_index = 1
         self.lane_num = 2
         self.collect_cycle = 30
+        self.speed_request_time = 30
         self.category_num = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
         self.acc_speed = 1
         self.calc_speed = 1
@@ -144,8 +147,7 @@ class main_function(QWidget):
         # t3.start()
         # self.sock.socket_send_msg("/end")
         # self.db.get_version_num()
-        self.db.get_traffic_data(cycle=self.collect_cycle)
-        # print(win32api.GetSystemTime())
+        self.db.get_individual_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)        # print(win32api.GetSystemTime())
         # dayOfWeek = datetime.date(2022, 7, 25).weekday()
         # print(dayOfWeek)
         # data = list()
@@ -267,7 +269,9 @@ class main_function(QWidget):
                     self.fe_check = True
                     print('0xFE response')
                 elif msg_op == chr(0x01):
-                    self.device_sync(msg_op, d_recv_msg)
+                    # self.device_sync(msg_op, d_recv_msg)
+                    self.frame_number_set = d_recv_msg[44]
+                    self.sync_time = time.time()
                     # self.sock.send_01_res_msg(self.local_ip, sender_ip)
                     print("not ack")
                 elif msg_op == chr(0x04):
@@ -297,7 +301,8 @@ class main_function(QWidget):
                     version_list = self.db.get_version_num()
                     self.sock.send_15_res_msg(self.local_ip, self.center_ip, version_list)
                 elif msg_op == chr(0x16):
-                    self.sock.send_16_res_msg(self.local_ip, self.center_ip)
+                    self.individual_traffic_data = self.db.get_individual_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
+                    self.sock.send_16_res_msg(self.local_ip, self.center_ip, self.frame_number_set)
                 elif msg_op == chr(0x17):
                     self.sock.send_17_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x18):
