@@ -304,7 +304,8 @@ class main_function(QWidget):
                     self.sock.send_15_res_msg(self.local_ip, self.center_ip, version_list)
                 elif msg_op == chr(0x16):
                     self.individual_traffic_data = self.db.get_individual_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
-                    self.sock.send_16_res_msg(self.local_ip, self.center_ip, self.frame_number_set)
+                    if self.individual_traffic_data != '':
+                        self.sock.send_16_res_msg(self.local_ip, self.center_ip, self.frame_number_set, self.individual_traffic_data)
                 elif msg_op == chr(0x17):
                     cam = d_recv_msg[44]
                     self.sock.send_17_res_msg(self.local_ip, self.center_ip, cam)
@@ -401,6 +402,10 @@ class main_function(QWidget):
                 temp = hex(ord(i))
                 day_list.append(temp[2:])
             self.ot.win_set_time(day_list)
+
+        parameter_list = [self.lane_num, self.collect_cycle, self.category_num, self.acc_speed, self.calc_speed, self.use_unexpected]
+        self.db.set_paramete_data(parameter_list)
+
 
     # region test send msg
     def op_FF_btn_click(self):
