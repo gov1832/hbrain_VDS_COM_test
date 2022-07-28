@@ -56,6 +56,8 @@ class main_function(QWidget):
         self.use_unexpected = None
         self.individual_traffic_data = None
         self.traffic_data = None
+        self.ntraffic_data = None
+        self.speed_data = None
         self.value_setting()
 
     def value_setting(self):
@@ -146,7 +148,9 @@ class main_function(QWidget):
         # t3.start()
         # self.sock.socket_send_msg("/end")
         # self.db.get_version_num()
-        self.db.get_traffic_data(cycle=self.collect_cycle, lane=2)
+        #self.db.get_traffic_data(cycle=self.collect_cycle, lane=2)
+        #self.db.get_ntraffic_data(lane=self.lane_num)
+        self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num)
         # print(win32api.GetSystemTime())
         # dayOfWeek = datetime.date(2022, 7, 25).weekday()
         # print(dayOfWeek)
@@ -279,8 +283,10 @@ class main_function(QWidget):
                     if self.traffic_data != '':
                         self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.frame_number_set, self.lane_num, self.traffic_data)
                 elif msg_op == chr(0x05):
+                    self.speed_data = self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num)
                     self.sock.send_05_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x07):
+                    self.ntraffic_data = self.db.get_ntraffic_data(lane=self.lane_num)
                     self.sock.send_07_res_msg(self.local_ip, self.center_ip)
                 elif msg_op == chr(0x0C):
                     self.device_sync(msg_op, d_recv_msg)
