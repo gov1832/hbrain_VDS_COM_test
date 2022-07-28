@@ -312,21 +312,15 @@ class Socket_function:
             self.socket_send_msg(send_msg)
 
     # 개별 차량 데이터 응답
-    def send_16_res_msg(self, sender_ip, destination_ip, frame):
+    def send_16_res_msg(self, sender_ip, destination_ip, frame, individual_traffic_data):
         controller_kind = 'VD'
         controller_number = '12345'
         point = chr(0x2D)
         opcode = chr(0x16)
-        # data = chr(0x06)  # ack
-        frame = chr(0x01)
-        car_count = chr(0x00) + chr(0x02)
-        lane_num_1 = chr(0x01)
-        time_1 = chr(10)
-        speed_1 = chr(75)
-        lane_num_2 = chr(0x01)
-        time_2 = chr(10)
-        speed_2 = chr(70)
-        data = frame + car_count + lane_num_1 + time_1 + speed_1 + lane_num_2 + time_2 + speed_2
+        car_count = chr(len(individual_traffic_data) >> 8) + chr(len(individual_traffic_data) & 0xFF)
+        data = frame + car_count
+        for i in individual_traffic_data:
+            data = data + str(i[0]) + str(i[1]) + str(i[2])
 
         length = self.ot.length_calc(1 + len(data))
 
