@@ -140,35 +140,8 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
-        # t1 = threading.Thread(target=self.test1, args=())
-        # t2 = threading.Thread(target=self.test1, args=())
-        # t3 = threading.Thread(target=self.test1, args=())
-        # t1.start()
-        # t2.start()
-        # t3.start()
-        # self.sock.socket_send_msg("/end")
-        # self.db.get_version_num()
-        #self.db.get_traffic_data(cycle=self.collect_cycle, lane=2)
-        #self.db.get_ntraffic_data(lane=self.lane_num)
-        self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num)
-        # print(win32api.GetSystemTime())
-        # dayOfWeek = datetime.date(2022, 7, 25).weekday()
-        # print(dayOfWeek)
-        # data = list()
-        # data.append(chr(0x20))
-        # data.append(chr(0x22))
-        # data.append(chr(0x07))
-        # data.append(chr(0x26))
-        # data.append(chr(0x13))
-        # data.append(chr(0x44))
-        # data.append(chr(0x30))
-        # day = ''
-        # for i in data:
-        #     day = day+i
-        # print(day)
-        # for i in day:
-        #     temp = hex(ord(i))
-        #     print(temp[2:])
+        data = [[3001,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000],[3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000]]
+        self.sock.send_05_res_msg(self.local_ip, self.center_ip, data)
 
     def test1(self):
         start = time.time()
@@ -177,7 +150,6 @@ class main_function(QWidget):
             s += i
         end = time.time()
         print("1-----------cha:", end-start)
-
 
     # region btn click function
     def socket_connect_btn_click(self):
@@ -284,10 +256,12 @@ class main_function(QWidget):
                         self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.frame_number_set, self.lane_num, self.traffic_data)
                 elif msg_op == chr(0x05):
                     self.speed_data = self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num)
-                    self.sock.send_05_res_msg(self.local_ip, self.center_ip)
+                    if self.speed_data != '':
+                        self.sock.send_05_res_msg(self.local_ip, self.center_ip, self.speed_data)
                 elif msg_op == chr(0x07):
                     self.ntraffic_data = self.db.get_ntraffic_data(lane=self.lane_num)
-                    self.sock.send_07_res_msg(self.local_ip, self.center_ip)
+                    if self.ntraffic_data != '':
+                        self.sock.send_07_res_msg(self.local_ip, self.center_ip, self.ntraffic_data)
                 elif msg_op == chr(0x0C):
                     self.device_sync(msg_op, d_recv_msg)
                     self.sock.send_0C_res_msg(self.local_ip, self.center_ip)
