@@ -8,33 +8,6 @@ from PyQt5.QtWidgets    import *
 
 from main_function import main_function
 
-
-"""
-test for gitr
-test test
-stees
-t
-set
-se
-t
-set
-se
-t
-s
-
-:parameter
-se
-t
-s
-et
-se
-t
-s
-et
-s
-et
-
-"""
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()

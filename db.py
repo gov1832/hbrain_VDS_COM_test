@@ -162,36 +162,6 @@ class DB_function:
                     sql = "SELECT * FROM obj_info where time >= '" + data_start + "' order by ID asc, time asc"
                     cur.execute(sql)
 
-                result = cur.fetchall()
-
-                count = [0]
-                limit_len = 40
-                for i in range(1, len(result)):
-                    # print(result[i])
-                    if (abs(result[i][3] - result[i - 1][3]) >= self.distlong_diff) or (
-                            abs(result[i][1] - result[i - 1][1]) > 0):
-                        count.append(i)
-                count.append(len(result))
-                # print(len(result))
-
-                for i in range(1, len(count)):
-                    cardata = []
-                    carspeed = 0
-                    carlane = 0
-                    carcont = 0
-                    for j in range(count[i - 1], count[i]):
-                        carcont += 1
-                        carspeed += result[j][4]
-                        if (result[j][12] % lane) == 0:
-                            carlane += lane
-                        else:
-                            carlane += (result[j][12] % lane)
-
-                    cardata.append(round(carlane / carcont))
-                    cardata.append((result[count[i - 1]][0] - data_count).seconds)
-                    cardata.append(carspeed / carcont)
-                    individual_traffic_data.append(cardata)
-
                 db_connect.close()
         except Exception as e:
             print("err: ", e)
@@ -219,7 +189,7 @@ class DB_function:
 
         return ntraffic_data
 
-    def get_speed_data(self, lane=2,cnum=[0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111],
+    def get_speed_data(self, lane=2,cnum=[0,11,21,31,41,51,61,71,81,91,101,111],
                        host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
         speed_data = []
 
@@ -229,14 +199,16 @@ class DB_function:
 
             for i in range(lane):
                 sql = "SELECT * FROM cumulative_velocity where Lane=" +str(i+1)+ " order by ID asc"
+
                 cur.execute(sql)
-                lane_speed = [0,0,0,0,0,0,0,0,0,0,0,0]
                 result = cur.fetchall()
-                for res in result:
-                    for i in reversed(range(len(cnum))):
-                        if res[2] >= cnum[i]:
-                            lane_speed[i] += 1
-                            break
+                if result != '':
+                    lane_speed = [0,0,0,0,0,0,0,0,0,0,0,0]
+                    for res in result:
+                        for i in reversed(range(len(cnum))):
+                            if res[2] >= cnum[i]:
+                                lane_speed[i] += 1
+                                break
 
                 speed_data.append(lane_speed)
 
