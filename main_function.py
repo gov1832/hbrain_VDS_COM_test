@@ -68,11 +68,12 @@ class main_function(QWidget):
         # S/W value
         self.client_connect = False
         # self.local_ip = '192.168.000.001'
-        self.local_ip = '127.000.000.001'
+        self.local_ip = self.ot.make_16ip(sip=self.ui.sock_ip_input.text())
         self.local_ex_ip = '183.99.41.239'
         self.center_ip = '123.456.789.123'
         self.controller_type = 'VD'
-        self.controller_index = 1
+        self.controller_index = chr(0x01) + chr(0x01) + chr(0x01) + chr(0x01) + chr(0x01)
+        self.controller_station = self.controller_type + self.controller_index
         self.lane_num = 2
         self.collect_cycle = 30
         self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
@@ -150,7 +151,8 @@ class main_function(QWidget):
         # self.db.get_version_num()
         #self.db.get_traffic_data(cycle=self.collect_cycle, lane=2)
         #self.db.get_ntraffic_data(lane=self.lane_num)
-        self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num)
+        #self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num)
+        self.ot.nack_find()
         # print(win32api.GetSystemTime())
         # dayOfWeek = datetime.date(2022, 7, 25).weekday()
         # print(dayOfWeek)
@@ -245,11 +247,14 @@ class main_function(QWidget):
 
     def parsing_msg(self, recv_msg):
         d_recv_msg = recv_msg.decode('utf-16')
+        #self.ot.nack_find(d_recv_msg) -> return [true, op, 0] / [false, op, 0x03]  op -> chr(0x15) nack-> chr(0x06)
 
         # for i in range(len(d_recv_msg)):
         #     print(i, "   ", d_recv_msg[i])
         # print(msg_op)
-        if len(d_recv_msg) > 42:
+        result = self.ot.nack_find(msg=d_recv_msg,csn=self.controller_station)
+        if result[0] == True:
+        # if len(d_recv_msg) > 42:
             # print("recv_msg: ", end=' ')
             # for data in d_recv_msg:
             #     print(hex(ord(data)), end='/')
@@ -265,7 +270,7 @@ class main_function(QWidget):
                 self.client_request_time = time.time()
                 print("RX_msg: [", recv_msg.decode('utf-16'), "]")
                 if msg_op == chr(0xFF):
-                    self.sock.send_FF_res_msg(self.local_ip, self.center_ip)
+                    self.sock.send_FF_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                     self.client_connect = True
                     self.connect_time = time.time()
                 elif msg_op == chr(0xFE):
@@ -281,52 +286,63 @@ class main_function(QWidget):
                 elif msg_op == chr(0x04):
                     self.traffic_data = self.db.get_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
                     if self.traffic_data != '':
-                        self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.frame_number_set, self.lane_num, self.traffic_data)
+                        self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.frame_number_set, self.lane_num, self.traffic_data)
+                    else:
+                        list = [False, chr(0x04), chr(0x06)]
+                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x05):
                     self.speed_data = self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num)
-                    self.sock.send_05_res_msg(self.local_ip, self.center_ip)
+                    self.sock.send_05_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 elif msg_op == chr(0x07):
                     self.ntraffic_data = self.db.get_ntraffic_data(lane=self.lane_num)
-                    self.sock.send_07_res_msg(self.local_ip, self.center_ip)
+                    self.sock.send_07_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 elif msg_op == chr(0x0C):
                     self.device_sync(msg_op, d_recv_msg)
-                    self.sock.send_0C_res_msg(self.local_ip, self.center_ip)
+                    self.sock.send_0C_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 elif msg_op == chr(0x0D):
-                    self.sock.send_0D_res_msg(self.local_ip, self.center_ip)
+                    self.sock.send_0D_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 elif msg_op == chr(0x0E):
                     self.device_sync(msg_op, d_recv_msg)
-                    self.sock.send_0E_res_msg(self.local_ip, self.center_ip)
+                    self.sock.send_0E_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 elif msg_op == chr(0x0F):
                     index = int(ord(d_recv_msg[44]))
-                    self.sock.send_0F_res_msg(self.local_ip, self.center_ip, index,
+                    self.sock.send_0F_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index,index,
                                               self.lane_num, self.collect_cycle, self.category_num, self.acc_speed, self.calc_speed, self.use_unexpected)
                 elif msg_op == chr(0x11):
                     request_time = time.time()
-                    self.sock.send_11_res_msg(self.local_ip, self.center_ip, self.connect_time, request_time)
+                    self.sock.send_11_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.connect_time, request_time)
                 elif msg_op == chr(0x13):
-                    self.sock.send_13_res_msg(self.local_ip, self.center_ip, d_recv_msg)
+                    self.sock.send_13_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, d_recv_msg)
                 elif msg_op == chr(0x15):
                     version_list = self.db.get_version_num()
-                    self.sock.send_15_res_msg(self.local_ip, self.center_ip, version_list)
+                    self.sock.send_15_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, version_list)
                 elif msg_op == chr(0x16):
                     self.individual_traffic_data = self.db.get_individual_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
                     if self.individual_traffic_data != '':
-                        self.sock.send_16_res_msg(self.local_ip, self.center_ip, self.frame_number_set, self.individual_traffic_data)
+                        self.sock.send_16_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.frame_number_set, self.individual_traffic_data)
+                    else:
+                        list = [False, chr(0x16), chr(0x06)]
+                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x17):
                     cam = d_recv_msg[44]
-                    self.sock.send_17_res_msg(self.local_ip, self.center_ip, cam)
+                    self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, cam)
                 elif msg_op == chr(0x18):
                     self.device_sync(msg_op, d_recv_msg)
-                    self.sock.send_18_res_msg(self.local_ip, self.center_ip)
+                    self.sock.send_18_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 elif msg_op == chr(0x19):
                     if self.use_unexpected == 1:
-                        self.sock.send_19_res_msg(self.local_ip, self.center_ip)
+                        self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 elif msg_op == chr(0x1E):
-                    self.sock.send_1E_res_msg(self.local_ip, self.center_ip)
+                    self.sock.send_1E_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
+
             elif destination_ip == self.center_ip:
                 print("msg   : [", recv_msg.decode('utf-16'), "]")
             else:
                 print("TX_msg: [", recv_msg.decode('utf-16'), "]")
+        else:
+            self.center_ip =  d_recv_msg[0:15]
+            list = result
+            self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
     # endregion
 
     def request_check_timer(self):
