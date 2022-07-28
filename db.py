@@ -159,8 +159,6 @@ class DB_function:
                     index_list.append(i[0])
 
                 for data in parameter_list:
-                    for i in data:
-
                     sql = "SELECT * FROM obj_info where time >= '" + data_start + "' order by ID asc, time asc"
                     cur.execute(sql)
 
