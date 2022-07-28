@@ -36,6 +36,7 @@ class DB_function:
 
         return version_list
 
+    # 교통량 데이터
     def get_traffic_data(self, cycle=30, sync_time=None, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
         traffic_data = []
 
@@ -95,6 +96,7 @@ class DB_function:
 
         return traffic_data
 
+    # 개별 차량 데이터
     def get_individual_traffic_data(self, cycle=30, sync_time=None, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
         individual_traffic_data = []
 
@@ -168,8 +170,7 @@ class DB_function:
 
         return individual_traffic_data
 
-    def get_ntraffic_data(self, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!',
-                       db='vds', charset='utf8'):
+    def get_ntraffic_data(self, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
         ntraffic_data = []
 
         try:
@@ -189,8 +190,7 @@ class DB_function:
 
         return ntraffic_data
 
-    def get_speed_data(self, lane=2,cnum=[0,11,21,31,41,51,61,71,81,91,101,111],
-                       host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+    def get_speed_data(self, lane=2, cnum=[],  host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
         speed_data = []
 
         try:
@@ -219,3 +219,43 @@ class DB_function:
             print("err: ", e)
 
         return speed_data
+
+    # S/W 파라미터 저장
+    def set_paramete_data(self, parameter_list=[], host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+        try:
+            if parameter_list == '':
+                print("parameter in none")
+            else:
+                lane = 1 << (16 - parameter_list[0])
+                lane_1 = lane >> 8
+                lane_2 = lane & 0xFF
+                list = [lane_1, lane_2]
+                for i in range(1, len(parameter_list)):
+                    list.append(parameter_list[i])
+                print("list: ", list)
+                db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset, autocommit=True)
+                cur = db_connect.cursor()
+                sql = "SELECT Param, Nbyte from parameter ORDER BY Param asc"
+                cur.execute(sql)
+                index_list = []
+                for i in cur:
+                    index_list.append((i[0], i[1]))
+                print("index: ", index_list)
+                index = 0
+                for i in range(len(list)):
+                    if type(list[i]) == type([]):
+                        for j in range(len(list[i])):
+                            sql = "UPDATE parameter set Data=" + str(list[i][j]) + " WHERE Param=" + str(index_list[index][0]) + " AND Nbyte=" + str(index_list[index][1]) + ";"
+                            index += 1
+                            print(sql)
+                            cur.execute(sql)
+                    else:
+                        sql = "UPDATE parameter set Data=" + str(list[i]) + " WHERE Param=" + str(index_list[index][0]) + " AND Nbyte=" + str(index_list[index][1]) + ";"
+                        index += 1
+                        print(sql)
+                        cur.execute(sql)
+
+                db_connect.close()
+        except Exception as e:
+            print("err: ", e)
+

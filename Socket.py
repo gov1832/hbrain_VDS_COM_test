@@ -79,78 +79,34 @@ class Socket_function:
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
         self.socket_send_msg(send_msg)
 
-    def send_05_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number):
+    def send_05_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, speed_data):
         point = chr(0x2D)
         opcode = chr(0x05)
-        lane = '2' # 2차선
-        lane_1 = [bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2),
-                  bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2)]
-        lane_2 = [bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2),
-                  bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2), bytearray(2)]
-        for i in range(len(lane_1)):
-            temp = lane_1[i]
+        lane = len(speed_data)
 
-            # num = random.randrange(0, 65535)
-            num = random.randrange(0, 300)
-            if num > 255:
-                num_high = num >> 8
-                num_low = num & 0xFF
-                temp[0] = ord(chr(num_high))
-                temp[1] = ord(chr(num_low))
-            else:
-                temp[1] = ord(chr(num))
-
-        for i in range(len(lane_2)):
-            temp = lane_2[i]
-
-            # num = random.randrange(0, 65535)
-            num = random.randrange(0, 300)
-            if num > 255:
-                num_high = num >> 8
-                num_low = num & 0xFF
-                temp[0] = ord(chr(num_high))
-                temp[1] = ord(chr(num_low))
-            else:
-                temp[1] = ord(chr(num))
-
-        data = lane
-        for cg_data in lane_1:
-            data = data + chr(cg_data[0])
-            data = data + chr(cg_data[1])
-        for cg_data in lane_2:
-            data = data + chr(cg_data[0])
-            data = data + chr(cg_data[1])
+        data = chr(lane)
+        print(speed_data)
+        for temp in speed_data:
+            for i in range(len(temp)):
+                data = data + chr(temp[i] >> 8) + chr(temp[i] & 0xFF)
 
         length = self.ot.length_calc(1 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
-
         self.socket_send_msg(send_msg)
 
-        # for i in range(len(send_msg)):
-        #     print(i, "   ", send_msg[i])
-
-    def send_07_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number):
+    def send_07_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, ntraffic_data):
         point = chr(0x2D)
         opcode = chr(0x07)
-
-        lane_1 = bytearray(2)
-        lane_2 = bytearray(2)
+        # ntraffinc_data = [ 1차선 교통량, 2차선 교통량 ]
 
         # num = random.randrange(0, 65535)
-        num1 = random.randrange(0, 250)
-        num1_high = num1 >> 8
-        num1_low = num1 & 0xFF
-        lane_1[0] = ord(chr(num1_high))
-        lane_1[1] = ord(chr(num1_low))
+        data = ''
+        for count in ntraffic_data:
+            num_high = count >> 8
+            num_low = count & 0xFF
+            data = data + chr(num_high) + chr(num_low)
 
-        num2 = random.randrange(0, 300)
-        num2_high = num2 >> 8
-        num2_low = num2 & 0xFF
-        lane_2[0] = ord(chr(num2_high))
-        lane_2[1] = ord(chr(num2_low))
-
-        data = chr(lane_1[0]) + chr(lane_1[1]) + chr(lane_2[0]) + chr(lane_2[1])
         length = self.ot.length_calc(1 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
