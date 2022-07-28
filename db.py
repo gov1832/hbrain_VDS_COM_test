@@ -199,3 +199,53 @@ class DB_function:
             print("err: ", e)
 
         return individual_traffic_data
+
+    def get_ntraffic_data(self, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!',
+                       db='vds', charset='utf8'):
+        ntraffic_data = []
+
+        try:
+            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset, autocommit=True)
+            cur = db_connect.cursor()
+            sql = "SELECT * FROM cumulative_traffic order by Lane asc"
+            cur.execute(sql)
+            result = cur.fetchall()
+            for i in range(lane):
+                ntraffic_data.append(result[i][1])
+            sql = "update cumulative_traffic set nTraffic=0" #초기화 부분
+            cur.execute(sql)
+
+            db_connect.close()
+        except Exception as e:
+            print("err: ", e)
+
+        return ntraffic_data
+
+    def get_speed_data(self, lane=2,cnum=[0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111],
+                       host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+        speed_data = []
+
+        try:
+            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset, autocommit=True)
+            cur = db_connect.cursor()
+
+            for i in range(lane):
+                sql = "SELECT * FROM cumulative_velocity where Lane=" +str(i+1)+ " order by ID asc"
+                cur.execute(sql)
+                lane_speed = [0,0,0,0,0,0,0,0,0,0,0,0]
+                result = cur.fetchall()
+                for res in result:
+                    for i in reversed(range(len(cnum))):
+                        if res[2] >= cnum[i]:
+                            lane_speed[i] += 1
+                            break
+
+                speed_data.append(lane_speed)
+
+            #sql = "truncate cumulative_velocity" #초기화 부분, 추후 활성화
+            #cur.execute(sql)
+            db_connect.close()
+        except Exception as e:
+            print("err: ", e)
+
+        return speed_data
