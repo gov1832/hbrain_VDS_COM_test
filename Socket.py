@@ -255,8 +255,8 @@ class Socket_function:
         point = chr(0x2D)
         opcode = chr(0x17)
         image_count = chr(1)
-        cam = "0"
-        imagelink = [0, "image_1.jpg"]
+        #cam = "0"
+        #imagelink = [0, "image_1.jpg"]
         if str(cam) == str(imagelink[0]):
             img = cv2.imread(imagelink[1], cv2.IMREAD_COLOR)
             encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
