@@ -90,6 +90,10 @@ class Other_function:
             elif (op == chr(0x18)) and (len(msg) != 51):
                 nacklist = [False, op, chr(0x05)]
                 return nacklist
+            else:
+                nacklist = [True, op, 0]
+                print(nacklist)
+                return nacklist
         else:
             nacklist = [True, op, 0]
             print(nacklist)
