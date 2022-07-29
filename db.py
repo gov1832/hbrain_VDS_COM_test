@@ -36,6 +36,7 @@ class DB_function:
 
         return version_list
 
+    # region get data
     # 교통량 데이터
     def get_traffic_data(self, cycle=30, sync_time=None, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
         traffic_data = []
@@ -84,9 +85,9 @@ class DB_function:
                             num_1 += 1
                         if result[i+1][12] % lane == 0:
                             num_2 += 1
-
-                traffic_temp = [temp_1[0], round(temp_1[1] / num_1)]
-                traffic_data.append(traffic_temp)
+                if num_1 != 0:
+                    traffic_temp = [temp_1[0], round(temp_1[1] / num_1)]
+                    traffic_data.append(traffic_temp)
                 traffic_temp = [temp_2[0], round(temp_2[1] / num_2)]
                 traffic_data.append(traffic_temp)
 
@@ -147,29 +148,6 @@ class DB_function:
 
         return individual_traffic_data
 
-    def set_paramete_data(self, parameter_list):
-        try:
-            if sync_time is None:
-                print('nack')
-            else:
-                db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
-                cur = db_connect.cursor()
-                sql = "SELECT distinct Param from paramete ORDER BY Param ascr"
-                cur.execute(sql)
-                index_list = []
-                for  i in cur:
-                    index_list.append(i[0])
-
-                for data in parameter_list:
-                    sql = "SELECT * FROM obj_info where time >= '" + data_start + "' order by ID asc, time asc"
-                    cur.execute(sql)
-
-                db_connect.close()
-        except Exception as e:
-            print("err: ", e)
-
-        return individual_traffic_data
-
     def get_ntraffic_data(self, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
         ntraffic_data = []
 
@@ -220,6 +198,26 @@ class DB_function:
 
         return speed_data
 
+    def controllerBox_state_data(self,  host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+        controllerBox_state_list = []
+        try:
+            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
+            cur = db_connect.cursor()
+            sql = "SELECT * FROM controllerbox_state;"
+            cur.execute(sql)
+            result = cur.fetchall()
+            print(result[0])
+            for i in range(1, len(result[0])):
+                controllerBox_state_list.append(result[0][i])
+
+            db_connect.close()
+        except Exception as e:
+            print("err: ", e)
+
+        return controllerBox_state_list
+    # endregion
+
+    # region set data
     # S/W 파라미터 저장
     def set_paramete_data(self, parameter_list=[], host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
         try:
@@ -258,4 +256,6 @@ class DB_function:
                 db_connect.close()
         except Exception as e:
             print("err: ", e)
+
+    # endregion
 

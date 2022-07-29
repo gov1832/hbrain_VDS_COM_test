@@ -141,8 +141,9 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
-        data = [[3001,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000],[3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000]]
-        self.sock.send_05_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, data)
+        # data = [[3001,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000],[3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000]]
+        # self.sock.send_05_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, data)
+        self.db.controllerBox_state_data()
 
     def test1(self):
         start = time.time()
@@ -283,12 +284,20 @@ class main_function(QWidget):
                                               self.lane_num, self.collect_cycle, self.category_num, self.acc_speed, self.calc_speed, self.use_unexpected)
                 elif msg_op == chr(0x11):
                     request_time = time.time()
-                    self.sock.send_11_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.connect_time, request_time)
+                    if self.connect_time is not None:
+                        self.sock.send_11_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.connect_time, request_time)
+                    else:
+                        list = [False, chr(0x11), chr(0xFF)]
+                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x13):
                     self.sock.send_13_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, d_recv_msg)
                 elif msg_op == chr(0x15):
                     version_list = self.db.get_version_num()
-                    self.sock.send_15_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, version_list)
+                    if version_list != '':
+                        self.sock.send_15_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, version_list)
+                    else:
+                        list = [False, chr(0x15), chr(0x06)]
+                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x16):
                     self.individual_traffic_data = self.db.get_individual_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
                     if self.individual_traffic_data != '':
@@ -300,20 +309,32 @@ class main_function(QWidget):
                     cam = d_recv_msg[44]
                     self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, cam)
                 elif msg_op == chr(0x18):
-                    self.device_sync(msg_op, d_recv_msg)
-                    self.sock.send_18_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
+                    result = self.device_sync(msg_op, d_recv_msg)
+                    if True in result:
+                        self.sock.send_18_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
+                    else:
+                        list = result
+                        self.sock.send_nack_res_mag(elf.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x19):
+                    # msg read와 별개의 스레드를 돌면서 돌발 테이블을 계속 확인.
+                    # 확인하다가 걸리면 밑에 코드 사용
+                    # send함수 파라미터로 보낼 데이터 전송해야함 -> db모듈에서 get
                     if self.use_unexpected == 1:
                         self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 elif msg_op == chr(0x1E):
-                    self.sock.send_1E_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
+                    self.controllerBox_state_list = self.db.controllerBox_state_data()
+                    if self.controllerBox_state_list != '':
+                        self.sock.send_1E_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.controllerBox_state_list)
+                    else:
+                        list = [False, chr(0x1E), chr(0x06)]
+                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
 
             elif destination_ip == self.center_ip:
                 print("msg   : [", recv_msg.decode('utf-16'), "]")
             else:
                 print("TX_msg: [", recv_msg.decode('utf-16'), "]")
         else:
-            self.center_ip =  d_recv_msg[0:15]
+            self.center_ip = d_recv_msg[0:15]
             list = result
             self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
     # endregion
@@ -396,7 +417,12 @@ class main_function(QWidget):
             for i in data:
                 temp = hex(ord(i))
                 day_list.append(temp[2:])
-            self.ot.win_set_time(day_list)
+            try:
+                self.ot.win_set_time(day_list)
+                return [True]
+            except Exception as e:
+                return [False, chr(0x18), chr(0x01)]
+
 
         parameter_list = [self.lane_num, self.collect_cycle, self.category_num, self.acc_speed, self.calc_speed, self.use_unexpected]
         self.db.set_paramete_data(parameter_list)

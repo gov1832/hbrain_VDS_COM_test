@@ -68,7 +68,7 @@ class Other_function:
             nacklist = [False, op, chr(0x01)]
             return nacklist
 
-        if len(msg) < 42:
+        if len(msg) < 44:
             nacklist = [False, 0, chr(0x02)]
             return nacklist
         elif csn_msg != csn:
@@ -77,6 +77,14 @@ class Other_function:
         elif op not in opcode:
             nacklist = [False, op, chr(0x04)]
             return nacklist
+        elif len(msg) == 44:
+            if op in [chr(0x01),chr(0x0E), chr(0x0F), chr(0x13), chr(0x17), chr(0x18), chr(0x19)]:
+                nacklist = [False, op, chr(0x05)]
+                return nacklist
+            else:
+                nacklist = [True, op, 0]
+                print(nacklist)
+                return nacklist
         elif len(msg) > 44:
             if op not in [chr(0x01),chr(0x0E), chr(0x0F), chr(0x13), chr(0x17), chr(0x18), chr(0x19)]:
                 nacklist = [False, op, chr(0x05)]
@@ -86,6 +94,10 @@ class Other_function:
                 return nacklist
             elif (op == chr(0x18)) and (len(msg) != 51):
                 nacklist = [False, op, chr(0x05)]
+                return nacklist
+            else:
+                nacklist = [True, op, 0]
+                print(nacklist)
                 return nacklist
         else:
             nacklist = [True, op, 0]
