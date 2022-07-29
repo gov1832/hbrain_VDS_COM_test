@@ -147,29 +147,6 @@ class DB_function:
 
         return individual_traffic_data
 
-    def set_paramete_data(self, parameter_list):
-        try:
-            if sync_time is None:
-                print('nack')
-            else:
-                db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
-                cur = db_connect.cursor()
-                sql = "SELECT distinct Param from paramete ORDER BY Param ascr"
-                cur.execute(sql)
-                index_list = []
-                for  i in cur:
-                    index_list.append(i[0])
-
-                for data in parameter_list:
-                    sql = "SELECT * FROM obj_info where time >= '" + data_start + "' order by ID asc, time asc"
-                    cur.execute(sql)
-
-                db_connect.close()
-        except Exception as e:
-            print("err: ", e)
-
-        return individual_traffic_data
-
     def get_ntraffic_data(self, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
         ntraffic_data = []
 
@@ -258,4 +235,34 @@ class DB_function:
                 db_connect.close()
         except Exception as e:
             print("err: ", e)
+
+
+    def get_image_link(self, request_time=None, direction=None, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+        image_link = []
+
+        try:
+            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset, autocommit=True)
+            cur = db_connect.cursor()
+            request_time = datetime.datetime.now() #추후 삭제 요망
+            direction = 0 #추후 삭제 요망
+            request_time = request_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+            sql_1 = "insert into image value('" +str(request_time)+ "', " +str(direction)+ ", '')"
+            cur.execute(sql_1)
+            sql_2 = "SELECT * FROM image order by time desc"
+
+            while True:
+                cur.execute(sql_2)
+                result = cur.fetchall()
+                if result[0][0].strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] == request_time:
+                    if result[0][2] != '':
+                       image_link.append(str(result[0][1]))
+                       image_link.append(result[0][2])
+                       break
+
+            db_connect.close()
+        except Exception as e:
+            print("err: ", e)
+
+        print(image_link)
+        return image_link
 

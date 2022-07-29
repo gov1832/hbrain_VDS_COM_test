@@ -141,8 +141,8 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
-        data = [[3001,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000],[3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000,3000]]
-        self.sock.send_05_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, data)
+
+        self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, cam='0', imagelink=['0', 'image_1.jpg'])
 
     def test1(self):
         start = time.time()
@@ -298,7 +298,9 @@ class main_function(QWidget):
                         self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x17):
                     cam = d_recv_msg[44]
-                    self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, cam)
+                    now_time = datetime.datetime.now()
+                    imagelink = self.db.get_image_link(request_time=now_time,direction=cam)
+                    self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, cam, imagelink)
                 elif msg_op == chr(0x18):
                     self.device_sync(msg_op, d_recv_msg)
                     self.sock.send_18_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)

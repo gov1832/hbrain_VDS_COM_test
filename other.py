@@ -84,6 +84,9 @@ class Other_function:
             elif (op in [chr(0x01),chr(0x0F), chr(0x17)]) and (len(msg) != 45):
                 nacklist = [False, op, chr(0x05)]
                 return nacklist
+            elif (op == chr(0x17)) and (msg[44] not in [0,1,2]):
+                nacklist = [False, op, chr(0x05)]
+                return nacklist
             elif (op == chr(0x18)) and (len(msg) != 51):
                 nacklist = [False, op, chr(0x05)]
                 return nacklist

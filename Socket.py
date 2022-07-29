@@ -5,6 +5,9 @@ from time import localtime
 from other import Other_function
 
 import random
+import cv2
+import numpy
+import base64
 
 class Socket_function:
     def __init__(self):
@@ -248,17 +251,40 @@ class Socket_function:
         self.socket_send_msg(send_msg)
 
     # 정지 영상 응답
-    def send_17_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, cam):
+    def send_17_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, cam, imagelink):
         point = chr(0x2D)
         opcode = chr(0x17)
         image_count = chr(1)
-        image_info = '1111' + '122334454524ofkcdo'
-        data = cam + image_count + image_info
+        cam = "0"
+        imagelink = [0, "image_1.jpg"]
+        if str(cam) == str(imagelink[0]):
+            img = cv2.imread(imagelink[1], cv2.IMREAD_COLOR)
+            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+            result, imgencode = cv2.imencode('.jpg', img, encode_param)
+            data = numpy.array(imgencode)
+            byteData = base64.b64encode(data)
+            stringData = ''
+            for i in byteData:
+                stringData += chr(i)
 
-        length = self.ot.length_calc(1 + len(data))
+            # lengthby = len(byteData)
+            # print(lengthby)
+            #
+            # total_length = ''
+            # for i in (length + 6).to_bytes(4, byteorder="big"):
+            #     total_length += chr(i)
+            #
+            # img_length = ''
+            # for i in lengthby.to_bytes(4, byteorder="big"):
+            #     img_length += chr(i)
+            img_length = self.ot.length_calc(len(stringData))
 
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
-        self.socket_send_msg(send_msg)
+            datafield = cam + image_count + img_length + stringData
+
+            length = self.ot.length_calc(1 + len(datafield))
+
+            send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + datafield
+            self.socket_send_msg(send_msg)
 
     # RTC 변경 응답
     def send_18_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number):
