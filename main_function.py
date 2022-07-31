@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 
 import time
 import datetime
+import queue
 from multiprocessing import Process
 import threading
 # import win32api
@@ -113,7 +114,7 @@ class main_function(QWidget):
         self.ui.op_1E_btn.setEnabled(False)
 
     def btn_event(self):
-        self.ui.socket_connect_btn.clicked.connect(self.socket_connect_btn_click)
+        self.ui.socket_open_btn.clicked.connect(self.socket_open_btn_click)
         self.ui.db_connect_btn.clicked.connect(self.db_connect_btn_click)
 
         # region request btn event
@@ -141,18 +142,10 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
-        self.db.get_version_num()
-
-    def test1(self):
-        start = time.time()
-        s = 0
-        for i in range(100000):
-            s += i
-        end = time.time()
-        print("1-----------cha:", end-start)
+        self.db.get_image_link()
 
     # region btn click function
-    def socket_connect_btn_click(self):
+    def socket_open_btn_click(self):
         sock_ip = self.ui.sock_ip_input.text()
         sock_port = int(self.ui.sock_port_input.text())
 
@@ -244,14 +237,12 @@ class main_function(QWidget):
                     self.client_connect = True
                     self.connect_time = time.time()
                 elif msg_op == chr(0xFE):
-                    # self.sock.send_FE_res_msg(self.local_ip, self.center_ip)
                     self.fe_check = True
                     print('0xFE response')
                 elif msg_op == chr(0x01):
                     # self.device_sync(msg_op, d_recv_msg)
                     self.frame_number_set = d_recv_msg[44]
                     self.sync_time = time.time()
-                    # self.sock.send_01_res_msg(self.local_ip, sender_ip)
                     print("not ack")
                 elif msg_op == chr(0x04):
                     self.traffic_data = self.db.get_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
@@ -306,7 +297,7 @@ class main_function(QWidget):
                 elif msg_op == chr(0x17):
                     cam = d_recv_msg[44]
                     now_time = datetime.datetime.now()
-                    imagelink = self.db.get_image_link(request_time=now_time,direction=cam)
+                    imagelink = self.db.get_image_link(request_time=now_time, direction=cam)
                     self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, cam, imagelink)
                 elif msg_op == chr(0x18):
                     result = self.device_sync(msg_op, d_recv_msg)
@@ -314,7 +305,7 @@ class main_function(QWidget):
                         self.sock.send_18_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                     else:
                         list = result
-                        self.sock.send_nack_res_mag(elf.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x19):
                     # msg read와 별개의 스레드를 돌면서 돌발 테이블을 계속 확인.
                     # 확인하다가 걸리면 밑에 코드 사용

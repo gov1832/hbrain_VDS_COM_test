@@ -27,7 +27,7 @@ class DB_function:
                 result.append(i[0])
             result.sort(reverse=True)
 
-            sql = "SELECT * FROM vds_version WHERE time='" + result[0] + "';"
+            sql = "SELECT * FROM vds_version WHERE time='" + str(result[0]) + "';"
             cur.execute(sql)
             for i in cur:
                 version_list.append(i)
@@ -208,8 +208,6 @@ class DB_function:
         try:
             db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset, autocommit=True)
             cur = db_connect.cursor()
-            request_time = datetime.datetime.now() #추후 삭제 요망
-            direction = 0 #추후 삭제 요망
             request_time = request_time.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
             sql_1 = "insert into image value('" +str(request_time)+ "', " +str(direction)+ ", '')"
             cur.execute(sql_1)
@@ -228,7 +226,6 @@ class DB_function:
         except Exception as e:
             print("err: ", e)
 
-        print(image_link)
         return image_link
 
     # 함체 정보 데이터
@@ -272,19 +269,16 @@ class DB_function:
                 index_list = []
                 for i in cur:
                     index_list.append((i[0], i[1]))
-                print("index: ", index_list)
                 index = 0
                 for i in range(len(list)):
                     if type(list[i]) == type([]):
                         for j in range(len(list[i])):
                             sql = "UPDATE parameter set Data=" + str(list[i][j]) + " WHERE Param=" + str(index_list[index][0]) + " AND Nbyte=" + str(index_list[index][1]) + ";"
                             index += 1
-                            print(sql)
                             cur.execute(sql)
                     else:
                         sql = "UPDATE parameter set Data=" + str(list[i]) + " WHERE Param=" + str(index_list[index][0]) + " AND Nbyte=" + str(index_list[index][1]) + ";"
                         index += 1
-                        print(sql)
                         cur.execute(sql)
 
                 db_connect.close()

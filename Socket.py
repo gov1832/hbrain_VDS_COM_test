@@ -64,7 +64,6 @@ class Socket_function:
         length = self.ot.length_calc(1)
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
-        print("dddd")
         self.socket_send_msg(send_msg)
 
     def send_04_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, frame, lane, traffic_data):
@@ -91,7 +90,7 @@ class Socket_function:
         lane = len(speed_data)
 
         data = chr(lane)
-        print(speed_data)
+        # print(speed_data)
         for temp in speed_data:
             for i in range(len(temp)):
                 data = data + chr(temp[i] >> 8) + chr(temp[i] & 0xFF)
@@ -231,12 +230,12 @@ class Socket_function:
             point = chr(0x2D)
             opcode = chr(0x15)
             ack = chr(0x06)
-            version = version_list[1] << 4
-            release = version_list[2] & 0x0F
-            version_num = chr(version + release)
-            make_year = chr(version_list[3])
-            make_month = chr(version_list[4])
-            make_day = chr(version_list[5])
+            version = version_list[0][1] << 4
+            release = version_list[0][2] & 0x0F
+            version_num = chr(version) + chr(release)
+            make_year = chr(version_list[0][3])
+            make_month = chr(version_list[0][4])
+            make_day = chr(version_list[0][5])
             data = version_num + make_year + make_month + make_day
             length = self.ot.length_calc(1 + len(data))
 
@@ -264,9 +263,9 @@ class Socket_function:
         opcode = chr(0x17)
         ack = chr(0x06)
         image_count = chr(1)
-        #cam = "0"
-        #imagelink = [0, "image_1.jpg"]
-        if str(cam) == str(imagelink[0]):
+        # cam = "0"
+        # imagelink = [0, "image_1.jpg"]
+        if cam == chr(int(imagelink[0])):
             img = cv2.imread(imagelink[1], cv2.IMREAD_COLOR)
             encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
             result, imgencode = cv2.imencode('.jpg', img, encode_param)
@@ -292,8 +291,10 @@ class Socket_function:
 
             length = self.ot.length_calc(1 + len(datafield))
 
-            send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + datafield
+            send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + datafield
             self.socket_send_msg(send_msg)
+        else:
+            print("cam 달라")
 
     # RTC 변경 응답
     def send_18_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number):
@@ -325,9 +326,9 @@ class Socket_function:
         length = self.ot.length_calc(1 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + data
-        print(send_msg)
-        for i in send_msg:
-            print(ord(i))
+        # print(send_msg)
+        # for i in send_msg:
+        #     print(ord(i))
         self.socket_send_msg(send_msg)
 
     def send_nack_res_mag(self, sender_ip, destination_ip, controller_kind, controller_number, list):

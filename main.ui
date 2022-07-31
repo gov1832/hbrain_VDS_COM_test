@@ -141,7 +141,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="socket_connect_btn">
+           <widget class="QPushButton" name="socket_open_btn">
             <property name="minimumSize">
              <size>
               <width>0</width>
