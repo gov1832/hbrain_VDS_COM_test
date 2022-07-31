@@ -187,8 +187,12 @@ class main_function(QWidget):
             # t.start()
             # read_socket = Process(target=self.read_socket_msg, args=())
             # read_socket.start()
-            self.sock.client_accept()
+            t = threading.Thread(target=self.client_accept_check, args=())
+            t.start()
 
+    def client_accept_check(self):
+        while True:
+            self.sock.client_accept()
             t = threading.Thread(target=self.read_socket_msg, args=())
             t.start()
 
@@ -298,7 +302,11 @@ class main_function(QWidget):
                     cam = d_recv_msg[44]
                     now_time = datetime.datetime.now()
                     imagelink = self.db.get_image_link(request_time=now_time, direction=cam)
-                    self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, cam, imagelink)
+                    if imagelink != '':
+                        self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, cam, imagelink)
+                    else:
+                        list = [False, chr(0x17), chr(0x06)]
+                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x18):
                     result = self.device_sync(msg_op, d_recv_msg)
                     if True in result:

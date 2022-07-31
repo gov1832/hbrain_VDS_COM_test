@@ -1,5 +1,6 @@
 
 import socket
+import queue
 from time import localtime
 
 from other import Other_function
@@ -14,6 +15,7 @@ class Socket_function:
         super().__init__()
 
         self.server_socket = None
+        self.client_socket_list = []
         self.client_socket = None
 
         self.ot = Other_function()
@@ -22,10 +24,19 @@ class Socket_function:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((ip, port))
-        self.server_socket.listen()
+        self.server_socket.listen(5)
 
     def client_accept(self):
-        self.client_socket, addr = self.server_socket.accept()
+        c_s, addr = self.server_socket.accept()
+        self.client_socket_list.append(c_s)
+        print(self.client_socket_list)
+        if len(self.client_socket_list) > 1:
+            self.client_socket_list.pop(0)
+
+        print("-", self.client_socket_list)
+
+        self.client_socket = self.client_socket_list[0]
+
         return self.client_socket
 
     def socket_connect(self, ip, port):
@@ -46,7 +57,15 @@ class Socket_function:
         #     print("de_msg[i]: ", recv_msg[i])
 
     def socket_read(self):
-        return self.client_socket.recv(1024)
+        msg = ''
+        try:
+            msg = self.client_socket.recv(1024)
+        except Exception as e:
+            # socket.close(self.client_socket)
+            self.client_socket.close()
+            print("err: read/ ", e)
+
+        return msg
 
     # region msg response
     def send_FF_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number):
