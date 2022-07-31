@@ -141,7 +141,7 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
-        self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, cam='0', imagelink=['0', 'image_1.jpg'])
+        self.db.get_version_num()
 
     def test1(self):
         start = time.time()
@@ -233,10 +233,10 @@ class main_function(QWidget):
             msg_op = d_recv_msg[43]
             msg_sender_ip = d_recv_msg[0:15]
             destination_ip = d_recv_msg[16:31]
-            self.center_ip = msg_sender_ip
 
             # 수신메시지의 목적지 IP == local IP
             if destination_ip == self.local_ip:
+                self.center_ip = msg_sender_ip
                 self.client_request_time = time.time()
                 print("RX_msg: [", recv_msg.decode('utf-16'), "]")
                 if msg_op == chr(0xFF):
@@ -346,7 +346,7 @@ class main_function(QWidget):
             # print("delay: ", time_delay)
 
             if (time_delay > 300) & self.fe_check:
-                self.sock.send_FE_msg(self.local_ip, self.center_ip)
+                self.sock.send_FE_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 self.fe_send_time = time.time()
                 self.fe_check = False
 
@@ -435,7 +435,7 @@ class main_function(QWidget):
 
     def op_FE_btn_click(self):
         print("FE btn_click")
-        self.sock.send_FE_msg(self.local_ip, self.center_ip)
+        self.sock.send_FE_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
 
     def op_01_btn_click(self):
         print("01 btn_click")

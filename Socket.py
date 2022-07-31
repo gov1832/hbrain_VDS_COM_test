@@ -34,7 +34,7 @@ class Socket_function:
 
     def socket_send_msg(self, send_msg):
         self.client_socket.send(send_msg.encode('utf-16'))
-        print("TX_msg: /", send_msg, "/")
+        # print("TX_msg: /", send_msg, "/")
         # recv
         # recv_msg = self.client_socket.recv(1024)
         # d_recv_msg = recv_msg.decode()
@@ -64,6 +64,7 @@ class Socket_function:
         length = self.ot.length_calc(1)
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
+        print("dddd")
         self.socket_send_msg(send_msg)
 
     def send_04_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, frame, lane, traffic_data):

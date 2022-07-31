@@ -86,7 +86,7 @@ class Other_function:
                 print(nacklist)
                 return nacklist
         elif len(msg) > 44:
-            if op not in [chr(0x01),chr(0x0E), chr(0x0F), chr(0x13), chr(0x17), chr(0x18), chr(0x19)]:
+            if op not in [chr(0x01),chr(0xFE),chr(0x0E), chr(0x0F), chr(0x13), chr(0x17), chr(0x18), chr(0x19)]:
                 nacklist = [False, op, chr(0x05)]
                 return nacklist
             elif (op in [chr(0x01),chr(0x0F), chr(0x17)]) and (len(msg) != 45):
