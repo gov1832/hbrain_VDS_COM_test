@@ -63,7 +63,7 @@ class Socket_function:
         opcode = chr(0xFE)
         length = self.ot.length_calc(1)
 
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcodemerg
         self.socket_send_msg(send_msg)
 
     def send_04_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, frame, lane, traffic_data):
