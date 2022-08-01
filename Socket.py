@@ -7,7 +7,7 @@ from other import Other_function
 
 import random
 import cv2
-import numpy
+import numpy as np
 import base64
 
 class Socket_function:
@@ -277,43 +277,30 @@ class Socket_function:
         self.socket_send_msg(send_msg)
 
     # 정지 영상 응답
-    def send_17_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, cam, imagelink):
-        point = chr(0x2D)
+    def send_17_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, img):
+        sender_ip += chr(0x2D)
+        destination_ip += chr(0x2D)
+        controller = controller_kind + controller_number
         opcode = chr(0x17)
         ack = chr(0x06)
-        image_count = chr(1)
-        # cam = "0"
-        # imagelink = [0, "image_1.jpg"]
-        if cam == chr(int(imagelink[0])):
-            img = cv2.imread(imagelink[1], cv2.IMREAD_COLOR)
-            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-            result, imgencode = cv2.imencode('.jpg', img, encode_param)
-            data = numpy.array(imgencode)
-            byteData = base64.b64encode(data)
-            stringData = ''
-            for i in byteData:
-                stringData += chr(i)
 
-            # lengthby = len(byteData)
-            # print(lengthby)
-            #
-            # total_length = ''
-            # for i in (length + 6).to_bytes(4, byteorder="big"):
-            #     total_length += chr(i)
-            #
-            # img_length = ''
-            # for i in lengthby.to_bytes(4, byteorder="big"):
-            #     img_length += chr(i)
-            img_length = self.ot.length_calc(len(stringData))
+        # encode image
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+        _, imgencode = cv2.imencode('.jpg', img, encode_param)
+        data = np.array(imgencode)
+        byteData = base64.b64encode(data)
+        stringData = ''
+        for i in byteData:
+            stringData += chr(i)
 
-            datafield = cam + image_count + img_length + stringData
+        img_length = self.ot.length_calc(len(stringData))
+        total_length = self.ot.length_calc(6 + len(stringData))
 
-            length = self.ot.length_calc(1 + len(datafield))
+        send_msg = sender_ip + destination_ip + controller + total_length + opcode + ack + img_length + stringData
 
-            send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + datafield
-            self.socket_send_msg(send_msg)
-        else:
-            print("cam 달라")
+        self.socket_send_msg(send_msg)
+
+
 
     # RTC 변경 응답
     def send_18_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number):
@@ -359,12 +346,12 @@ class Socket_function:
         #     print(ord(i))
         self.socket_send_msg(send_msg)
 
-    def send_nack_res_mag(self, sender_ip, destination_ip, controller_kind, controller_number, list):
+    def send_nack_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, list):
         point = chr(0x2D)
         nack = chr(0x15)
         opcode = list[1]
         data = list[2]
-        length = self.ot.length_calc(len(opcode) + len(data))
+        length = self.ot.length_calc(len(opcode) + len(data) + 1)
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + nack + data
         self.socket_send_msg(send_msg)

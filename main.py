@@ -8,6 +8,8 @@ from PyQt5.QtWidgets    import *
 
 from main_function import main_function
 
+import cv2
+
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -30,6 +32,7 @@ class MainWindow(QWidget):
         return os.path.join(base_path, relative_path)
 
 if __name__ == '__main__':
+
     app = QApplication(sys.argv)
     ex = MainWindow()
     ex.show()
