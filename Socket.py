@@ -40,8 +40,9 @@ class Socket_function:
         return self.client_socket
 
     def client_socket_close(self):
-        # self.client_socket.close()
-        self.client_socket.detach()
+        # self.client_socket.shutdown(socket.SHUT_RDWR)
+        self.client_socket.close()
+        # self.client_socket.detach()
         self.client_socket = None
 
     def socket_connect(self, ip, port):
