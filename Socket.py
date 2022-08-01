@@ -326,14 +326,23 @@ class Socket_function:
         self.socket_send_msg(send_msg)
 
     # 돌발 상황 정보
-    def send_19_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number):
+    def send_19_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, outbreak):
         point = chr(0x2D)
         opcode = chr(0xFE)
-        data = '100000001233444444444455555555556666'
-        length = self.ot.length_calc(1 + len(data))
+        ack = chr(0x06)
+        breaktime = chr(len(outbreak))
+        stringdata = ''
+        for bre in outbreak:
+            dt = bre[0]
+            daytime = chr(int(dt.strftime("%Y")[:2])) + chr(int(dt.strftime("%y"))) + chr(int(dt.strftime("%m"))) + chr(int(dt.strftime("%d"))) + chr(int(dt.strftime("%H"))) + chr(int(dt.strftime("%M"))) + chr(int(dt.strftime("%S")))
 
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
-        self.socket_send_msg(send_msg)
+            stringdata = stringdata + daytime + chr(bre[1]) + chr(bre[2]) + bre[3] + bre[4] + chr(round(bre[5]))
+        datafield = breaktime + stringdata
+        length = self.ot.length_calc(2 + len(datafield))
+
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + datafield
+        print(send_msg)
+        #self.socket_send_msg(send_msg)
 
     def send_1E_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, controllerBox_state_list):
         point = chr(0x2D)

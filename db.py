@@ -183,13 +183,13 @@ class DB_function:
 
                 cur.execute(sql)
                 result = cur.fetchall()
-                if result != '':
-                    lane_speed = [0,0,0,0,0,0,0,0,0,0,0,0]
-                    for res in result:
-                        for i in reversed(range(len(cnum))):
-                            if res[2] >= cnum[i]:
-                                lane_speed[i] += 1
-                                break
+
+                lane_speed = [0,0,0,0,0,0,0,0,0,0,0,0]
+                for res in result:
+                    for i in reversed(range(len(cnum))):
+                        if res[2] >= cnum[i]:
+                            lane_speed[i] += 1
+                            break
 
                 speed_data.append(lane_speed)
 
@@ -246,8 +246,42 @@ class DB_function:
             print("err: ", e)
 
         return controllerBox_state_list
-    # endregion
 
+        # 돌발 상황 정보
+    def get_outbreak(self, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds',
+                     charset='utf8'):
+        outbreak = []
+
+        try:
+            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset,
+                                         autocommit=True)
+            cur = db_connect.cursor()
+            sql = "SELECT * FROM outbreak order by time desc"
+            cur.execute(sql)
+            result = cur.fetchall()
+
+            if result:
+                for i in range(lane):
+                    for j in range(len(result)):
+                        if result[j][1] == (i + 1):
+                            out = []
+                            out.append(result[j][0])
+                            out.append(result[j][1])
+                            out.append(result[j][2])
+                            out.append(result[j][3])
+                            out.append(result[j][4])
+                            out.append(result[j][5])
+                            outbreak.append(out)
+
+                #sql = "truncate outbreak" #초기화 부분, 추후 활성화
+                #cur.execute(sql)
+            db_connect.close()
+        except Exception as e:
+            print("err: ", e)
+        print(outbreak)
+        return outbreak
+
+    # endregion
     # region set data
     # S/W 파라미터 저장
     def set_paramete_data(self, parameter_list=[], host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
