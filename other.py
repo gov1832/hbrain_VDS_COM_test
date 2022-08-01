@@ -59,8 +59,6 @@ class Other_function:
                   chr(0x0C), chr(0x0D), chr(0x0E), chr(0x0F), chr(0x11), chr(0x12),
                   chr(0x13), chr(0x15), chr(0x16), chr(0x17), chr(0x18), chr(0x19), chr(0x1E),]
         try:
-            # socket.setdefaulttimeout(3)
-            # socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(('183.99.41.239', 23306))
             response = requests.get("https://www.naver.com", timeout=2)
         except Exception as ex:
             print("network_check_error")

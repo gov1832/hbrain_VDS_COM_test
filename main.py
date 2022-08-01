@@ -8,8 +8,6 @@ from PyQt5.QtWidgets    import *
 
 from main_function import main_function
 
-import cv2
-
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -31,21 +29,9 @@ class MainWindow(QWidget):
         # return os.path.join(base_path, './', relative_path)
         return os.path.join(base_path, relative_path)
 
+import binascii
 if __name__ == '__main__':
-    # cap = cv2.VideoCapture('testImg.jg')
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-    # _, img = cap.read()
-    #
-    # print(str(type(img)))
-    # if str(type(img)) == "<class 'NoneType'>":
-    #     print('asljdhfgoasdjhh')
-    #
-    # if type(img) == None:
-    #     print(type(img))
-    # else:
-    #     cv2.imshow('img', img)
-    #     cv2.waitKey(0)
+
     app = QApplication(sys.argv)
     ex = MainWindow()
     ex.show()
