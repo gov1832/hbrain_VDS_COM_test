@@ -29,7 +29,6 @@ class Socket_function:
     def client_accept(self):
         c_s, addr = self.server_socket.accept()
         self.client_socket_list.append(c_s)
-        print(self.client_socket_list)
         if len(self.client_socket_list) > 1:
             self.client_socket_list.pop(0)
 
@@ -45,7 +44,8 @@ class Socket_function:
 
     def socket_send_msg(self, send_msg):
         self.client_socket.send(send_msg.encode('utf-16'))
-        # print("TX_msg: /", send_msg, "/")
+        print("TX_msg: [", send_msg, "]")
+        print("TX: [", send_msg.encode('utf-16'), "]")
         # recv
         # recv_msg = self.client_socket.recv(1024)
         # d_recv_msg = recv_msg.decode()
@@ -82,7 +82,7 @@ class Socket_function:
         opcode = chr(0xFE)
         length = self.ot.length_calc(1)
 
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcodemerg
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
         self.socket_send_msg(send_msg)
 
     def send_04_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, frame, lane, traffic_data):
@@ -269,7 +269,7 @@ class Socket_function:
         car_count = chr(len(individual_traffic_data) >> 8) + chr(len(individual_traffic_data) & 0xFF)
         data = frame + car_count
         for i in individual_traffic_data:
-            data = data + str(i[0]) + str(i[1]) + str(i[2])
+            data = data + chr(i[0]) + chr(i[1]) + chr(int(i[2]))
 
         length = self.ot.length_calc(1 + len(data))
 
@@ -372,18 +372,6 @@ class Socket_function:
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
         self.socket_send_msg(send_msg)
-    #
-    # def send_FE_msg(self):
-    #     sender_ip = '123.456.789.123'
-    #     destination_ip = '127.000.000.001'
-    #     controller_kind = 'VD'
-    #     controller_number = '12345'
-    #     length = self.length_calc(1)
-    #     point = chr(0x2D)
-    #     opcode = chr(0xFE)
-    #
-    #     send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode
-    #     self.socket_send_msg(send_msg)
 
     def send_01_msg(self):
         sender_ip = '123.456.789.123'

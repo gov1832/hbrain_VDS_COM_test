@@ -89,8 +89,9 @@ class DB_function:
                 if num_1 != 0:
                     traffic_temp = [temp_1[0], round(temp_1[1] / num_1)]
                     traffic_data.append(traffic_temp)
-                traffic_temp = [temp_2[0], round(temp_2[1] / num_2)]
-                traffic_data.append(traffic_temp)
+                if num_2 != 0:
+                    traffic_temp = [temp_2[0], round(temp_2[1] / num_2)]
+                    traffic_data.append(traffic_temp)
 
                 db_connect.close()
         except Exception as e:
@@ -110,7 +111,7 @@ class DB_function:
                 cur = db_connect.cursor()
                 temp = time.localtime(sync_time - cycle)
                 data_start = time.strftime("%Y-%m-%d %H:%M:%S", temp)
-                data_count = datetime.strptime(data_start, '%Y-%m-%d %H:%M:%S')
+                data_count = datetime.datetime.strptime(data_start, '%Y-%m-%d %H:%M:%S')
                 sql = "SELECT * FROM obj_info where time >= '" + data_start + "' order by ID asc, time asc"
                 cur.execute(sql)
 
@@ -137,11 +138,11 @@ class DB_function:
                             carlane += lane
                         else:
                             carlane += (result[j][12]%lane)
-
-                    cardata.append(round(carlane/carcont))
-                    cardata.append((result[count[i-1]][0]-data_count).seconds)
-                    cardata.append(carspeed/carcont)
-                    individual_traffic_data.append(cardata)
+                    if carcont != 0:
+                        cardata.append(round(carlane/carcont))
+                        cardata.append((result[count[i-1]][0]-data_count).seconds)
+                        cardata.append(int(carspeed/carcont))
+                        individual_traffic_data.append(cardata)
 
                 db_connect.close()
         except Exception as e:
@@ -193,8 +194,8 @@ class DB_function:
 
                 speed_data.append(lane_speed)
 
-            #sql = "truncate cumulative_velocity" #초기화 부분, 추후 활성화
-            #cur.execute(sql)
+            sql = "truncate cumulative_velocity" #초기화 부분, 추후 활성화
+            cur.execute(sql)
             db_connect.close()
         except Exception as e:
             print("err: ", e)
@@ -237,7 +238,6 @@ class DB_function:
             sql = "SELECT * FROM controllerbox_state;"
             cur.execute(sql)
             result = cur.fetchall()
-            print(result[0])
             for i in range(1, len(result[0])):
                 controllerBox_state_list.append(result[0][i])
 

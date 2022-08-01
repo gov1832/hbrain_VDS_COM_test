@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1021</width>
+    <width>1027</width>
     <height>954</height>
    </rect>
   </property>
@@ -162,15 +162,6 @@
         </item>
        </layout>
       </item>
-      <item row="3" column="1">
-       <widget class="QListView" name="listView_2">
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-         </font>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="0">
        <widget class="QLabel" name="status_bar">
         <property name="font">
@@ -181,15 +172,6 @@
         </property>
         <property name="text">
          <string>Status bar</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QListView" name="listView">
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-         </font>
         </property>
        </widget>
       </item>
@@ -465,6 +447,44 @@
         <property name="text">
          <string>Time</string>
         </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QTableWidget" name="tx_table">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
+        <column>
+         <property name="text">
+          <string>Time</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>OPcode</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QTableWidget" name="rx_table">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
+        <column>
+         <property name="text">
+          <string>Time</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>OPcode</string>
+         </property>
+        </column>
        </widget>
       </item>
      </layout>
