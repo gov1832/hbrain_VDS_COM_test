@@ -314,13 +314,16 @@ class Socket_function:
         breaktime = chr(len(outbreak))
         stringdata = ''
         for bre in outbreak:
-            for eak in bre:
-                stringdata += chr(eak)
+            dt = bre[0]
+            daytime = chr(int(dt.strftime("%Y")[:2])) + chr(int(dt.strftime("%y"))) + chr(int(dt.strftime("%m"))) + chr(int(dt.strftime("%d"))) + chr(int(dt.strftime("%H"))) + chr(int(dt.strftime("%M"))) + chr(int(dt.strftime("%S")))
+
+            stringdata = stringdata + daytime + chr(bre[1]) + chr(bre[2]) + bre[3] + bre[4] + chr(round(bre[5]))
         datafield = breaktime + stringdata
         length = self.ot.length_calc(2 + len(datafield))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + datafield
-        self.socket_send_msg(send_msg)
+        print(send_msg)
+        #self.socket_send_msg(send_msg)
 
     def send_1E_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, controllerBox_state_list):
         point = chr(0x2D)

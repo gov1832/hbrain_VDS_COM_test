@@ -273,13 +273,12 @@ class DB_function:
                             out.append(result[j][5])
                             outbreak.append(out)
 
-                sql = "truncate outbreak" #초기화 부분, 추후 활성화
-                cur.execute(sql)
+                #sql = "truncate outbreak" #초기화 부분, 추후 활성화
+                #cur.execute(sql)
             db_connect.close()
         except Exception as e:
             print("err: ", e)
         print(outbreak)
-        print(len(outbreak))
         return outbreak
 
     # endregion
