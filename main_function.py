@@ -8,6 +8,9 @@ from multiprocessing import Process
 import threading
 # import win32api
 
+import numpy as np
+import cv2
+
 from db import DB_function
 from Socket import Socket_function
 from other import Other_function
@@ -142,7 +145,11 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
-        self.db.get_image_link()
+        cap = cv2.VideoCapture('rtsp://admin:hbrain0372!@183.99.41.239')
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        ret, img = cap.read()
+        self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, img)
 
     # region btn click function
     def socket_open_btn_click(self):
@@ -250,7 +257,7 @@ class main_function(QWidget):
                         self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.frame_number_set, self.lane_num, self.traffic_data)
                     else:
                         list = [False, chr(0x04), chr(0x06)]
-                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x05):
                     self.speed_data = self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num)
                     if self.speed_data != '':
@@ -277,35 +284,45 @@ class main_function(QWidget):
                         self.sock.send_11_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.connect_time, request_time)
                     else:
                         list = [False, chr(0x11), chr(0xFF)]
-                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x13):
                     self.sock.send_13_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, d_recv_msg)
+
                 elif msg_op == chr(0x15):
                     version_list = self.db.get_version_num()
                     if version_list != '':
                         self.sock.send_15_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, version_list)
                     else:
                         list = [False, chr(0x15), chr(0x06)]
-                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+
                 elif msg_op == chr(0x16):
                     self.individual_traffic_data = self.db.get_individual_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
                     if self.individual_traffic_data != '':
                         self.sock.send_16_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.frame_number_set, self.individual_traffic_data)
                     else:
                         list = [False, chr(0x16), chr(0x06)]
-                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+
                 elif msg_op == chr(0x17):
-                    cam = d_recv_msg[44]
-                    now_time = datetime.datetime.now()
-                    imagelink = self.db.get_image_link(request_time=now_time, direction=cam)
-                    self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, cam, imagelink)
+                    cap = cv2.VideoCapture('rtsp://admin:hbrain0372!@183.99.41.239')
+                    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+                    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+                    _, img = cap.read()
+                    if img != None:
+                        self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, img)
+                    else:
+                        list = [False, chr(0x17), chr(0x06)]
+                        self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+
+
                 elif msg_op == chr(0x18):
                     result = self.device_sync(msg_op, d_recv_msg)
                     if True in result:
                         self.sock.send_18_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                     else:
                         list = result
-                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                 elif msg_op == chr(0x19):
                     # msg read와 별개의 스레드를 돌면서 돌발 테이블을 계속 확인.
                     # 확인하다가 걸리면 밑에 코드 사용
@@ -318,7 +335,7 @@ class main_function(QWidget):
                         self.sock.send_1E_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.controllerBox_state_list)
                     else:
                         list = [False, chr(0x1E), chr(0x06)]
-                        self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
 
             elif destination_ip == self.center_ip:
                 print("msg   : [", recv_msg.decode('utf-16'), "]")
@@ -327,7 +344,7 @@ class main_function(QWidget):
         else:
             self.center_ip = d_recv_msg[0:15]
             list = result
-            self.sock.send_nack_res_mag(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+            self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
     # endregion
 
     def request_check_timer(self):
