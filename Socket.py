@@ -1,5 +1,6 @@
 
 import socket
+import select
 import queue
 from time import localtime
 
@@ -15,7 +16,7 @@ class Socket_function:
         super().__init__()
 
         self.server_socket = None
-        self.client_socket_list = []
+        self.client_socket_list = list()
         self.client_socket = None
 
         self.ot = Other_function()
@@ -24,19 +25,24 @@ class Socket_function:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((ip, port))
-        self.server_socket.listen(5)
+        self.server_socket.listen()
+        # self.server_socket.listen(5)
 
     def client_accept(self):
         c_s, addr = self.server_socket.accept()
         self.client_socket_list.append(c_s)
-        if len(self.client_socket_list) > 1:
+        # self.client_socket_list.append((c_s, addr))
+        if len(self.client_socket_list) > 5:
             self.client_socket_list.pop(0)
-
-        print("-", self.client_socket_list)
-
-        self.client_socket = self.client_socket_list[0]
+        self.client_socket = self.client_socket_list[-1]
+        print("-", self.client_socket)
 
         return self.client_socket
+
+    def client_socket_close(self):
+        # self.client_socket.close()
+        self.client_socket.detach()
+        self.client_socket = None
 
     def socket_connect(self, ip, port):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -59,11 +65,14 @@ class Socket_function:
     def socket_read(self):
         msg = ''
         try:
+            print("recv waiting", self.client_socket)
             msg = self.client_socket.recv(1024)
+            print("msg: ", msg)
+            print("recv!")
+
         except Exception as e:
-            # socket.close(self.client_socket)
-            self.client_socket.close()
-            print("err: read/ ", e)
+            # self.client_socket = None
+            print("err: read/ ")
 
         return msg
 
@@ -328,7 +337,7 @@ class Socket_function:
     # 돌발 상황 정보
     def send_19_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, outbreak):
         point = chr(0x2D)
-        opcode = chr(0xFE)
+        opcode = chr(0x19)
         ack = chr(0x06)
         breaktime = chr(len(outbreak))
         stringdata = ''
@@ -341,8 +350,8 @@ class Socket_function:
         length = self.ot.length_calc(2 + len(datafield))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + datafield
-        print(send_msg)
-        #self.socket_send_msg(send_msg)
+        # print(send_msg)
+        self.socket_send_msg(send_msg)
 
     def send_1E_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, controllerBox_state_list):
         point = chr(0x2D)
