@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1027</width>
+    <width>1337</width>
     <height>954</height>
    </rect>
   </property>
@@ -18,8 +18,8 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>1001</width>
-     <height>930</height>
+     <width>1306</width>
+     <height>925</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="main_layout" stretch="5,1">
@@ -172,16 +172,6 @@
         </property>
         <property name="text">
          <string>Status bar</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QFrame" name="frame_3">
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
         </property>
        </widget>
       </item>
@@ -486,6 +476,48 @@
          </property>
         </column>
        </widget>
+      </item>
+      <item row="1" column="1">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,8">
+          <property name="spacing">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>5</number>
+          </property>
+          <property name="rightMargin">
+           <number>20</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_10">
+            <property name="font">
+             <font>
+              <family>Consolas</family>
+             </font>
+            </property>
+            <property name="text">
+             <string>IMG URL :</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="ImgURL_Edit">
+            <property name="text">
+             <string>testImg.jpg</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
