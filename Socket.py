@@ -307,13 +307,19 @@ class Socket_function:
         self.socket_send_msg(send_msg)
 
     # 돌발 상황 정보
-    def send_19_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number):
+    def send_19_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, outbreak):
         point = chr(0x2D)
         opcode = chr(0xFE)
-        data = '100000001233444444444455555555556666'
-        length = self.ot.length_calc(1 + len(data))
+        ack = chr(0x06)
+        breaktime = chr(len(outbreak))
+        stringdata = ''
+        for bre in outbreak:
+            for eak in bre:
+                stringdata += chr(eak)
+        datafield = breaktime + stringdata
+        length = self.ot.length_calc(2 + len(datafield))
 
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + datafield
         self.socket_send_msg(send_msg)
 
     def send_1E_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, controllerBox_state_list):

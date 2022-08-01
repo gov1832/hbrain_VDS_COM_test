@@ -142,7 +142,7 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
-        self.db.get_image_link()
+        s=self.db.get_outbreak()
 
     # region btn click function
     def socket_open_btn_click(self):
@@ -191,6 +191,8 @@ class main_function(QWidget):
 
             t = threading.Thread(target=self.read_socket_msg, args=())
             t.start()
+            dt = threading.Thread(target=self.read_dsocket_msg, args=())
+            dt.start()
 
     def db_connect_btn_click(self):
         print("db..")
@@ -207,6 +209,15 @@ class main_function(QWidget):
                 break
             else:
                 self.parsing_msg(recv_msg)
+
+    def read_dsocket_msg(self):
+        while 1:
+            outbreakdata = self.db.get_outbreak(self.lane_num)
+            if outbreakdata == []:
+                break
+            else:
+                self.sock.send_19_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, outbreakdata)
+
 
     def parsing_msg(self, recv_msg):
         d_recv_msg = recv_msg.decode('utf-16')
