@@ -36,15 +36,9 @@ class Socket_function:
     def client_accept(self):
         c_s, addr = self.server_socket.accept()
         self.client_socket_list.append(c_s)
-        # self.client_socket_list.append((c_s, addr))
-        # if len(self.client_socket_list) > 5:
-        #     self.client_socket_list.pop(0)
-        # if self.client_socket is not None:
-        #     self.client_socket.close()
-        #     self.server_socket.close()
-        #     self.socket_server_open(self.ip, self.port)
+        if len(self.client_socket_list) > 5:
+            self.client_socket_list.pop(0)
         self.client_socket = self.client_socket_list[-1]
-        print("-", self.client_socket)
 
         return self.client_socket
 
@@ -75,13 +69,11 @@ class Socket_function:
     def socket_read(self):
         msg = ''
         try:
-            print("recv waiting", self.client_socket)
             msg = self.client_socket.recv(1024)
-            print("recv!")
 
         except Exception as e:
             # self.client_socket = None
-            print("err: read/ ")
+            print("err: read/ ", e)
 
         return msg
 

@@ -23,6 +23,17 @@ class Other_function:
 
             # win32api.SetSystemTime(year, month, dayOfWeek, day, hour, minute, sec, 0)
 
+    def get_controller_number(self, cont_num):
+        datalist = []
+        for i in range(0, len(cont_num), 2):
+            datalist.append(int(cont_num[i: i + 2], 16))
+
+        result = ''
+        for i in datalist:
+            result = result + chr(i)
+        print(len(result))
+        return result
+
     def length_calc(self, length):
         length_1 = length & 0xFF
         length_2 = (length >> 8) & 0xFF
@@ -61,7 +72,7 @@ class Other_function:
         try:
             # socket.setdefaulttimeout(3)
             # socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(('183.99.41.239', 23306))
-            response = requests.get("https://www.naver.com", timeout=2)
+            response = requests.get("https://www.naver.com", timeout=1)
         except Exception as ex:
             print("network_check_error")
             nacklist = [False, op, chr(0x01)]

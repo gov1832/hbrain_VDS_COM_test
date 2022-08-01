@@ -37,22 +37,6 @@
       <property name="bottomMargin">
        <number>20</number>
       </property>
-      <item row="1" column="0">
-       <widget class="QFrame" name="frame_2">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>150</height>
-         </size>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <layout class="QVBoxLayout" name="socket_layout" stretch="5,5,3">
         <property name="spacing">
@@ -210,7 +194,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="dp_ip_input"/>
+           <widget class="QLineEdit" name="db_ip_input"/>
           </item>
           <item>
            <widget class="QLabel" name="label">
@@ -329,6 +313,9 @@
           </property>
           <property name="rightMargin">
            <number>20</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
           </property>
           <item>
            <widget class="QFrame" name="frame_4">
@@ -469,8 +456,51 @@
           </item>
           <item>
            <widget class="QLineEdit" name="ImgURL_Edit">
+            <property name="font">
+             <font>
+              <family>Consolas</family>
+             </font>
+            </property>
             <property name="text">
              <string>testImg.jpg</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <item>
+           <widget class="QLabel" name="label_12">
+            <property name="font">
+             <font>
+              <family>Consolas</family>
+             </font>
+            </property>
+            <property name="text">
+             <string>CONTROLLER NUMBER :</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="cont_num_edit">
+            <property name="font">
+             <font>
+              <family>Consolas</family>
+             </font>
+            </property>
+            <property name="text">
+             <string>1234567890</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -513,6 +543,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_FF_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0xFF 장비인증</string>
         </property>
@@ -520,6 +555,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_FE_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
         </property>
@@ -530,6 +570,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_01_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x01 제어기 동기화</string>
         </property>
@@ -537,6 +582,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_04_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x04 교통 데이터</string>
         </property>
@@ -544,6 +594,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_05_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x05 속도 데이터</string>
         </property>
@@ -551,6 +606,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_07_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x07 누적 교통량 데이터</string>
         </property>
@@ -558,6 +618,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_0C_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x0C 제어기 리셋</string>
         </property>
@@ -565,6 +630,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_0D_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x0D 제어기 초기화</string>
         </property>
@@ -572,6 +642,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_0E_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x0E 파라미터 다운로드</string>
         </property>
@@ -579,6 +654,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_0F_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x0F 파라미터 업로드</string>
         </property>
@@ -586,6 +666,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_11_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x11 온라인 상태</string>
         </property>
@@ -593,6 +678,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_12_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x12 메모리 검사</string>
         </property>
@@ -600,6 +690,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_13_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x13 메시지 에코</string>
         </property>
@@ -607,6 +702,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_15_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x15 버전 정보</string>
         </property>
@@ -614,6 +714,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_16_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x16 개별 차량 데이터</string>
         </property>
@@ -621,6 +726,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_17_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x17 정지 영상</string>
         </property>
@@ -628,6 +738,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_18_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x18 RTC 변경</string>
         </property>
@@ -635,6 +750,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_19_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x19 돌발상황 정보</string>
         </property>
@@ -642,6 +762,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="op_1E_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>0x1E 상태 정보</string>
         </property>
@@ -649,6 +774,11 @@
       </item>
       <item>
        <widget class="QPushButton" name="test_btn">
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+         </font>
+        </property>
         <property name="text">
          <string>TEST Btn</string>
         </property>
