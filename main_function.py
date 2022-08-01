@@ -34,6 +34,7 @@ class main_function(QWidget):
         self.btn_event()
 
         # system scenario value
+        self.client_test = None
         self.client_connect = None
         self.client_request_time = None
         self.recv_count = None
@@ -73,6 +74,7 @@ class main_function(QWidget):
         self.fe_check = True
         self.fe_num = 0
         self.read_thread = []
+        # self.client_test = []
 
         # S/W value
         self.client_connect = False
@@ -210,13 +212,14 @@ class main_function(QWidget):
 
     def client_accept_check(self):
         while True:
-            self.sock.client_accept()
+            self.client_test = self.sock.client_accept()
             t = threading.Thread(target=self.read_socket_msg, args=())
             self.read_thread.append(t)
             self.read_thread[-1].start()
+            print("thread: ", self.read_thread)
 
-            dt = threading.Thread(target=self.read_dsocket_msg, args=())
-            dt.start()
+            # dt = threading.Thread(target=self.read_dsocket_msg, args=())
+            # dt.start()
 
     def db_connect_btn_click(self):
         print("db..")
@@ -230,10 +233,14 @@ class main_function(QWidget):
         while 1:
             recv_msg = self.sock.socket_read()
             if recv_msg == '':
+                # if len(self.read_thread) > 1:
+                # self.read_thread.pop(0)
+                # self.sock.client_socket_close()
                 break
             else:
-                self.read_thread.pop(0)
                 self.parsing_msg(recv_msg)
+        self.sock.client_socket_close()
+        print("client close")
 
     def read_dsocket_msg(self):
         while 1:
