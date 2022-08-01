@@ -158,11 +158,17 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
-        cap = cv2.VideoCapture('rtsp://admin:hbrain0372!@183.99.41.239')
+        #cap = cv2.VideoCapture('rtsp://admin:hbrain0372!@183.99.41.239')
+
+        cap = cv2.VideoCapture(self.ui.ImgURL_Edit.text())
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-        ret, img = cap.read()
-        self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, img)
+        _, img = cap.read()
+        if str(type(img)) != "<class 'NoneType'>":
+            self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, img)
+        else:
+            list = [False, chr(0x17), chr(0x06)]
+            self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
 
     # region btn click function
     def socket_open_btn_click(self):
@@ -342,11 +348,11 @@ class main_function(QWidget):
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
 
                 elif msg_op == chr(0x17):
-                    cap = cv2.VideoCapture('rtsp://admin:hbrain0372!@183.99.41.239')
+                    cap = cv2.VideoCapture(self.ui.ImgURL_Edit.text())
                     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
                     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
                     _, img = cap.read()
-                    if img != None:
+                    if str(type(img)) != "<class 'NoneType'>":
                         self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, img)
                     else:
                         list = [False, chr(0x17), chr(0x06)]
