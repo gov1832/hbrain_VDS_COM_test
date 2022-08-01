@@ -176,7 +176,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <layout class="QVBoxLayout" name="db_layout">
+       <layout class="QVBoxLayout" name="db_layout" stretch="1,1,1,1,1">
         <property name="spacing">
          <number>1</number>
         </property>
@@ -184,9 +184,15 @@
          <number>5</number>
         </property>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,8,2,8">
+         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,0,2,0">
+          <property name="topMargin">
+           <number>5</number>
+          </property>
           <property name="rightMargin">
            <number>20</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
           </property>
           <item>
            <widget class="QLabel" name="label_4">
@@ -204,20 +210,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="db_ip_input">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Consolas</family>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-           </widget>
+           <widget class="QLineEdit" name="dp_ip_input"/>
           </item>
           <item>
            <widget class="QLabel" name="label">
@@ -232,27 +225,20 @@
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="db_port_input">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Consolas</family>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-           </widget>
+           <widget class="QLineEdit" name="db_port_input"/>
           </item>
          </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="2,8">
+          <property name="topMargin">
+           <number>5</number>
+          </property>
           <property name="rightMargin">
            <number>20</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
           </property>
           <item>
            <widget class="QLabel" name="label_5">
@@ -270,27 +256,20 @@
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="db_id_input">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Consolas</family>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-           </widget>
+           <widget class="QLineEdit" name="db_id_input"/>
           </item>
          </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="2,8">
+          <property name="topMargin">
+           <number>5</number>
+          </property>
           <property name="rightMargin">
            <number>20</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
           </property>
           <item>
            <widget class="QLabel" name="label_6">
@@ -308,27 +287,20 @@
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="db_pw_input">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Consolas</family>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-           </widget>
+           <widget class="QLineEdit" name="db_pw_input"/>
           </item>
          </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="2,8">
+          <property name="topMargin">
+           <number>5</number>
+          </property>
           <property name="rightMargin">
            <number>20</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
           </property>
           <item>
            <widget class="QLabel" name="label_7">
@@ -346,25 +318,15 @@
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="db_name_input">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>30</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>Consolas</family>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-           </widget>
+           <widget class="QLineEdit" name="db_name_input"/>
           </item>
          </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0">
+          <property name="topMargin">
+           <number>5</number>
+          </property>
           <property name="rightMargin">
            <number>20</number>
           </property>
