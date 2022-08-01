@@ -19,9 +19,14 @@ class Socket_function:
         self.client_socket_list = list()
         self.client_socket = None
 
+        self.ip = None
+        self.port = None
+
         self.ot = Other_function()
 
     def socket_server_open(self, ip, port):
+        self.ip = ip
+        self.port = port
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((ip, port))
@@ -32,8 +37,12 @@ class Socket_function:
         c_s, addr = self.server_socket.accept()
         self.client_socket_list.append(c_s)
         # self.client_socket_list.append((c_s, addr))
-        if len(self.client_socket_list) > 5:
-            self.client_socket_list.pop(0)
+        # if len(self.client_socket_list) > 5:
+        #     self.client_socket_list.pop(0)
+        # if self.client_socket is not None:
+        #     self.client_socket.close()
+        #     self.server_socket.close()
+        #     self.socket_server_open(self.ip, self.port)
         self.client_socket = self.client_socket_list[-1]
         print("-", self.client_socket)
 
@@ -68,7 +77,6 @@ class Socket_function:
         try:
             print("recv waiting", self.client_socket)
             msg = self.client_socket.recv(1024)
-            print("msg: ", msg)
             print("recv!")
 
         except Exception as e:

@@ -239,7 +239,8 @@ class main_function(QWidget):
                 break
             else:
                 self.parsing_msg(recv_msg)
-        self.sock.client_socket_close()
+                # print(recv_msg.decode('utf-16'))
+        # self.sock.client_socket_close()
         print("client close")
 
     def read_dsocket_msg(self):
@@ -248,10 +249,10 @@ class main_function(QWidget):
             if outbreakdata:
                 self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, outbreakdata)
 
-
     def parsing_msg(self, recv_msg):
         print("---------------------------------------------------------------------------")
         d_recv_msg = recv_msg.decode('utf-16')
+        print(d_recv_msg)
 
         result = self.ot.nack_find(msg=d_recv_msg, csn=self.controller_station)
         if result[0] == True:

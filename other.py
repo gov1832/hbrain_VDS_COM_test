@@ -3,6 +3,7 @@ import os
 # import win32api
 import datetime
 import socket
+import requests
 
 class Other_function:
     def __init__(self):
@@ -50,8 +51,6 @@ class Other_function:
 
         return iplong
 
-    # self.ot.nack_find(d_recv_msg) -> return [true, op, 0] / [false, op, 0x03]  op -> chr(0x15) nack-> chr(0x06)
-    # send_msg ='123.456.789.123-127.000.000.001-VD123451chr(0x04)'
     def nack_find(self, msg=None, csn=None):
         nacklist=[]
         op = msg[43]
@@ -60,9 +59,9 @@ class Other_function:
                   chr(0x0C), chr(0x0D), chr(0x0E), chr(0x0F), chr(0x11), chr(0x12),
                   chr(0x13), chr(0x15), chr(0x16), chr(0x17), chr(0x18), chr(0x19), chr(0x1E),]
         try:
-            socket.setdefaulttimeout(3)
-            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(('183.99.41.239', 23306))
-
+            # socket.setdefaulttimeout(3)
+            # socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(('183.99.41.239', 23306))
+            response = requests.get("https://www.naver.com", timeout=2)
         except Exception as ex:
             print("network_check_error")
             nacklist = [False, op, chr(0x01)]
