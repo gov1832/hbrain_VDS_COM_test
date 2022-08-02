@@ -24,13 +24,20 @@ class Other_function:
             # win32api.SetSystemTime(year, month, dayOfWeek, day, hour, minute, sec, 0)
 
     def get_controller_number(self, cont_num):
-        datalist = []
-        for i in range(0, len(cont_num), 2):
-            datalist.append(int(cont_num[i: i + 2], 16))
-
         result = ''
-        for i in datalist:
-            result = result + chr(i)
+        try:
+            if len(cont_num) == 10:
+                datalist = []
+                for i in range(0, len(cont_num), 2):
+                    datalist.append(int(cont_num[i: i + 2], 16))
+
+                for i in datalist:
+                    result = result + chr(i)
+            else:
+                return result
+        except Exception as e:
+            print("err controller num: ", e)
+
         return result
 
     def length_calc(self, length):

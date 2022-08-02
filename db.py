@@ -15,6 +15,8 @@ class DB_function:
             cur = db_connect.cursor()
             sql = 'use ' + db
             cur.execute(sql)
+
+            db_connect.close()
             return True
         except Exception as e:
             return False

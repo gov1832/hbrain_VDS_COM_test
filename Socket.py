@@ -30,21 +30,23 @@ class Socket_function:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((ip, port))
-        self.server_socket.listen()
+        self.server_socket.listen(5)
         # self.server_socket.listen(5)
 
     def client_accept(self):
         c_s, addr = self.server_socket.accept()
         self.client_socket_list.append(c_s)
-        if len(self.client_socket_list) > 5:
+        if len(self.client_socket_list) > 2:
+            # self.client_socket_close()
             self.client_socket_list.pop(0)
+            self.client_socket_list[0].close()
         self.client_socket = self.client_socket_list[-1]
-
+        # print("list==", self.client_socket_list)
         return self.client_socket
 
     def client_socket_close(self):
         # self.client_socket.shutdown(socket.SHUT_RDWR)
-        self.client_socket.close()
+        # self.client_socket.close()
         # self.client_socket.detach()
         self.client_socket = None
 
@@ -54,8 +56,9 @@ class Socket_function:
 
     def socket_send_msg(self, send_msg):
         self.client_socket.send(send_msg.encode('utf-16'))
-        print("TX_msg: [", send_msg, "]")
-        print("TX: [", send_msg.encode('utf-16'), "]")
+        print("TX OPCode: ", "0x{:02X}".format(ord(send_msg[43])))
+        # print("TX_msg: [", send_msg, "]")
+        # print("TX: [", send_msg.encode('utf-16'), "]")
         # recv
         # recv_msg = self.client_socket.recv(1024)
         # d_recv_msg = recv_msg.decode()
@@ -70,7 +73,7 @@ class Socket_function:
         msg = ''
         try:
             msg = self.client_socket.recv(1024)
-
+            # print(self.client_socket)
         except Exception as e:
             # self.client_socket = None
             print("err: read/ ", e)

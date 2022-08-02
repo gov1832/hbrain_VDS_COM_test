@@ -43,6 +43,8 @@ class main_function(QWidget):
         self.fe_check = None
         self.fe_num = None
         self.read_thread = None
+        self.dsocket_thread = None
+        # self.d
         self.request_timer = QTimer()
         self.request_timer.start(5000)
         self.request_timer.timeout.connect(self.request_check_timer)
@@ -117,26 +119,26 @@ class main_function(QWidget):
         self.ui.db_name_input.setText("vds")
 
         self.ui.socket_open_btn.setEnabled(False)
-        self.ui.op_FF_btn.setEnabled(False)
-        self.ui.op_FE_btn.setEnabled(False)
-        self.ui.op_01_btn.setEnabled(False)
-        self.ui.op_04_btn.setEnabled(False)
-        self.ui.op_05_btn.setEnabled(False)
-        self.ui.op_07_btn.setEnabled(False)
-        self.ui.op_0C_btn.setEnabled(False)
-        self.ui.op_0D_btn.setEnabled(False)
-        self.ui.op_0D_btn.setEnabled(False)
-        self.ui.op_0E_btn.setEnabled(False)
-        self.ui.op_0F_btn.setEnabled(False)
-        self.ui.op_11_btn.setEnabled(False)
-        self.ui.op_12_btn.setEnabled(False)
-        self.ui.op_13_btn.setEnabled(False)
-        self.ui.op_15_btn.setEnabled(False)
-        self.ui.op_16_btn.setEnabled(False)
-        self.ui.op_17_btn.setEnabled(False)
-        self.ui.op_18_btn.setEnabled(False)
-        self.ui.op_19_btn.setEnabled(False)
-        self.ui.op_1E_btn.setEnabled(False)
+        # self.ui.op_FF_btn.setEnabled(False)
+        # self.ui.op_FE_btn.setEnabled(False)
+        # self.ui.op_01_btn.setEnabled(False)
+        # self.ui.op_04_btn.setEnabled(False)
+        # self.ui.op_05_btn.setEnabled(False)
+        # self.ui.op_07_btn.setEnabled(False)
+        # self.ui.op_0C_btn.setEnabled(False)
+        # self.ui.op_0D_btn.setEnabled(False)
+        # self.ui.op_0D_btn.setEnabled(False)
+        # self.ui.op_0E_btn.setEnabled(False)
+        # self.ui.op_0F_btn.setEnabled(False)
+        # self.ui.op_11_btn.setEnabled(False)
+        # self.ui.op_12_btn.setEnabled(False)
+        # self.ui.op_13_btn.setEnabled(False)
+        # self.ui.op_15_btn.setEnabled(False)
+        # self.ui.op_16_btn.setEnabled(False)
+        # self.ui.op_17_btn.setEnabled(False)
+        # self.ui.op_18_btn.setEnabled(False)
+        # self.ui.op_19_btn.setEnabled(False)
+        # self.ui.op_1E_btn.setEnabled(False)
 
         self.ui.tx_table.setColumnWidth(0, 180)
         self.ui.tx_table.setColumnWidth(1, 80)
@@ -150,29 +152,30 @@ class main_function(QWidget):
     def btn_event(self):
         self.ui.socket_open_btn.clicked.connect(self.socket_open_btn_click)
         self.ui.db_connect_btn.clicked.connect(self.db_connect_btn_click)
+        self.ui.cont_num_change_btn.clicked.connect(self.cont_num_change_btn_click)
 
         # region request btn event
-        self.ui.op_FF_btn.clicked.connect(self.op_FF_btn_click)
-        self.ui.op_FE_btn.clicked.connect(self.op_FE_btn_click)
-        self.ui.op_01_btn.clicked.connect(self.op_01_btn_click)
-        self.ui.op_04_btn.clicked.connect(self.op_04_btn_click)
-        self.ui.op_05_btn.clicked.connect(self.op_05_btn_click)
-        self.ui.op_07_btn.clicked.connect(self.op_07_btn_click)
-        self.ui.op_0C_btn.clicked.connect(self.op_0C_btn_click)
-        self.ui.op_0D_btn.clicked.connect(self.op_0D_btn_click)
-        self.ui.op_0E_btn.clicked.connect(self.op_0E_btn_click)
-        self.ui.op_0F_btn.clicked.connect(self.op_0F_btn_click)
-        self.ui.op_11_btn.clicked.connect(self.op_11_btn_click)
-        self.ui.op_12_btn.clicked.connect(self.op_12_btn_click)
-        self.ui.op_13_btn.clicked.connect(self.op_13_btn_click)
-        self.ui.op_15_btn.clicked.connect(self.op_15_btn_click)
-        self.ui.op_16_btn.clicked.connect(self.op_16_btn_click)
-        self.ui.op_17_btn.clicked.connect(self.op_17_btn_click)
-        self.ui.op_18_btn.clicked.connect(self.op_18_btn_click)
-        self.ui.op_19_btn.clicked.connect(self.op_19_btn_click)
-        self.ui.op_1E_btn.clicked.connect(self.op_1E_btn_click)
-        # test
-        self.ui.test_btn.clicked.connect(self.test_btn_click)
+        # self.ui.op_FF_btn.clicked.connect(self.op_FF_btn_click)
+        # self.ui.op_FE_btn.clicked.connect(self.op_FE_btn_click)
+        # self.ui.op_01_btn.clicked.connect(self.op_01_btn_click)
+        # self.ui.op_04_btn.clicked.connect(self.op_04_btn_click)
+        # self.ui.op_05_btn.clicked.connect(self.op_05_btn_click)
+        # self.ui.op_07_btn.clicked.connect(self.op_07_btn_click)
+        # self.ui.op_0C_btn.clicked.connect(self.op_0C_btn_click)
+        # self.ui.op_0D_btn.clicked.connect(self.op_0D_btn_click)
+        # self.ui.op_0E_btn.clicked.connect(self.op_0E_btn_click)
+        # self.ui.op_0F_btn.clicked.connect(self.op_0F_btn_click)
+        # self.ui.op_11_btn.clicked.connect(self.op_11_btn_click)
+        # self.ui.op_12_btn.clicked.connect(self.op_12_btn_click)
+        # self.ui.op_13_btn.clicked.connect(self.op_13_btn_click)
+        # self.ui.op_15_btn.clicked.connect(self.op_15_btn_click)
+        # self.ui.op_16_btn.clicked.connect(self.op_16_btn_click)
+        # self.ui.op_17_btn.clicked.connect(self.op_17_btn_click)
+        # self.ui.op_18_btn.clicked.connect(self.op_18_btn_click)
+        # self.ui.op_19_btn.clicked.connect(self.op_19_btn_click)
+        # self.ui.op_1E_btn.clicked.connect(self.op_1E_btn_click)
+        # # test
+        # self.ui.test_btn.clicked.connect(self.test_btn_click)
         # endregion
 
     def test_btn_click(self):
@@ -202,59 +205,61 @@ class main_function(QWidget):
     def socket_open_btn_click(self):
         self.local_ip = self.ot.make_16ip(sip=self.ui.sock_ip_input.text())
         self.controller_index = self.ot.get_controller_number(self.ui.cont_num_edit.text())
-        sock_ip = self.ui.sock_ip_input.text()
-        sock_port = int(self.ui.sock_port_input.text())
+        if self.controller_index != '':
+            sock_ip = self.ui.sock_ip_input.text()
+            sock_port = int(self.ui.sock_port_input.text())
 
-        if sock_ip == '' or sock_port == '':
-            self.ui.status_bar.setText("Socket IP, PORT를 입력해주세요!")
+            if sock_ip == '' or sock_port == '':
+                self.ui.status_bar.setText("Socket IP, PORT를 입력해주세요!")
+            else:
+                self.ui.status_bar.setText("Socket server open..")
+                try:
+                    self.sock.socket_server_open(sock_ip, sock_port)
+                except Exception as e:
+                    self.ui.status_bar.setText("err socket open: " + e)
+                self.ui.status_bar.setText("Socket server '" + sock_ip + "', '" + str(sock_port) + "' open !")
+                self.ui.socket_open_btn.setEnabled(False)
+
+                # region test btn true
+                # self.ui.op_FF_btn.setEnabled(False)
+                # self.ui.op_FE_btn.setEnabled(True)
+                # self.ui.op_01_btn.setEnabled(False)
+                # self.ui.op_04_btn.setEnabled(False)
+                # self.ui.op_05_btn.setEnabled(False)
+                # self.ui.op_07_btn.setEnabled(False)
+                # self.ui.op_0C_btn.setEnabled(False)
+                # self.ui.op_0D_btn.setEnabled(False)
+                # self.ui.op_0D_btn.setEnabled(False)
+                # self.ui.op_0E_btn.setEnabled(False)
+                # self.ui.op_0F_btn.setEnabled(False)
+                # self.ui.op_11_btn.setEnabled(False)
+                # self.ui.op_12_btn.setEnabled(False)
+                # self.ui.op_13_btn.setEnabled(False)
+                # self.ui.op_15_btn.setEnabled(False)
+                # self.ui.op_16_btn.setEnabled(False)
+                # self.ui.op_17_btn.setEnabled(False)
+                # self.ui.op_18_btn.setEnabled(False)
+                # self.ui.op_19_btn.setEnabled(True)
+                # self.ui.op_1E_btn.setEnabled(False)
+                # endregion
+
+                t = threading.Thread(target=self.client_accept_check, args=())
+                t.start()
         else:
-            self.ui.status_bar.setText("Socket server open..")
-            try:
-                self.sock.socket_server_open(sock_ip, sock_port)
-            except Exception as e:
-                self.ui.status_bar.setText("err socket open: " + e)
-            self.ui.status_bar.setText("Socket server '" + sock_ip + "', '" + str(sock_port) + "' open !")
-
-            # region test btn true
-            self.ui.op_FF_btn.setEnabled(False)
-            self.ui.op_FE_btn.setEnabled(True)
-            self.ui.op_01_btn.setEnabled(False)
-            self.ui.op_04_btn.setEnabled(False)
-            self.ui.op_05_btn.setEnabled(False)
-            self.ui.op_07_btn.setEnabled(False)
-            self.ui.op_0C_btn.setEnabled(False)
-            self.ui.op_0D_btn.setEnabled(False)
-            self.ui.op_0D_btn.setEnabled(False)
-            self.ui.op_0E_btn.setEnabled(False)
-            self.ui.op_0F_btn.setEnabled(False)
-            self.ui.op_11_btn.setEnabled(False)
-            self.ui.op_12_btn.setEnabled(False)
-            self.ui.op_13_btn.setEnabled(False)
-            self.ui.op_15_btn.setEnabled(False)
-            self.ui.op_16_btn.setEnabled(False)
-            self.ui.op_17_btn.setEnabled(False)
-            self.ui.op_18_btn.setEnabled(False)
-            self.ui.op_19_btn.setEnabled(True)
-            self.ui.op_1E_btn.setEnabled(False)
-            # endregion
-
-            # read 스레드 시작 while
-            # t = threading.Thread(target=self.read_socket_msg, args=())
-            # t.start()
-            # read_socket = Process(target=self.read_socket_msg, args=())
-            # read_socket.start()
-            t = threading.Thread(target=self.client_accept_check, args=())
-            t.start()
+            self.ui.status_bar.setText("controller number는 10자로 입력해주세요")
 
     def client_accept_check(self):
         while True:
             self.client_test = self.sock.client_accept()
             t = threading.Thread(target=self.read_socket_msg, args=())
             self.read_thread.append(t)
+            if len(self.read_thread) > 2:
+                self.read_thread.pop(0)
             self.read_thread[-1].start()
+            print(self.read_thread)
 
-            dt = threading.Thread(target=self.read_dsocket_msg, args=())
-            dt.start()
+            self.dsocket_thread = threading.Thread(target=self.read_dsocket_msg, args=())
+            # dt.start()
 
     def db_connect_btn_click(self):
         self.db_ip = self.ui.db_ip_input.text()
@@ -264,6 +269,19 @@ class main_function(QWidget):
         self.db_name = self.ui.db_name_input.text()
         if self.db.db_connection_check(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8'):
             self.ui.socket_open_btn.setEnabled(True)
+
+    def cont_num_change_btn_click(self):
+        cont_num = self.ot.get_controller_number(self.ui.cont_num_edit.text())
+        self.controller_index = cont_num
+        if self.controller_index == '':
+            self.ui.status_bar.setText("controller number는 10자로 입력해주세요")
+        else:
+            self.ui.status_bar.setText("controller number: " +
+                                       str(hex(ord(self.controller_index[0]))) +
+                                       str(hex(ord(self.controller_index[1]))) +
+                                       str(hex(ord(self.controller_index[2]))) +
+                                       str(hex(ord(self.controller_index[3]))) +
+                                       str(hex(ord(self.controller_index[4]))))
 
     # endregion
 
@@ -281,10 +299,12 @@ class main_function(QWidget):
                 self.parsing_msg(recv_msg)
                 # print(recv_msg.decode('utf-16'))
         # self.sock.client_socket_close()
+        self.client_connect = False
         print("client close")
 
     def read_dsocket_msg(self):
-        while 1:
+        while self.client_connect:
+            # if self.client_connect:
             outbreakdata = self.db.get_outbreak(lane=self.lane_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
             if outbreakdata:
                 self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, outbreakdata)
@@ -311,13 +331,15 @@ class main_function(QWidget):
             if destination_ip == self.local_ip:
                 self.center_ip = msg_sender_ip
                 self.client_request_time = time.time()
-                print("RX_msg: [", recv_msg.decode('utf-16'), "]")
-                print("RX: [", recv_msg, "]")
+                # print("RX_msg: [", recv_msg.decode('utf-16'), "]")
+                # print("RX: [", recv_msg, "]")
+                print("RX OPCode: ", "0x{:02X}".format(ord(msg_op)))
                 if msg_op == chr(0xFF):
                     self.sock.send_FF_res_msg(self.local_ip, self.center_ip, self.controller_type,
                                               self.controller_index)
                     self.update_TX_Log(chr(0xFF), [1])
                     self.client_connect = True
+                    self.dsocket_thread.start()
                     self.connect_time = time.time()
                 elif msg_op == chr(0xFE):
                     self.fe_check = True
@@ -547,79 +569,79 @@ class main_function(QWidget):
         self.db.set_paramete_data(parameter_list)
 
     # region test send msg
-    def op_FF_btn_click(self):
-        print("FF btn_click")
-        self.sock.send_FF_msg()
-
-    def op_FE_btn_click(self):
-        print("FE btn_click")
-        self.sock.send_FE_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
-
-    def op_01_btn_click(self):
-        print("01 btn_click")
-        self.sock.send_01_msg()
-
-    def op_04_btn_click(self):
-        print("04 btn_click")
-        self.sock.send_04_msg()
-
-    def op_05_btn_click(self):
-        print("05 btn_click")
-        self.sock.send_05_msg()
-
-    def op_07_btn_click(self):
-        print("07 btn_click")
-        self.sock.send_07_msg()
-
-    def op_0C_btn_click(self):
-        print("0C btn_click")
-        self.sock.send_0C_msg()
-
-    def op_0D_btn_click(self):
-        print("0D btn_click")
-        self.sock.send_0D_msg()
-
-    def op_0E_btn_click(self):
-        print("0E btn_click")
-        self.sock.send_0E_msg()
-
-    def op_0F_btn_click(self):
-        print("0F btn_click")
-        self.sock.send_0F_msg()
-
-    def op_11_btn_click(self):
-        print("11 btn_click")
-        self.sock.send_11_msg()
-
-    def op_12_btn_click(self):
-        print("12 btn_click")
-
-    def op_13_btn_click(self):
-        print("13 btn_click")
-        self.sock.send_13_msg()
-
-    def op_15_btn_click(self):
-        print("15 btn_click")
-        self.sock.send_15_msg()
-
-    def op_16_btn_click(self):
-        print("16 btn_click")
-        self.sock.send_16_msg()
-
-    def op_17_btn_click(self):
-        print("17 btn_click")
-        self.sock.send_17_msg()
-
-    def op_18_btn_click(self):
-        print("18 btn_click")
-        self.sock.send_18_msg()
-
-    def op_19_btn_click(self):
-        print("19 btn_click")
-
-    def op_1E_btn_click(self):
-        print("1E btn_click")
-        self.sock.send_1E_msg()
+    # def op_FF_btn_click(self):
+    #     print("FF btn_click")
+    #     self.sock.send_FF_msg()
+    #
+    # def op_FE_btn_click(self):
+    #     print("FE btn_click")
+    #     self.sock.send_FE_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
+    #
+    # def op_01_btn_click(self):
+    #     print("01 btn_click")
+    #     self.sock.send_01_msg()
+    #
+    # def op_04_btn_click(self):
+    #     print("04 btn_click")
+    #     self.sock.send_04_msg()
+    #
+    # def op_05_btn_click(self):
+    #     print("05 btn_click")
+    #     self.sock.send_05_msg()
+    #
+    # def op_07_btn_click(self):
+    #     print("07 btn_click")
+    #     self.sock.send_07_msg()
+    #
+    # def op_0C_btn_click(self):
+    #     print("0C btn_click")
+    #     self.sock.send_0C_msg()
+    #
+    # def op_0D_btn_click(self):
+    #     print("0D btn_click")
+    #     self.sock.send_0D_msg()
+    #
+    # def op_0E_btn_click(self):
+    #     print("0E btn_click")
+    #     self.sock.send_0E_msg()
+    #
+    # def op_0F_btn_click(self):
+    #     print("0F btn_click")
+    #     self.sock.send_0F_msg()
+    #
+    # def op_11_btn_click(self):
+    #     print("11 btn_click")
+    #     self.sock.send_11_msg()
+    #
+    # def op_12_btn_click(self):
+    #     print("12 btn_click")
+    #
+    # def op_13_btn_click(self):
+    #     print("13 btn_click")
+    #     self.sock.send_13_msg()
+    #
+    # def op_15_btn_click(self):
+    #     print("15 btn_click")
+    #     self.sock.send_15_msg()
+    #
+    # def op_16_btn_click(self):
+    #     print("16 btn_click")
+    #     self.sock.send_16_msg()
+    #
+    # def op_17_btn_click(self):
+    #     print("17 btn_click")
+    #     self.sock.send_17_msg()
+    #
+    # def op_18_btn_click(self):
+    #     print("18 btn_click")
+    #     self.sock.send_18_msg()
+    #
+    # def op_19_btn_click(self):
+    #     print("19 btn_click")
+    #
+    # def op_1E_btn_click(self):
+    #     print("1E btn_click")
+    #     self.sock.send_1E_msg()
 
     # endregion
 

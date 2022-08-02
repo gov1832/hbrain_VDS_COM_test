@@ -15,7 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_6">
    <item>
-    <layout class="QHBoxLayout" name="main_layout" stretch="5,1">
+    <layout class="QHBoxLayout" name="main_layout" stretch="5">
      <property name="spacing">
       <number>10</number>
      </property>
@@ -172,8 +172,14 @@
          </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,8,2,8">
+           <property name="topMargin">
+            <number>5</number>
+           </property>
            <property name="rightMargin">
             <number>20</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
            </property>
            <item>
             <widget class="QLabel" name="label_4">
@@ -224,8 +230,14 @@
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="2,8">
+           <property name="topMargin">
+            <number>5</number>
+           </property>
            <property name="rightMargin">
             <number>20</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
            </property>
            <item>
             <widget class="QLabel" name="label_5">
@@ -255,8 +267,14 @@
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="2,8">
+           <property name="topMargin">
+            <number>5</number>
+           </property>
            <property name="rightMargin">
             <number>20</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
            </property>
            <item>
             <widget class="QLabel" name="label_6">
@@ -286,8 +304,14 @@
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="2,8">
+           <property name="topMargin">
+            <number>5</number>
+           </property>
            <property name="rightMargin">
             <number>20</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
            </property>
            <item>
             <widget class="QLabel" name="label_7">
@@ -317,8 +341,14 @@
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0">
+           <property name="topMargin">
+            <number>5</number>
+           </property>
            <property name="rightMargin">
             <number>20</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
            </property>
            <item>
             <widget class="QFrame" name="frame_4">
@@ -375,19 +405,6 @@
          </property>
          <property name="margin">
           <number>10</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLabel" name="time_bar">
-         <property name="font">
-          <font>
-           <family>Consolas</family>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Time</string>
          </property>
         </widget>
        </item>
@@ -521,7 +538,7 @@
         </layout>
        </item>
        <item row="1" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="2,2,1">
          <item>
           <widget class="QLabel" name="label_11">
            <property name="font">
@@ -546,180 +563,58 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="cont_num_change_btn">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+            </font>
+           </property>
+           <property name="text">
+            <string>change</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="btn_layout" stretch="3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1">
-       <property name="bottomMargin">
-        <number>30</number>
-       </property>
-       <item>
-        <widget class="QLabel" name="hbrain_icon">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>150</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>AcadEref</family>
-           <pointsize>16</pointsize>
-           <underline>true</underline>
-          </font>
-         </property>
-         <property name="text">
-          <string>TEST</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_FF_btn">
-         <property name="text">
-          <string>0xFF 장비인증</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_FE_btn">
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>0xFE 통신세션유효성확인</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_01_btn">
-         <property name="text">
-          <string>0x01 제어기 동기화</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_04_btn">
-         <property name="text">
-          <string>0x04 교통 데이터</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_05_btn">
-         <property name="text">
-          <string>0x05 속도 데이터</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_07_btn">
-         <property name="text">
-          <string>0x07 누적 교통량 데이터</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_0C_btn">
-         <property name="text">
-          <string>0x0C 제어기 리셋</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_0D_btn">
-         <property name="text">
-          <string>0x0D 제어기 초기화</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_0E_btn">
-         <property name="text">
-          <string>0x0E 파라미터 다운로드</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_0F_btn">
-         <property name="text">
-          <string>0x0F 파라미터 업로드</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_11_btn">
-         <property name="text">
-          <string>0x11 온라인 상태</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_12_btn">
-         <property name="text">
-          <string>0x12 메모리 검사</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_13_btn">
-         <property name="text">
-          <string>0x13 메시지 에코</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_15_btn">
-         <property name="text">
-          <string>0x15 버전 정보</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_16_btn">
-         <property name="text">
-          <string>0x16 개별 차량 데이터</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_17_btn">
-         <property name="text">
-          <string>0x17 정지 영상</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_18_btn">
-         <property name="text">
-          <string>0x18 RTC 변경</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_19_btn">
-         <property name="text">
-          <string>0x19 돌발상황 정보</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="op_1E_btn">
-         <property name="text">
-          <string>0x1E 상태 정보</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="test_btn">
-         <property name="text">
-          <string>TEST Btn</string>
-         </property>
-        </widget>
+       <item row="4" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="9,1">
+         <item>
+          <widget class="QLabel" name="time_bar">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+            </font>
+           </property>
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="hbrain_icon">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>150</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>AcadEref</family>
+             <pointsize>16</pointsize>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>TEST</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -727,28 +622,6 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>op_FF_btn</tabstop>
-  <tabstop>op_FE_btn</tabstop>
-  <tabstop>op_01_btn</tabstop>
-  <tabstop>op_04_btn</tabstop>
-  <tabstop>op_05_btn</tabstop>
-  <tabstop>op_07_btn</tabstop>
-  <tabstop>op_0C_btn</tabstop>
-  <tabstop>op_0D_btn</tabstop>
-  <tabstop>op_0E_btn</tabstop>
-  <tabstop>op_0F_btn</tabstop>
-  <tabstop>op_11_btn</tabstop>
-  <tabstop>op_12_btn</tabstop>
-  <tabstop>op_13_btn</tabstop>
-  <tabstop>op_15_btn</tabstop>
-  <tabstop>op_16_btn</tabstop>
-  <tabstop>op_17_btn</tabstop>
-  <tabstop>op_18_btn</tabstop>
-  <tabstop>op_19_btn</tabstop>
-  <tabstop>op_1E_btn</tabstop>
-  <tabstop>test_btn</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>
