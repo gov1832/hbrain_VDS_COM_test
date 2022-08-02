@@ -497,7 +497,7 @@ class main_function(QWidget):
             time_delay = now_time - self.client_request_time
             # print("delay: ", time_delay)
 
-            if (time_delay > 10) & self.fe_check:
+            if (time_delay > 300) & self.fe_check:
                 self.sock.send_FE_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 self.update_TX_Log(chr(0xFE), [0])
                 self.fe_send_time = time.time()
