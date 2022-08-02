@@ -1,6 +1,6 @@
 import sys
 import os
-# import win32api
+import win32api
 import datetime
 import socket
 import requests
@@ -20,8 +20,8 @@ class Other_function:
             hour = int(daylist[4])
             minute = int(daylist[5])
             sec = int(daylist[6])
-
-            # win32api.SetSystemTime(year, month, dayOfWeek, day, hour, minute, sec, 0)
+            print(year, month, day, dayOfWeek, hour, minute, sec)
+            win32api.SetSystemTime(year, month, dayOfWeek, day, hour, minute, sec, 0)
 
     def get_controller_number(self, cont_num):
         datalist = []
@@ -67,7 +67,7 @@ class Other_function:
         csn_msg = msg[32:39]
         opcode = [chr(0xFF), chr(0xFE), chr(0x01), chr(0x04), chr(0x05), chr(0x07),
                   chr(0x0C), chr(0x0D), chr(0x0E), chr(0x0F), chr(0x11), chr(0x12),
-                  chr(0x13), chr(0x15), chr(0x16), chr(0x17), chr(0x18), chr(0x19), chr(0x1E),]
+                  chr(0x13), chr(0x15),  chr(0x16), chr(0x17), chr(0x18), chr(0x19), chr(0x1E),]
         try:
             response = requests.get("https://www.google.com", timeout=2)
         except Exception as ex:
