@@ -82,7 +82,7 @@ class Socket_function:
         point = chr(0x2D)
         opcode = chr(0xFF)
         ack = chr(0x06)
-        length = self.ot.length_calc(1 + len(ack))
+        length = self.ot.length_calc(2 + len(ack))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack
         self.socket_send_msg(send_msg)
@@ -107,7 +107,7 @@ class Socket_function:
         for i in traffic_data:
             lane_data = lane_data + chr(i[0]) + chr(i[1])
         data = frame_num + lane_num + lane_data
-        length = self.ot.length_calc(1 + len(data))
+        length = self.ot.length_calc(2 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + data
         self.socket_send_msg(send_msg)
@@ -124,7 +124,7 @@ class Socket_function:
             for i in range(len(temp)):
                 data = data + chr(temp[i] >> 8) + chr(temp[i] & 0xFF)
 
-        length = self.ot.length_calc(1 + len(data))
+        length = self.ot.length_calc(2 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + data
         self.socket_send_msg(send_msg)
@@ -141,7 +141,7 @@ class Socket_function:
             num_low = int(count) & 0xFF
             data = data + chr(num_high) + chr(num_low)
 
-        length = self.ot.length_calc(1 + len(data))
+        length = self.ot.length_calc(2 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + data
         self.socket_send_msg(send_msg)
@@ -173,7 +173,6 @@ class Socket_function:
         self.socket_send_msg(send_msg)
 
     def send_0F_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, index, lane_num, collect_cycle, category_num, acc_speed, calc_speed, use_unexpected):
-        length = '0002'
         point = chr(0x2D)
         opcode = chr(0x0F)
         ack = chr(0x06)
@@ -220,6 +219,7 @@ class Socket_function:
             byte_1 = chr(use_unexpected)
             data = data + byte_1
 
+        length = self.ot.length_calc(2 + len(data))
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + data
         self.socket_send_msg(send_msg)
 
@@ -234,7 +234,7 @@ class Socket_function:
             time_3 = (time_cha >> 16) & 0xFF
             time_4 = (time_cha >> 24) & 0xFF
             data = chr(time_3) + chr(time_3) + chr(time_2) + chr(time_1)
-            length = self.ot.length_calc(1 + len(data))
+            length = self.ot.length_calc(2 + len(data))
 
             send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + data
             self.socket_send_msg(send_msg)
@@ -247,7 +247,7 @@ class Socket_function:
         opcode = chr(0x13)
         ack = chr(0x06)
         data = msg[44:]
-        length = self.ot.length_calc(1 + len(data))
+        length = self.ot.length_calc(2 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack +data
         self.socket_send_msg(send_msg)
@@ -266,7 +266,7 @@ class Socket_function:
             make_month = chr(version_list[0][4])
             make_day = chr(version_list[0][5])
             data = version_num + make_year + make_month + make_day
-            length = self.ot.length_calc(1 + len(data))
+            length = self.ot.length_calc(2 + len(data))
 
             send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + data
             self.socket_send_msg(send_msg)
@@ -281,7 +281,7 @@ class Socket_function:
         for i in individual_traffic_data:
             data = data + chr(i[0]) + chr(i[1]) + chr(int(i[2]))
 
-        length = self.ot.length_calc(1 + len(data))
+        length = self.ot.length_calc(2 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + data
         self.socket_send_msg(send_msg)
@@ -348,7 +348,7 @@ class Socket_function:
         data = ''
         for i in controllerBox_state_list:
             data += chr(i)
-        length = self.ot.length_calc(1 + len(data))
+        length = self.ot.length_calc(2 + len(data))
 
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + data
         # print(send_msg)

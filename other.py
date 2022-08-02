@@ -69,7 +69,7 @@ class Other_function:
                   chr(0x0C), chr(0x0D), chr(0x0E), chr(0x0F), chr(0x11), chr(0x12),
                   chr(0x13), chr(0x15), chr(0x16), chr(0x17), chr(0x18), chr(0x19), chr(0x1E),]
         try:
-            response = requests.get("https://www.naver.com", timeout=2)
+            response = requests.get("https://www.google.com", timeout=2)
         except Exception as ex:
             print("network_check_error")
             nacklist = [False, op, chr(0x01)]
@@ -85,7 +85,7 @@ class Other_function:
             nacklist = [False, op, chr(0x04)]
             return nacklist
         elif len(msg) == 44:
-            if op in [chr(0x01),chr(0x0E), chr(0x0F), chr(0x13), chr(0x17), chr(0x18), chr(0x19)]:
+            if op in [chr(0x01),chr(0x0E), chr(0x0F), chr(0x13), chr(0x18), chr(0x19)]:
                 nacklist = [False, op, chr(0x05)]
                 return nacklist
             else:
@@ -93,14 +93,13 @@ class Other_function:
                 print(nacklist)
                 return nacklist
         elif len(msg) > 44:
-            if op not in [chr(0x01),chr(0xFE),chr(0x0E), chr(0x0F), chr(0x13), chr(0x17), chr(0x18), chr(0x19)]:
+            if op not in [chr(0x01),chr(0xFE),chr(0x0E), chr(0x0F), chr(0x13), chr(0x18), chr(0x19)]:
                 nacklist = [False, op, chr(0x05)]
                 return nacklist
-            elif (op in [chr(0x01),chr(0x0F), chr(0x17)]) and (len(msg) != 45):
+            elif (op in [chr(0x01),chr(0x0F)]) and (len(msg) != 45):
                 nacklist = [False, op, chr(0x05)]
                 return nacklist
-            elif (op == chr(0x17)) and (msg[44] not in [chr(0), chr(1), chr(2)]):
-                x=hex(ord(msg[44]))
+            elif (op in [chr(0xFE), chr(0x19)]) and (len(msg) > 46):
                 nacklist = [False, op, chr(0x05)]
                 return nacklist
             elif (op == chr(0x18)) and (len(msg) != 51):
