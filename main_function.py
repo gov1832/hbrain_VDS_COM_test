@@ -67,8 +67,8 @@ class main_function(QWidget):
         self.lane_num = None
         self.collect_cycle = None
         self.category_num = None
-        self.acc_speed = None
-        self.calc_speed = None
+        self.use_ntraffic = None
+        self.use_category_speed = None
         self.use_unexpected = None
         self.individual_traffic_data = None
         self.traffic_data = None
@@ -94,8 +94,8 @@ class main_function(QWidget):
         self.lane_num = 2
         self.collect_cycle = 30
         self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
-        self.acc_speed = 1
-        self.calc_speed = 1
+        self.use_ntraffic = 1
+        self.use_category_speed = 1
         self.use_unexpected = 1
 
     def time_bar_timeout(self):
@@ -307,8 +307,9 @@ class main_function(QWidget):
             # if self.client_connect:
             outbreakdata = self.db.get_outbreak(lane=self.lane_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
             if outbreakdata:
-                self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, outbreakdata)
-                self.update_TX_Log(chr(0x19), [0])
+                if self.use_unexpected:
+                    self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, outbreakdata)
+                    self.update_TX_Log(chr(0x19), [0])
 
     def parsing_msg(self, recv_msg):
         print("---------------------------------------------------------------------------")
@@ -339,7 +340,8 @@ class main_function(QWidget):
                                               self.controller_index)
                     self.update_TX_Log(chr(0xFF), [1])
                     self.client_connect = True
-                    self.dsocket_thread.start()
+                    if not self.dsocket_thread.is_alive():
+                        self.dsocket_thread.start()
                     self.connect_time = time.time()
                 elif msg_op == chr(0xFE):
                     self.fe_check = True
@@ -363,13 +365,15 @@ class main_function(QWidget):
                 elif msg_op == chr(0x05):
                     self.speed_data = self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
                     if self.speed_data:
-                        self.sock.send_05_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.speed_data)
-                        self.update_TX_Log(chr(0x05), [1])
+                        if self.use_category_speed:
+                            self.sock.send_05_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.speed_data)
+                            self.update_TX_Log(chr(0x05), [1])
                 elif msg_op == chr(0x07):
                     self.ntraffic_data = self.db.get_ntraffic_data(lane=self.lane_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
                     if self.ntraffic_data:
-                        self.sock.send_07_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.ntraffic_data)
-                        self.update_TX_Log(chr(0x07), [1])
+                        if self.use_ntraffic:
+                            self.sock.send_07_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.ntraffic_data)
+                            self.update_TX_Log(chr(0x07), [1])
                 elif msg_op == chr(0x0C):
                     self.device_sync(msg_op, d_recv_msg)
                     self.sock.send_0C_res_msg(self.local_ip, self.center_ip, self.controller_type,
@@ -388,8 +392,8 @@ class main_function(QWidget):
                     index = int(ord(d_recv_msg[44]))
                     self.sock.send_0F_res_msg(self.local_ip, self.center_ip, self.controller_type,
                                               self.controller_index, index,
-                                              self.lane_num, self.collect_cycle, self.category_num, self.acc_speed,
-                                              self.calc_speed, self.use_unexpected)
+                                              self.lane_num, self.collect_cycle, self.category_num, self.use_ntraffic,
+                                              self.use_category_speed, self.use_unexpected)
                     self.update_TX_Log(chr(0x0F), [1])
                 elif msg_op == chr(0x11):
                     request_time = time.time()
@@ -513,8 +517,8 @@ class main_function(QWidget):
             self.lane_num = 2
             self.collect_cycle = 30
             self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
-            self.acc_speed = 1
-            self.calc_speed = 1
+            self.use_ntraffic = 1
+            self.use_category_speed = 1
             self.use_unexpected = 1
             # 이외의 설정값 등 리셋
         elif op == chr(0x0E):
@@ -541,14 +545,14 @@ class main_function(QWidget):
                 data = msg[45:]
                 for i in range(len(data)):
                     self.category_num[i] = int(ord(data[i]))
-            # 누적 속도
+            # 누적 교통량
             elif index == 7:
                 data = int(ord(msg[45]))
-                self.acc_speed = data
-            # 속도 계산
+                self.use_ntraffic = data
+            # 속도 데이터 (카테고리)
             elif index == 9:
                 data = int(ord(msg[45]))
-                self.calc_speed = data
+                self.use_category_speed = data
             # 돌발 사용 여부
             elif index == 19:
                 data = int(ord(msg[45]))
@@ -565,8 +569,8 @@ class main_function(QWidget):
             except Exception as e:
                 return [False, chr(0x18), chr(0x01)]
 
-        parameter_list = [self.lane_num, self.collect_cycle, self.category_num, self.acc_speed, self.calc_speed, self.use_unexpected]
-        self.db.set_paramete_data(parameter_list)
+        parameter_list = [self.lane_num, self.collect_cycle, self.category_num, self.use_ntraffic, self.use_category_speed, self.use_unexpected]
+        self.db.set_paramete_data(parameter_list=parameter_list, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
 
     # region test send msg
     # def op_FF_btn_click(self):
