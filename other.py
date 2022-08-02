@@ -23,6 +23,16 @@ class Other_function:
 
             # win32api.SetSystemTime(year, month, dayOfWeek, day, hour, minute, sec, 0)
 
+    def get_controller_number(self, cont_num):
+        datalist = []
+        for i in range(0, len(cont_num), 2):
+            datalist.append(int(cont_num[i: i + 2], 16))
+
+        result = ''
+        for i in datalist:
+            result = result + chr(i)
+        return result
+
     def length_calc(self, length):
         length_1 = length & 0xFF
         length_2 = (length >> 8) & 0xFF

@@ -9,12 +9,20 @@ class DB_function:
         super().__init__()
         self.distlong_diff = 20
 
-    def test(self):
-        print(":sdfaasfd")
+    def db_connection_check(self, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+        try:
+            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
+            cur = db_connect.cursor()
+            sql = 'use ' + db
+            cur.execute(sql)
+            return True
+        except Exception as e:
+            return False
+            print("err: ", e)
 
     # region get data
     # 버전
-    def get_version_num(self, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+    def get_version_num(self, host='183.99.41.239', port=None, user=None, password=None, db=None, charset='utf8'):
         version_list = []
         try:
             db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
@@ -39,7 +47,7 @@ class DB_function:
         return version_list
 
     # 교통량 데이터
-    def get_traffic_data(self, cycle=30, sync_time=None, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+    def get_traffic_data(self, cycle=30, sync_time=None, lane=2, host='183.99.41.239', port=None, user=None, password=None, db=None, charset='utf8'):
         traffic_data = []
 
         try:
@@ -100,7 +108,7 @@ class DB_function:
         return traffic_data
 
     # 개별 차량 데이터
-    def get_individual_traffic_data(self, cycle=30, sync_time=None, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+    def get_individual_traffic_data(self, cycle=30, sync_time=None, lane=2, host='183.99.41.239', port=None, user=None, password=None, db=None, charset='utf8'):
         individual_traffic_data = []
 
         try:
@@ -151,7 +159,7 @@ class DB_function:
         return individual_traffic_data
 
     # 차선별 누적 교통량 데이터
-    def get_ntraffic_data(self, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+    def get_ntraffic_data(self, lane=2, host='183.99.41.239', port=None, user=None, password=None, db=None, charset='utf8'):
         ntraffic_data = []
 
         try:
@@ -172,7 +180,7 @@ class DB_function:
         return ntraffic_data
 
     # 카테고리(속도) 기준 차선별 교통량
-    def get_speed_data(self, lane=2, cnum=[],  host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+    def get_speed_data(self, lane=2, cnum=[],  host='183.99.41.239', port=None, user=None, password=None, db=None, charset='utf8'):
         speed_data = []
 
         try:
@@ -203,7 +211,7 @@ class DB_function:
         return speed_data
 
     # DB 이미지 경로
-    def get_image_link(self, request_time=None, direction=None, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+    def get_image_link(self, request_time=None, direction=None, host='183.99.41.239', port=None, user=None, password=None, db=None, charset='utf8'):
         image_link = []
 
         try:
@@ -230,7 +238,7 @@ class DB_function:
         return image_link
 
     # 함체 정보 데이터
-    def get_controllerBox_state_data(self,  host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+    def get_controllerBox_state_data(self,  host='183.99.41.239', port=None, user=None, password=None, db=None, charset='utf8'):
         controllerBox_state_list = []
         try:
             db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
@@ -248,7 +256,7 @@ class DB_function:
         return controllerBox_state_list
 
         # 돌발 상황 정보
-    def get_outbreak(self, lane=2, host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds',
+    def get_outbreak(self, lane=2, host='183.99.41.239', port=None, user=None, password=None, db=None,
                      charset='utf8'):
         outbreak = []
 
@@ -283,7 +291,7 @@ class DB_function:
     # endregion
     # region set data
     # S/W 파라미터 저장
-    def set_paramete_data(self, parameter_list=[], host='183.99.41.239', port=23306, user='root', password='hbrain0372!', db='vds', charset='utf8'):
+    def set_paramete_data(self, parameter_list=[], host='183.99.41.239', port=None, user=None, password=None, db=None, charset='utf8'):
         try:
             if parameter_list == '':
                 print("parameter in none")
