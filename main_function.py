@@ -1,8 +1,9 @@
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import *
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 import time
-import datetime
+from datetime import datetime
 import queue
 from multiprocessing import Process
 import threading
@@ -124,10 +125,14 @@ class main_function(QWidget):
         self.ui.op_19_btn.setEnabled(False)
         self.ui.op_1E_btn.setEnabled(False)
 
-        self.ui.tx_table.setColumnWidth(0, 100)
-        self.ui.tx_table.setColumnWidth(1, 100)
-        self.ui.rx_table.setColumnWidth(0, 100)
-        self.ui.rx_table.setColumnWidth(0, 100)
+        self.ui.tx_table.setColumnWidth(0, 180)
+        self.ui.tx_table.setColumnWidth(1, 80)
+        self.ui.tx_table.setColumnWidth(2, 80)
+        self.ui.tx_table.setColumnWidth(3, 200)
+        self.ui.rx_table.setColumnWidth(0, 180)
+        self.ui.rx_table.setColumnWidth(1, 80)
+        self.ui.rx_table.setColumnWidth(2, 80)
+        self.ui.rx_table.setColumnWidth(3, 200)
 
     def btn_event(self):
         self.ui.socket_open_btn.clicked.connect(self.socket_open_btn_click)
@@ -159,16 +164,26 @@ class main_function(QWidget):
 
     def test_btn_click(self):
         #cap = cv2.VideoCapture('rtsp://admin:hbrain0372!@183.99.41.239')
+        date_s = (datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])
+        numRows = self.ui.tx_table.rowCount()
+        self.ui.tx_table.insertRow(numRows)
+        # Add text to the row
+        self.ui.tx_table.setItem(numRows, 0, QTableWidgetItem(date_s))
+        self.ui.tx_table.setItem(numRows, 1, QTableWidgetItem('test2'))
+        if numRows % 2 == 0:
+            self.ui.tx_table.setItem(numRows, 2, QTableWidgetItem('test3'))
 
-        cap = cv2.VideoCapture(self.ui.ImgURL_Edit.text())
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-        _, img = cap.read()
-        if str(type(img)) != "<class 'NoneType'>":
-            self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, img)
-        else:
-            list = [False, chr(0x17), chr(0x06)]
-            self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+        # cap = cv2.VideoCapture(self.ui.ImgURL_Edit.text())
+        # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        # _, img = cap.read()
+        # if str(type(img)) != "<class 'NoneType'>":
+        #     self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, img)
+        # else:
+        #     list = [False, chr(0x17), chr(0x06)]
+        #     self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+
+
 
     # region btn click function
     def socket_open_btn_click(self):
@@ -224,8 +239,8 @@ class main_function(QWidget):
             self.read_thread[-1].start()
             print("thread: ", self.read_thread)
 
-            # dt = threading.Thread(target=self.read_dsocket_msg, args=())
-            # dt.start()
+            dt = threading.Thread(target=self.read_dsocket_msg, args=())
+            dt.start()
 
     def db_connect_btn_click(self):
         print("db..")
@@ -254,11 +269,18 @@ class main_function(QWidget):
             outbreakdata = self.db.get_outbreak(self.lane_num)
             if outbreakdata:
                 self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, outbreakdata)
+                self.update_TX_Log(chr(0x19), [0])
 
     def parsing_msg(self, recv_msg):
         print("---------------------------------------------------------------------------")
         d_recv_msg = recv_msg.decode('utf-16')
-        print(d_recv_msg)
+        if (d_recv_msg[43] == chr(0xFE)) or (d_recv_msg[43] == chr(0x19)):
+            if d_recv_msg[44] == chr(0x06):
+                self.update_RX_Log(d_recv_msg[43], [1])
+            elif d_recv_msg[44] == chr(0x15):
+                self.update_RX_Log(d_recv_msg[43], [2, d_recv_msg[45]])
+        else:
+            self.update_RX_Log(d_recv_msg[43], [0])
 
         result = self.ot.nack_find(msg=d_recv_msg, csn=self.controller_station)
         if result[0] == True:
@@ -275,6 +297,7 @@ class main_function(QWidget):
                 if msg_op == chr(0xFF):
                     self.sock.send_FF_res_msg(self.local_ip, self.center_ip, self.controller_type,
                                               self.controller_index)
+                    self.update_TX_Log(chr(0xFF), [1])
                     self.client_connect = True
                     self.connect_time = time.time()
                 elif msg_op == chr(0xFE):
@@ -290,62 +313,77 @@ class main_function(QWidget):
                     self.traffic_data = self.db.get_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
                     if self.traffic_data != [] and self.frame_number_04 is not None:
                         self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.frame_number_04, self.lane_num, self.traffic_data)
+                        self.update_TX_Log(chr(0x04), [1])
                         self.frame_number_04 = None
                     else:
                         list = [False, chr(0x04), chr(0x06)]
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.update_TX_Log(chr(0x04), [2, list[2]])
                 elif msg_op == chr(0x05):
                     self.speed_data = self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num)
                     if self.speed_data:
                         self.sock.send_05_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.speed_data)
+                        self.update_TX_Log(chr(0x05), [1])
                 elif msg_op == chr(0x07):
                     self.ntraffic_data = self.db.get_ntraffic_data(lane=self.lane_num)
                     if self.ntraffic_data:
                         self.sock.send_07_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.ntraffic_data)
+                        self.update_TX_Log(chr(0x07), [1])
                 elif msg_op == chr(0x0C):
                     self.device_sync(msg_op, d_recv_msg)
                     self.sock.send_0C_res_msg(self.local_ip, self.center_ip, self.controller_type,
                                               self.controller_index)
+                    self.update_TX_Log(chr(0x0C), [1])
                 elif msg_op == chr(0x0D):
                     self.sock.send_0D_res_msg(self.local_ip, self.center_ip, self.controller_type,
                                               self.controller_index)
+                    self.update_TX_Log(chr(0x0D), [1])
                 elif msg_op == chr(0x0E):
                     self.device_sync(msg_op, d_recv_msg)
                     self.sock.send_0E_res_msg(self.local_ip, self.center_ip, self.controller_type,
                                               self.controller_index)
+                    self.update_TX_Log(chr(0x0E), [1])
                 elif msg_op == chr(0x0F):
                     index = int(ord(d_recv_msg[44]))
                     self.sock.send_0F_res_msg(self.local_ip, self.center_ip, self.controller_type,
                                               self.controller_index, index,
                                               self.lane_num, self.collect_cycle, self.category_num, self.acc_speed,
                                               self.calc_speed, self.use_unexpected)
+                    self.update_TX_Log(chr(0x0F), [1])
                 elif msg_op == chr(0x11):
                     request_time = time.time()
                     if self.connect_time is not None:
                         self.sock.send_11_res_msg(self.local_ip, self.center_ip, self.controller_type,
                                                   self.controller_index, self.connect_time, request_time)
+                        self.update_TX_Log(chr(0x11), [1])
                     else:
                         list = [False, chr(0x11), chr(0xFF)]
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.update_TX_Log(chr(0x11), [2, list[2]])
                 elif msg_op == chr(0x13):
                     self.sock.send_13_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, d_recv_msg)
+                    self.update_TX_Log(chr(0x13), [1])
 
                 elif msg_op == chr(0x15):
                     version_list = self.db.get_version_num()
                     if version_list:
                         self.sock.send_15_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, version_list)
+                        self.update_TX_Log(chr(0x15), [1])
                     else:
                         list = [False, chr(0x15), chr(0x06)]
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.update_TX_Log(chr(0x15), [2, list[2]])
 
                 elif msg_op == chr(0x16):
                     self.individual_traffic_data = self.db.get_individual_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num)
                     if self.individual_traffic_data != [] and self.frame_number_16 is not None:
                         self.sock.send_16_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.frame_number_16, self.individual_traffic_data)
+                        self.update_TX_Log(chr(0x16), [1])
                         self.frame_number_16 = None
                     else:
                         list = [False, chr(0x16), chr(0x06)]
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.update_TX_Log(chr(0x16), [2, list[2]])
 
                 elif msg_op == chr(0x17):
                     cap = cv2.VideoCapture(self.ui.ImgURL_Edit.text())
@@ -354,9 +392,11 @@ class main_function(QWidget):
                     _, img = cap.read()
                     if str(type(img)) != "<class 'NoneType'>":
                         self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, img)
+                        self.update_TX_Log(chr(0x17), [1])
                     else:
                         list = [False, chr(0x17), chr(0x06)]
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.update_TX_Log(chr(0x17), [2, list[2]])
 
 
                 elif msg_op == chr(0x18):
@@ -364,9 +404,11 @@ class main_function(QWidget):
                     if True in result:
                         self.sock.send_18_res_msg(self.local_ip, self.center_ip, self.controller_type,
                                                   self.controller_index)
+                        self.update_TX_Log(chr(0x18), [1])
                     else:
                         list = result
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.update_TX_Log(chr(0x18), [2, list[2]])
                 elif msg_op == chr(0x19):
                     # msg read와 별개의 스레드를 돌면서 돌발 테이블을 계속 확인.
                     # 확인하다가 걸리면 밑에 코드 사용
@@ -374,13 +416,16 @@ class main_function(QWidget):
                     if self.use_unexpected == 1:
                         self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type,
                                                   self.controller_index)
+                        self.update_TX_Log(chr(0x19), [1])
                 elif msg_op == chr(0x1E):
                     self.controllerBox_state_list = self.db.get_controllerBox_state_data()
                     if self.controllerBox_state_list:
                         self.sock.send_1E_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.controllerBox_state_list)
+                        self.update_TX_Log(chr(0x1E), [1])
                     else:
                         list = [False, chr(0x1E), chr(0x06)]
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+                        self.update_TX_Log(chr(0x1E), [2, list[2]])
 
             elif destination_ip == self.center_ip:
                 print("msg   : [", recv_msg.decode('utf-16'), "]")
@@ -390,6 +435,7 @@ class main_function(QWidget):
             self.center_ip = d_recv_msg[0:15]
             list = result
             self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
+            self.update_TX_Log(chr(0xFF), [2, list[2]])
     # endregion
 
     def request_check_timer(self):
@@ -400,6 +446,7 @@ class main_function(QWidget):
 
             if (time_delay > 300) & self.fe_check:
                 self.sock.send_FE_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
+                self.update_TX_Log(chr(0xFE), [0])
                 self.fe_send_time = time.time()
                 self.fe_check = False
 
@@ -407,6 +454,7 @@ class main_function(QWidget):
                 fe_delay = now_time - self.fe_send_time
                 if (fe_delay > 5) & (self.fe_num < 2):
                     self.sock.send_FE_msg(self.local_ip, self.center_ip)
+                    self.update_TX_Log(chr(0xFE), [0])
                     self.fe_send_time = time.time()
                     self.fe_num += 1
                 else:
@@ -556,3 +604,66 @@ class main_function(QWidget):
         self.sock.send_1E_msg()
 
     # endregion
+
+    def update_RX_Log(self, OPCODE, list):
+        date_s = (datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])
+        numRows = self.ui.rx_table.rowCount()
+        self.ui.rx_table.insertRow(numRows)
+        # Add text to the row
+        self.ui.rx_table.setItem(numRows, 0, QTableWidgetItem(date_s))
+        self.ui.rx_table.setItem(numRows, 1, QTableWidgetItem("0x{:02X}".format(ord(OPCODE))))
+        # list[0] { 0 : None, 1 : ACK, 2 : NACK}
+        if list[0] == 1:
+            self.ui.rx_table.setItem(numRows, 2, QTableWidgetItem('ACK'))
+        elif list[0] == 2:
+            self.ui.rx_table.setItem(numRows, 2, QTableWidgetItem('NACK'))
+            if list[1] == chr(0x01):
+                self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('System Error'))
+            elif list[1] == chr(0x02):
+                self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Data Length Error'))
+            elif list[1] == chr(0x03):
+                self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('CSN Error'))
+            elif list[1] == chr(0x04):
+                self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('OP Code Error'))
+            elif list[1] == chr(0x05):
+                self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Out of Index Error'))
+            elif list[1] == chr(0x06):
+                self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Not Ready Error'))
+            elif list[1] == chr(0xFF):
+                self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Error'))
+            else:
+                self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Reserved'))
+
+        self.ui.rx_table.scrollToBottom();
+
+
+    def update_TX_Log(self, OPCODE, list):
+        date_s = (datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])
+        numRows = self.ui.tx_table.rowCount()
+        self.ui.tx_table.insertRow(numRows)
+        # Add text to the row
+        self.ui.tx_table.setItem(numRows, 0, QTableWidgetItem(date_s))
+        self.ui.tx_table.setItem(numRows, 1, QTableWidgetItem("0x{:02X}".format(ord(OPCODE))))
+        # list[0] { 0 : None, 1 : ACK, 2 : NACK}
+        if list[0] == 1:
+            self.ui.tx_table.setItem(numRows, 2, QTableWidgetItem('ACK'))
+        elif list[0] == 2:
+            self.ui.tx_table.setItem(numRows, 2, QTableWidgetItem('NACK'))
+            if list[1] == chr(0x01):
+                self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('System Error'))
+            elif list[1] == chr(0x02):
+                self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Data Length Error'))
+            elif list[1] == chr(0x03):
+                self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('CSN Error'))
+            elif list[1] == chr(0x04):
+                self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('OP Code Error'))
+            elif list[1] == chr(0x05):
+                self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Out of Index Error'))
+            elif list[1] == chr(0x06):
+                self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Not Ready Error'))
+            elif list[1] == chr(0xFF):
+                self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Error'))
+            else:
+                self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Reserved'))
+
+        self.ui.tx_table.scrollToBottom();

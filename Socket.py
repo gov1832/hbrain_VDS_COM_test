@@ -89,10 +89,10 @@ class Socket_function:
     def send_FF_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number):
         point = chr(0x2D)
         opcode = chr(0xFF)
-        data = chr(0x06) # ack
-        length = self.ot.length_calc(1 + len(data))
+        ack = chr(0x06)
+        length = self.ot.length_calc(1 + len(ack))
 
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + data
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack
         self.socket_send_msg(send_msg)
 
     def send_FE_msg(self, sender_ip, destination_ip, controller_kind, controller_number):
