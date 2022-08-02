@@ -220,10 +220,12 @@ class main_function(QWidget):
                 self.ui.status_bar.setText("Socket server open..")
                 try:
                     self.sock.socket_server_open(sock_ip, sock_port)
+                    self.ui.status_bar.setText("Socket server '" + sock_ip + "', '" + str(sock_port) + "' open !")
+                    self.ui.socket_open_btn.setEnabled(False)
+                    t = threading.Thread(target=self.client_accept_check, args=())
+                    t.start()
                 except Exception as e:
-                    self.ui.status_bar.setText("err socket open: " + e)
-                self.ui.status_bar.setText("Socket server '" + sock_ip + "', '" + str(sock_port) + "' open !")
-                self.ui.socket_open_btn.setEnabled(False)
+                    self.ui.status_bar.setText("socket server open fail")
 
                 # region test btn true
                 # self.ui.op_FF_btn.setEnabled(False)
@@ -248,8 +250,7 @@ class main_function(QWidget):
                 # self.ui.op_1E_btn.setEnabled(False)
                 # endregion
 
-                t = threading.Thread(target=self.client_accept_check, args=())
-                t.start()
+
         else:
             self.ui.status_bar.setText("controller number는 10자로 입력해주세요")
 
