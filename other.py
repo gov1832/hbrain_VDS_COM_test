@@ -85,6 +85,9 @@ class Other_function:
         if len(msg) < 44:
             nacklist = [False, 0, chr(0x02)]
             return nacklist
+        elif (op == chr(0xFF)) and (csn_msg == [chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00)]):
+            nacklist = [True, op, 0]
+            return nacklist
         elif csn_msg != csn:
             nacklist = [False, op, chr(0x03)]
             return nacklist
