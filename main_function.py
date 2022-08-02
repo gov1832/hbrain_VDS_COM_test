@@ -288,6 +288,7 @@ class main_function(QWidget):
     def cont_num_change_btn_click(self):
         cont_num = self.ot.get_controller_number(self.ui.cont_num_edit.text())
         self.controller_index = cont_num
+        self.controller_station = self.controller_type + self.controller_index
         if self.controller_index == '':
             self.ui.status_bar.setText("controller number는 10자로 입력해주세요")
         else:
