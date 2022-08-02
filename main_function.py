@@ -365,7 +365,7 @@ class main_function(QWidget):
                     if self.traffic_data != [] and self.frame_number_04 is not None:
                         self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.frame_number_04, self.lane_num, self.traffic_data)
                         self.update_TX_Log(chr(0x04), [1])
-                        self.frame_number_04 = None
+                        # self.frame_number_04 = None
                     else:
                         list = [False, chr(0x04), chr(0x06)]
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
@@ -432,7 +432,7 @@ class main_function(QWidget):
                     if self.individual_traffic_data != [] and self.frame_number_16 is not None:
                         self.sock.send_16_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.frame_number_16, self.individual_traffic_data)
                         self.update_TX_Log(chr(0x16), [1])
-                        self.frame_number_16 = None
+                        # self.frame_number_16 = None
                     else:
                         list = [False, chr(0x16), chr(0x06)]
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
