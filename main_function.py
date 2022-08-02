@@ -277,10 +277,10 @@ class main_function(QWidget):
             self.ui.status_bar.setText("controller number는 10자로 입력해주세요")
         else:
             self.ui.status_bar.setText("controller number: " +
-                                       str(hex(ord(self.controller_index[0]))) +
-                                       str(hex(ord(self.controller_index[1]))) +
-                                       str(hex(ord(self.controller_index[2]))) +
-                                       str(hex(ord(self.controller_index[3]))) +
+                                       str(hex(ord(self.controller_index[0]))) + "/" +
+                                       str(hex(ord(self.controller_index[1]))) + "/" +
+                                       str(hex(ord(self.controller_index[2]))) + "/" +
+                                       str(hex(ord(self.controller_index[3]))) + "/" +
                                        str(hex(ord(self.controller_index[4]))))
 
     # endregion
