@@ -275,14 +275,19 @@ class main_function(QWidget):
 
 
     def db_connect_btn_click(self):
-        self.db_ip = self.ui.db_ip_input.text()
-        self.db_port = self.ui.db_port_input.text()
-        self.db_id = self.ui.db_id_input.text()
-        self.db_pw = self.ui.db_pw_input.text()
-        self.db_name = self.ui.db_name_input.text()
-        if self.db.db_connection_check(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8'):
-            self.ui.socket_open_btn.setEnabled(True)
-            self.ui.db_connect_btn.setEnabled(False)
+        try:
+            self.db_ip = self.ui.db_ip_input.text()
+            self.db_port = self.ui.db_port_input.text()
+            self.db_id = self.ui.db_id_input.text()
+            self.db_pw = self.ui.db_pw_input.text()
+            self.db_name = self.ui.db_name_input.text()
+            if self.db.db_connection_check(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8'):
+                self.ui.socket_open_btn.setEnabled(True)
+                self.ui.db_connect_btn.setEnabled(False)
+                self.ui.status_bar.setText("DB connect success")
+
+        except Exception as e:
+            self.ui.status_bar.setText("DB connect fail")
 
 
     def cont_num_change_btn_click(self):
@@ -505,7 +510,7 @@ class main_function(QWidget):
             time_delay = now_time - self.client_request_time
             # print("delay: ", time_delay)
 
-            if (time_delay > 300) & self.fe_check:
+            if (time_delay > 300) and self.fe_check:
                 self.sock.send_FE_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 self.update_TX_Log(chr(0xFE), [0])
                 self.fe_send_time = time.time()
@@ -513,7 +518,7 @@ class main_function(QWidget):
 
             if not self.fe_check:
                 fe_delay = now_time - self.fe_send_time
-                if (fe_delay > 5) & (self.fe_num < 2):
+                if (fe_delay > 5) and (self.fe_num < 2):
                     self.sock.send_FE_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                     self.update_TX_Log(chr(0xFE), [0])
                     self.fe_send_time = time.time()
