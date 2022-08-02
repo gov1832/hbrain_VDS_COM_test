@@ -71,6 +71,9 @@
                <family>Consolas</family>
               </font>
              </property>
+             <property name="placeholderText">
+              <string>input socket server IP</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -107,6 +110,9 @@
               <font>
                <family>Consolas</family>
               </font>
+             </property>
+             <property name="placeholderText">
+              <string>input socket server PORT</string>
              </property>
             </widget>
            </item>
@@ -203,6 +209,9 @@
                <family>Consolas</family>
               </font>
              </property>
+             <property name="placeholderText">
+              <string>input DB ip</string>
+             </property>
             </widget>
            </item>
            <item>
@@ -223,6 +232,9 @@
               <font>
                <family>Consolas</family>
               </font>
+             </property>
+             <property name="placeholderText">
+              <string>input DB port</string>
              </property>
             </widget>
            </item>
@@ -261,6 +273,9 @@
                <family>Consolas</family>
               </font>
              </property>
+             <property name="placeholderText">
+              <string>input DB id</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -298,6 +313,9 @@
                <family>Consolas</family>
               </font>
              </property>
+             <property name="placeholderText">
+              <string>input DB pw</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -334,6 +352,9 @@
               <font>
                <family>Consolas</family>
               </font>
+             </property>
+             <property name="placeholderText">
+              <string>input DB table</string>
              </property>
             </widget>
            </item>
@@ -531,6 +552,9 @@
              <property name="alignment">
               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
+             <property name="placeholderText">
+              <string>input Image link</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -559,7 +583,10 @@
             </font>
            </property>
            <property name="text">
-            <string>1234567890</string>
+            <string>0101010101</string>
+           </property>
+           <property name="placeholderText">
+            <string>input CSN (10)</string>
            </property>
           </widget>
          </item>

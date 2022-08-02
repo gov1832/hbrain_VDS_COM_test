@@ -329,7 +329,6 @@ class Socket_function:
     def send_19_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, outbreak):
         point = chr(0x2D)
         opcode = chr(0x19)
-        ack = chr(0x06)
         breaktime = chr(len(outbreak))
         stringdata = ''
         for bre in outbreak:
@@ -338,9 +337,9 @@ class Socket_function:
 
             stringdata = stringdata + daytime + chr(bre[1]) + chr(bre[2]) + bre[3] + bre[4] + chr(round(bre[5]))
         datafield = breaktime + stringdata
-        length = self.ot.length_calc(2 + len(datafield))
+        length = self.ot.length_calc(1 + len(datafield))
 
-        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + ack + datafield
+        send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + datafield
         # print(send_msg)
         self.socket_send_msg(send_msg)
 

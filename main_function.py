@@ -112,11 +112,16 @@ class main_function(QWidget):
         # self.ui.db_id_input.setText("input")
         # self.ui.db_pw_input.setText("input")
         # self.ui.db_name_input.setText("input")
-        self.ui.db_ip_input.setText("183.99.41.239")
-        self.ui.db_port_input.setText("23306")
-        self.ui.db_id_input.setText("root")
-        self.ui.db_pw_input.setText("hbrain0372!")
-        self.ui.db_name_input.setText("vds")
+        # self.ui.db_ip_input.setText("183.99.41.239")
+        # self.ui.db_port_input.setText("23306")
+        # self.ui.db_id_input.setText("root")
+        # self.ui.db_pw_input.setText("hbrain0372!")
+        # self.ui.db_name_input.setText("vds")
+        # self.ui.db_ip_input.setText("input DB ip")
+        # self.ui.db_port_input.setText("input DB port")
+        # self.ui.db_id_input.setText("input DB id")
+        # self.ui.db_pw_input.setText("input DB pw")
+        self.ui.db_name_input.setText("hbrain_vds")
 
         self.ui.socket_open_btn.setEnabled(False)
         # self.ui.op_FF_btn.setEnabled(False)
@@ -142,11 +147,11 @@ class main_function(QWidget):
 
         self.ui.tx_table.setColumnWidth(0, 180)
         self.ui.tx_table.setColumnWidth(1, 80)
-        self.ui.tx_table.setColumnWidth(2, 80)
+        self.ui.tx_table.setColumnWidth(2, 90)
         self.ui.tx_table.setColumnWidth(3, 200)
         self.ui.rx_table.setColumnWidth(0, 180)
         self.ui.rx_table.setColumnWidth(1, 80)
-        self.ui.rx_table.setColumnWidth(2, 80)
+        self.ui.rx_table.setColumnWidth(2, 90)
         self.ui.rx_table.setColumnWidth(3, 200)
 
     def btn_event(self):
@@ -277,6 +282,8 @@ class main_function(QWidget):
         self.db_name = self.ui.db_name_input.text()
         if self.db.db_connection_check(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8'):
             self.ui.socket_open_btn.setEnabled(True)
+            self.ui.db_connect_btn.setEnabled(False)
+
 
     def cont_num_change_btn_click(self):
         cont_num = self.ot.get_controller_number(self.ui.cont_num_edit.text())
