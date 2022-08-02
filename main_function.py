@@ -251,15 +251,23 @@ class main_function(QWidget):
     def client_accept_check(self):
         while True:
             self.client_test = self.sock.client_accept()
+            # read thread
             t = threading.Thread(target=self.read_socket_msg, args=())
             self.read_thread.append(t)
             if len(self.read_thread) > 2:
                 self.read_thread.pop(0)
             self.read_thread[-1].start()
-            print(self.read_thread)
-
+            # 돌발 thread
             self.dsocket_thread = threading.Thread(target=self.read_dsocket_msg, args=())
             # dt.start()
+            # 파라미터값 초기화
+            self.lane_num = 2
+            self.collect_cycle = 30
+            self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
+            self.use_ntraffic = 1
+            self.use_category_speed = 1
+            self.use_unexpected = 1
+
 
     def db_connect_btn_click(self):
         self.db_ip = self.ui.db_ip_input.text()
@@ -489,7 +497,7 @@ class main_function(QWidget):
             time_delay = now_time - self.client_request_time
             # print("delay: ", time_delay)
 
-            if (time_delay > 300) & self.fe_check:
+            if (time_delay > 10) & self.fe_check:
                 self.sock.send_FE_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                 self.update_TX_Log(chr(0xFE), [0])
                 self.fe_send_time = time.time()
@@ -498,13 +506,17 @@ class main_function(QWidget):
             if not self.fe_check:
                 fe_delay = now_time - self.fe_send_time
                 if (fe_delay > 5) & (self.fe_num < 2):
-                    self.sock.send_FE_msg(self.local_ip, self.center_ip)
+                    self.sock.send_FE_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                     self.update_TX_Log(chr(0xFE), [0])
                     self.fe_send_time = time.time()
                     self.fe_num += 1
-                else:
-                    self.client_connect = False
-                    self.fe_num = 0
+                # else:
+                #     self.client_connect = False
+                #     self.fe_num = 0
+            if self.fe_num == 2:
+                self.client_connect = False
+                self.fe_num = 0
+                self.fe_check = True
 
         else:
             print("client not connect")
@@ -531,11 +543,11 @@ class main_function(QWidget):
                 if data_1 != 0:  # 1byte
                     for i in range(0, 8):
                         if (data_1 >> i) & 0x01 == 0x01:
-                            self.lane_num = i + 1
+                            self.lane_num = (8-i)
                 else:  # 2 byte
                     for i in range(0, 8):
                         if (data_2 >> i) & 0x01 == 0x01:
-                            self.lane_num = (i + 1) + 8
+                            self.lane_num = (8 - i) + 8
             # 수집 주기
             elif index == 3:
                 data = int(ord(msg[45]))
@@ -543,6 +555,7 @@ class main_function(QWidget):
             # 차량 속도 구분
             elif index == 5:
                 data = msg[45:]
+                print(len(data))
                 for i in range(len(data)):
                     self.category_num[i] = int(ord(data[i]))
             # 누적 교통량
