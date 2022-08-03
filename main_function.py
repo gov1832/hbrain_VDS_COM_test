@@ -77,6 +77,16 @@ class main_function(QWidget):
         self.controllerBox_state_list = None
         self.value_setting()
 
+    def closeEvent(self, QCloseEvent):
+        re = QtGui.QMessageBox.question(self, "종료 확인", "종료 하시겠습니까?",
+                                  QMessageBox.Yes | QMessageBox.No)
+
+        if re == QtGui.QMessageBox.Yes:
+            QCloseEvent.accept()
+        else:
+            QCloseEvent.ignore()
+
+
     def value_setting(self):
         # system scenario value
         self.fe_check = True

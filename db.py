@@ -136,22 +136,25 @@ class DB_function:
                 count.append(len(result))
                 #print(len(result))
 
-                for i in range(1,len(count)):
+                for i in range(1, len(count)):
                     cardata = []
                     carspeed = 0
                     carlane = 0
                     carcont = 0
-                    for j in range(count[i-1], count[i]):
+                    carid = 0
+                    for j in range(count[i - 1], count[i]):
                         carcont += 1
                         carspeed += result[j][4]
-                        if (result[j][12]%lane) == 0:
+                        carid += result[j][9]
+                        if (result[j][12] % lane) == 0:
                             carlane += lane
                         else:
-                            carlane += (result[j][12]%lane)
+                            carlane += (result[j][12] % lane)
                     if carcont != 0:
-                        cardata.append(round(carlane/carcont))
-                        cardata.append((result[count[i-1]][0]-data_count).seconds)
-                        cardata.append(int(carspeed/carcont))
+                        cardata.append(round(carlane / carcont))
+                        cardata.append((result[count[i - 1]][0] - data_count).seconds)
+                        cardata.append(int(carspeed / carcont))
+                        cardata.append(round(carid / carcont))
                         individual_traffic_data.append(cardata)
 
                 db_connect.close()
