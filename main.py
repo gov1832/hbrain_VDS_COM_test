@@ -13,8 +13,8 @@ class MainWindow(QWidget):
         super().__init__()
 
         self.ui = loadUi(self.resource_path('main.ui'), self)
-        self.ui.hbrain_icon.setPixmap(QPixmap("resources/icon/hbrain_logo.png"))
-        self.setWindowIcon(QIcon("resources/icon/hbrain.png"))
+        self.ui.hbrain_icon.setPixmap(QPixmap(self.resource_path("hbrain_logo.png")))
+        self.setWindowIcon(QIcon(self.resource_path("hbrain.png")))
         self.mf = main_function(self.ui)
 
     def resource_path(self, relative_path):
