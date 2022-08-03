@@ -77,16 +77,6 @@ class main_function(QWidget):
         self.controllerBox_state_list = None
         self.value_setting()
 
-    def closeEvent(self, QCloseEvent):
-        re = QtGui.QMessageBox.question(self, "종료 확인", "종료 하시겠습니까?",
-                                  QMessageBox.Yes | QMessageBox.No)
-
-        if re == QtGui.QMessageBox.Yes:
-            QCloseEvent.accept()
-        else:
-            QCloseEvent.ignore()
-
-
     def value_setting(self):
         # system scenario value
         self.fe_check = True
@@ -97,7 +87,7 @@ class main_function(QWidget):
         # S/W value
         self.client_connect = False
         self.local_ip = self.ot.make_16ip(sip=self.ui.sock_ip_input.text())
-        self.center_ip = '123.456.789.123'
+        self.center_ip = '000.000.000.000'
         self.controller_type = 'VD'
         self.controller_index = self.ot.get_controller_number(self.ui.cont_num_edit.text())
         self.controller_station = self.controller_type + self.controller_index
@@ -115,23 +105,24 @@ class main_function(QWidget):
 
     def set_ui(self):
         # socket
-        self.ui.sock_ip_input.setText("127.0.0.1")
+        self.ui.sock_ip_input.setText("192.168.1.56")
         self.ui.sock_port_input.setText("30100")
         # self.ui.dp_ip_input.setText("input")
         # self.ui.db_port_input.setText("input")
         # self.ui.db_id_input.setText("input")
         # self.ui.db_pw_input.setText("input")
         # self.ui.db_name_input.setText("input")
-        # self.ui.db_ip_input.setText("183.99.41.239")
-        # self.ui.db_port_input.setText("23306")
-        # self.ui.db_id_input.setText("root")
+        self.ui.db_ip_input.setText("183.98.24.70")
+        self.ui.db_port_input.setText("53307")
+        self.ui.db_id_input.setText("admin")
+        self.ui.db_name_input.setText("hbrain_vds")
         # self.ui.db_pw_input.setText("hbrain0372!")
         # self.ui.db_name_input.setText("vds")
+        self.ui.db_name_input.setEnabled(False)
         # self.ui.db_ip_input.setText("input DB ip")
         # self.ui.db_port_input.setText("input DB port")
         # self.ui.db_id_input.setText("input DB id")
         # self.ui.db_pw_input.setText("input DB pw")
-        self.ui.db_name_input.setText("hbrain_vds")
 
         self.ui.socket_open_btn.setEnabled(False)
         # self.ui.op_FF_btn.setEnabled(False)
@@ -232,7 +223,7 @@ class main_function(QWidget):
                     self.sock.socket_server_open(sock_ip, sock_port)
                     self.ui.status_bar.setText("Socket server '" + sock_ip + "', '" + str(sock_port) + "' open !")
                     self.ui.socket_open_btn.setEnabled(False)
-                    t = threading.Thread(target=self.client_accept_check, args=())
+                    t = threading.Thread(target=self.client_accept_check, args=(), daemon=True)
                     t.start()
                 except Exception as e:
                     self.ui.status_bar.setText("socket server open fail")
@@ -268,13 +259,13 @@ class main_function(QWidget):
         while True:
             self.client_test = self.sock.client_accept()
             # read thread
-            t = threading.Thread(target=self.read_socket_msg, args=())
+            t = threading.Thread(target=self.read_socket_msg, args=(), daemon=True)
             self.read_thread.append(t)
             if len(self.read_thread) > 2:
                 self.read_thread.pop(0)
             self.read_thread[-1].start()
             # 돌발 thread
-            self.dsocket_thread = threading.Thread(target=self.read_dsocket_msg, args=())
+            self.dsocket_thread = threading.Thread(target=self.read_dsocket_msg, args=(), daemon=True)
             # dt.start()
             # 파라미터값 초기화
             self.lane_num = 2
