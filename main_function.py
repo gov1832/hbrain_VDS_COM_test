@@ -337,6 +337,8 @@ class main_function(QWidget):
     def parsing_msg(self, recv_msg):
         print("---------------------------------------------------------------------------")
         d_recv_msg = recv_msg.decode('utf-16')
+        # for i in range(len(d_recv_msg)):
+        #     print(i,": ", ord(d_recv_msg[i]))
         if (d_recv_msg[43] == chr(0xFE)) or (d_recv_msg[43] == chr(0x19)):
             if d_recv_msg[44] == chr(0x06):
                 self.update_RX_Log(d_recv_msg[43], [1])

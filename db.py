@@ -234,6 +234,7 @@ class DB_function:
         return controllerBox_state_list
 
         # 돌발 상황 정보
+
     def get_outbreak(self, lane=2, host=None, port=None, user=None, password=None, db=None,
                      charset='utf8'):
         outbreak = []
@@ -265,6 +266,7 @@ class DB_function:
         except Exception as e:
             print("err: ", e)
         return outbreak
+
 
     # endregion
     # region set data
