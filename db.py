@@ -267,6 +267,58 @@ class DB_function:
             print("err: ", e)
         return outbreak
 
+    def get_parameter_data(self, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+        lane_num = None
+        collect_cycle = None
+        category_num = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        use_ntraffic = None
+        use_category_speed = None
+        use_unexpected = None
+        parameter_list = []
+
+        try:
+            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset,
+                                         autocommit=True)
+            cur = db_connect.cursor()
+            sql = "SELECT * FROM parameter"
+            cur.execute(sql)
+            result = cur.fetchall()
+
+            for i in range(len(result)):
+                if result[i][0] == 1:
+                    if (result[i][1] == 0) and result[i][2]:
+                        tenp = result[i][2]
+                        for i in range(0, 8):
+                            if (tenp >> i) & 0x01 == 0x01:
+                                lane_num = 8 - i
+
+                    if (result[i][1] == 1) and result[i][2]:
+                        tenp = result[i][2]
+                        for i in range(0, 8):
+                            if (tenp >> i) & 0x01 == 0x01:
+                                lane_num = (8 - i) + 8
+
+                elif result[i][0] == 3:
+                    collect_cycle = result[i][2]
+                elif result[i][0] == 5:
+                    category_num[result[i][1]] = result[i][2]
+                elif result[i][0] == 7:
+                    use_ntraffic = result[i][2]
+                elif result[i][0] == 9:
+                    use_category_speed = result[i][2]
+                elif result[i][0] == 19:
+                    use_unexpected = result[i][2]
+
+            db_connect.close()
+            parameter_list.append(lane_num)
+            parameter_list.append(collect_cycle)
+            parameter_list.append(category_num)
+            parameter_list.append(use_ntraffic)
+            parameter_list.append(use_category_speed)
+            parameter_list.append(use_unexpected)
+        except Exception as e:
+            print("err: ", e)
+        return parameter_list
 
     # endregion
     # region set data

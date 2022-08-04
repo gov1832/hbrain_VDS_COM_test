@@ -185,15 +185,21 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
+        print(self.lane_num,
+                self.collect_cycle,
+                self.category_num,
+                self.use_ntraffic,
+                self.use_category_speed,
+                self.use_unexpected)
         #cap = cv2.VideoCapture('rtsp://admin:hbrain0372!@183.99.41.239')
-        date_s = (datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])
-        numRows = self.ui.tx_table.rowCount()
-        self.ui.tx_table.insertRow(numRows)
-        # Add text to the row
-        self.ui.tx_table.setItem(numRows, 0, QTableWidgetItem(date_s))
-        self.ui.tx_table.setItem(numRows, 1, QTableWidgetItem('test2'))
-        if numRows % 2 == 0:
-            self.ui.tx_table.setItem(numRows, 2, QTableWidgetItem('test3'))
+        # date_s = (datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])
+        # numRows = self.ui.tx_table.rowCount()
+        # self.ui.tx_table.insertRow(numRows)
+        # # Add text to the row
+        # self.ui.tx_table.setItem(numRows, 0, QTableWidgetItem(date_s))
+        # self.ui.tx_table.setItem(numRows, 1, QTableWidgetItem('test2'))
+        # if numRows % 2 == 0:
+        #     self.ui.tx_table.setItem(numRows, 2, QTableWidgetItem('test3'))
 
         # cap = cv2.VideoCapture(self.ui.ImgURL_Edit.text())
         # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
@@ -268,13 +274,21 @@ class main_function(QWidget):
             self.dsocket_thread = threading.Thread(target=self.read_dsocket_msg, args=(), daemon=True)
             # dt.start()
             # 파라미터값 초기화
-            self.lane_num = 2
-            self.collect_cycle = 30
-            self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
-            self.use_ntraffic = 1
-            self.use_category_speed = 1
-            self.use_unexpected = 1
-
+            parameter_list = self.db.get_parameter_data(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8')
+            if parameter_list:
+                self.lane_num = parameter_list[0]
+                self.collect_cycle = parameter_list[1]
+                self.category_num = parameter_list[2]
+                self.use_ntraffic = parameter_list[3]
+                self.use_category_speed = parameter_list[4]
+                self.use_unexpected = parameter_list[5]
+            else:
+                self.lane_num = 2
+                self.collect_cycle = 30
+                self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
+                self.use_ntraffic = 1
+                self.use_category_speed = 1
+                self.use_unexpected = 1
 
     def db_connect_btn_click(self):
         try:
