@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1337</width>
-    <height>957</height>
+    <height>1087</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <number>10</number>
      </property>
      <item>
-      <layout class="QGridLayout" name="gridLayout_2" rowstretch="3,0,0,0,0" columnstretch="5,0">
+      <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0,0" columnstretch="0,0">
        <property name="leftMargin">
         <number>20</number>
        </property>
@@ -30,45 +30,6 @@
        <property name="bottomMargin">
         <number>20</number>
        </property>
-       <item row="4" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="9,1">
-         <item>
-          <widget class="QLabel" name="time_bar">
-           <property name="font">
-            <font>
-             <family>Consolas</family>
-            </font>
-           </property>
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="hbrain_icon">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>150</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>AcadEref</family>
-             <pointsize>16</pointsize>
-             <underline>true</underline>
-            </font>
-           </property>
-           <property name="text">
-            <string>TEST</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="0" column="0">
         <layout class="QVBoxLayout" name="socket_layout" stretch="5,5,3">
          <property name="spacing">
@@ -193,6 +154,61 @@
           </layout>
          </item>
         </layout>
+       </item>
+       <item row="4" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="9,1">
+         <item>
+          <widget class="QLabel" name="time_bar">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+            </font>
+           </property>
+           <property name="text">
+            <string>Time</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="hbrain_icon">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>150</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>9</pointsize>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>Image</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="label_9">
+         <property name="font">
+          <font>
+           <family>Consolas</family>
+           <pointsize>18</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>TX</string>
+         </property>
+         <property name="margin">
+          <number>10</number>
+         </property>
+        </widget>
        </item>
        <item row="0" column="1">
         <layout class="QVBoxLayout" name="db_layout">
@@ -409,6 +425,12 @@
            </item>
            <item>
             <widget class="QPushButton" name="db_connect_btn">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>34</height>
+              </size>
+             </property>
              <property name="font">
               <font>
                <family>Consolas</family>
@@ -422,51 +444,6 @@
           </layout>
          </item>
         </layout>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="label_9">
-         <property name="font">
-          <font>
-           <family>Consolas</family>
-           <pointsize>18</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>TX</string>
-         </property>
-         <property name="margin">
-          <number>10</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="status_bar">
-         <property name="font">
-          <font>
-           <family>Consolas</family>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Status bar</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="font">
-          <font>
-           <family>Consolas</family>
-           <pointsize>18</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>RX</string>
-         </property>
-         <property name="margin">
-          <number>10</number>
-         </property>
-        </widget>
        </item>
        <item row="3" column="1">
         <widget class="QTableWidget" name="tx_table">
@@ -640,6 +617,51 @@
             </widget>
            </item>
           </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="font">
+          <font>
+           <family>Consolas</family>
+           <pointsize>18</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>RX</string>
+         </property>
+         <property name="margin">
+          <number>10</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="status_bar">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Status bar</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QCheckBox" name="Log_check_box">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+            </font>
+           </property>
+           <property name="text">
+            <string>Log Save</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>

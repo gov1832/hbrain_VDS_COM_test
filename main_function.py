@@ -32,7 +32,7 @@ class main_function(QWidget):
         self.timer.timeout.connect(self.time_bar_timeout)
 
         self.set_ui()
-        self.btn_event()
+        self.ui_event()
 
         # system scenario value
         self.client_test = None
@@ -75,6 +75,7 @@ class main_function(QWidget):
         self.ntraffic_data = None
         self.speed_data = None
         self.controllerBox_state_list = None
+        self.m_log_save = None
         self.value_setting()
 
     def value_setting(self):
@@ -97,6 +98,7 @@ class main_function(QWidget):
         self.use_ntraffic = 1
         self.use_category_speed = 1
         self.use_unexpected = 1
+        self.m_log_save = False
 
     def time_bar_timeout(self):
         now = time.localtime()
@@ -105,26 +107,24 @@ class main_function(QWidget):
 
     def set_ui(self):
         # socket
-        self.ui.sock_ip_input.setText("192.168.1.56")
+        self.ui.sock_ip_input.setText("127.0.0.1")
         self.ui.sock_port_input.setText("30100")
         # self.ui.dp_ip_input.setText("input")
-        # self.ui.db_port_input.setText("input")
-        # self.ui.db_id_input.setText("input")
-        # self.ui.db_pw_input.setText("input")
-        # self.ui.db_name_input.setText("input")
-        self.ui.db_ip_input.setText("183.98.24.70")
-        self.ui.db_port_input.setText("53307")
-        self.ui.db_id_input.setText("admin")
+        # self.ui.db_ip_input.setText("183.98.24.70")
+        # self.ui.db_port_input.setText("53307")
+        # self.ui.db_id_input.setText("admin")
+        # self.ui.db_name_input.setText("hbrain_vds")
+        self.ui.db_ip_input.setText("183.99.41.239")
+        self.ui.db_port_input.setText("23307")
+        self.ui.db_id_input.setText("root")
         self.ui.db_name_input.setText("hbrain_vds")
-        # self.ui.db_pw_input.setText("hbrain0372!")
+        self.ui.db_pw_input.setText("hbrain0372!")
         # self.ui.db_name_input.setText("vds")
         self.ui.db_name_input.setEnabled(False)
-        # self.ui.db_ip_input.setText("input DB ip")
-        # self.ui.db_port_input.setText("input DB port")
-        # self.ui.db_id_input.setText("input DB id")
-        # self.ui.db_pw_input.setText("input DB pw")
 
         self.ui.socket_open_btn.setEnabled(False)
+
+        # region send test btn
         # self.ui.op_FF_btn.setEnabled(False)
         # self.ui.op_FE_btn.setEnabled(False)
         # self.ui.op_01_btn.setEnabled(False)
@@ -145,6 +145,7 @@ class main_function(QWidget):
         # self.ui.op_18_btn.setEnabled(False)
         # self.ui.op_19_btn.setEnabled(False)
         # self.ui.op_1E_btn.setEnabled(False)
+        # endregion
 
         self.ui.tx_table.setColumnWidth(0, 180)
         self.ui.tx_table.setColumnWidth(1, 80)
@@ -155,10 +156,16 @@ class main_function(QWidget):
         self.ui.rx_table.setColumnWidth(2, 90)
         self.ui.rx_table.setColumnWidth(3, 200)
 
-    def btn_event(self):
+    def ui_event(self):
+        # region btn event
         self.ui.socket_open_btn.clicked.connect(self.socket_open_btn_click)
         self.ui.db_connect_btn.clicked.connect(self.db_connect_btn_click)
         self.ui.cont_num_change_btn.clicked.connect(self.cont_num_change_btn_click)
+        # endregion
+
+        # region ui event
+        self.ui.Log_check_box.stateChanged.connect(self.log_check_box_check)
+        # endregion
 
         # region request btn event
         # self.ui.op_FF_btn.clicked.connect(self.op_FF_btn_click)
@@ -191,7 +198,7 @@ class main_function(QWidget):
                 self.use_ntraffic,
                 self.use_category_speed,
                 self.use_unexpected)
-        #cap = cv2.VideoCapture('rtsp://admin:hbrain0372!@183.99.41.239')
+        # cap = cv2.VideoCapture('rtsp://admin:hbrain0372!@183.99.41.239')
         # date_s = (datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])
         # numRows = self.ui.tx_table.rowCount()
         # self.ui.tx_table.insertRow(numRows)
@@ -321,6 +328,17 @@ class main_function(QWidget):
                                        str(hex(ord(self.controller_index[4]))))
 
     # endregion
+
+    # region ui click function
+    def log_check_box_check(self):
+        if self.ui.Log_check_box.isChecked():
+            self.m_log_save = True
+        else:
+            self.m_log_save = False
+
+        print(self.m_log_save)
+    # endregion
+
 
     # region socket_msg
 
@@ -722,7 +740,7 @@ class main_function(QWidget):
             else:
                 self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Reserved'))
 
-        self.ui.rx_table.scrollToBottom();
+        self.ui.rx_table.scrollToBottom()
 
 
     def update_TX_Log(self, OPCODE, list):
@@ -754,4 +772,4 @@ class main_function(QWidget):
             else:
                 self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Reserved'))
 
-        self.ui.tx_table.scrollToBottom();
+        self.ui.tx_table.scrollToBottom()
