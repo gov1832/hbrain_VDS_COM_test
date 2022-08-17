@@ -1,3 +1,5 @@
+import os.path
+
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -15,6 +17,7 @@ import cv2
 from db import DB_function
 from Socket import Socket_function
 from other import Other_function
+from log import Log_function
 
 
 class main_function(QWidget):
@@ -26,6 +29,7 @@ class main_function(QWidget):
         self.db = DB_function()
         self.sock = Socket_function()
         self.ot = Other_function()
+        self.log = Log_function()
 
         self.timer = QTimer()
         self.timer.start(1000)
@@ -33,6 +37,11 @@ class main_function(QWidget):
 
         self.set_ui()
         self.ui_event()
+
+        exe_path = os.path.abspath(".")
+        log_folder = "Log"
+        folder_path = os.path.join(exe_path, log_folder)
+        self.log.make_directory(folder_path=folder_path)
 
         # system scenario value
         self.client_test = None
@@ -115,7 +124,7 @@ class main_function(QWidget):
         # self.ui.db_id_input.setText("admin")
         # self.ui.db_name_input.setText("hbrain_vds")
         self.ui.db_ip_input.setText("183.99.41.239")
-        self.ui.db_port_input.setText("23307")
+        self.ui.db_port_input.setText("23306")
         self.ui.db_id_input.setText("root")
         self.ui.db_name_input.setText("hbrain_vds")
         self.ui.db_pw_input.setText("hbrain0372!")
@@ -156,6 +165,9 @@ class main_function(QWidget):
         self.ui.rx_table.setColumnWidth(2, 90)
         self.ui.rx_table.setColumnWidth(3, 200)
 
+        if not self.ui.Log_check_box.isChecked():
+            self.ui.Log_check_box.toggle()
+
     def ui_event(self):
         # region btn event
         self.ui.socket_open_btn.clicked.connect(self.socket_open_btn_click)
@@ -192,33 +204,7 @@ class main_function(QWidget):
         # endregion
 
     def test_btn_click(self):
-        print(self.lane_num,
-                self.collect_cycle,
-                self.category_num,
-                self.use_ntraffic,
-                self.use_category_speed,
-                self.use_unexpected)
-        # cap = cv2.VideoCapture('rtsp://admin:hbrain0372!@183.99.41.239')
-        # date_s = (datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])
-        # numRows = self.ui.tx_table.rowCount()
-        # self.ui.tx_table.insertRow(numRows)
-        # # Add text to the row
-        # self.ui.tx_table.setItem(numRows, 0, QTableWidgetItem(date_s))
-        # self.ui.tx_table.setItem(numRows, 1, QTableWidgetItem('test2'))
-        # if numRows % 2 == 0:
-        #     self.ui.tx_table.setItem(numRows, 2, QTableWidgetItem('test3'))
-
-        # cap = cv2.VideoCapture(self.ui.ImgURL_Edit.text())
-        # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-        # _, img = cap.read()
-        # if str(type(img)) != "<class 'NoneType'>":
-        #     self.sock.send_17_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, img)
-        # else:
-        #     list = [False, chr(0x17), chr(0x06)]
-        #     self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
-
-
+        self.log.log_save()
 
     # region btn click function
     def socket_open_btn_click(self):
@@ -229,17 +215,17 @@ class main_function(QWidget):
             sock_port = int(self.ui.sock_port_input.text())
 
             if sock_ip == '' or sock_port == '':
-                self.ui.status_bar.setText("Socket IP, PORT를 입력해주세요!")
+                self.update_Statusbar_text("Socket IP, PORT를 입력해주세요!")
             else:
-                self.ui.status_bar.setText("Socket server open..")
+                self.update_Statusbar_text("Socket server open..")
                 try:
                     self.sock.socket_server_open(sock_ip, sock_port)
-                    self.ui.status_bar.setText("Socket server '" + sock_ip + "', '" + str(sock_port) + "' open !")
+                    self.update_Statusbar_text("Socket server '" + sock_ip + "', '" + str(sock_port) + "' open !")
                     self.ui.socket_open_btn.setEnabled(False)
                     t = threading.Thread(target=self.client_accept_check, args=(), daemon=True)
                     t.start()
                 except Exception as e:
-                    self.ui.status_bar.setText("socket server open fail")
+                    self.update_Statusbar_text("socket server open fail")
 
                 # region test btn true
                 # self.ui.op_FF_btn.setEnabled(False)
@@ -266,7 +252,7 @@ class main_function(QWidget):
 
 
         else:
-            self.ui.status_bar.setText("controller number는 10자로 입력해주세요")
+            self.update_Statusbar_text("controller number는 10자로 입력해주세요")
 
     def client_accept_check(self):
         while True:
@@ -307,10 +293,10 @@ class main_function(QWidget):
             if self.db.db_connection_check(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8'):
                 self.ui.socket_open_btn.setEnabled(True)
                 self.ui.db_connect_btn.setEnabled(False)
-                self.ui.status_bar.setText("DB connect success")
+                self.update_Statusbar_text("DB connect success")
 
         except Exception as e:
-            self.ui.status_bar.setText("DB connect fail")
+            self.update_Statusbar_text("DB connect fail")
 
 
     def cont_num_change_btn_click(self):
@@ -318,15 +304,14 @@ class main_function(QWidget):
         self.controller_index = cont_num
         self.controller_station = self.controller_type + self.controller_index
         if self.controller_index == '':
-            self.ui.status_bar.setText("controller number는 10자로 입력해주세요")
+            self.update_Statusbar_text("controller number는 10자로 입력해주세요")
         else:
-            self.ui.status_bar.setText("controller number: " +
+            self.update_Statusbar_text("controller number: " +
                                        str(hex(ord(self.controller_index[0]))) + "/" +
                                        str(hex(ord(self.controller_index[1]))) + "/" +
                                        str(hex(ord(self.controller_index[2]))) + "/" +
                                        str(hex(ord(self.controller_index[3]))) + "/" +
                                        str(hex(ord(self.controller_index[4]))))
-
     # endregion
 
     # region ui click function
@@ -338,7 +323,6 @@ class main_function(QWidget):
 
         print(self.m_log_save)
     # endregion
-
 
     # region socket_msg
 
@@ -357,6 +341,7 @@ class main_function(QWidget):
         self.client_connect = False
         print("client close")
 
+    # 돌발
     def read_dsocket_msg(self):
         while self.client_connect:
             # if self.client_connect:
@@ -568,7 +553,8 @@ class main_function(QWidget):
                 self.fe_check = True
 
         else:
-            print("client not connect")
+            print("Waiting for Client...")
+            self.update_Statusbar_text("Waiting for Client...")
 
     def device_sync(self, op, msg):
         lane = 1
@@ -711,65 +697,102 @@ class main_function(QWidget):
 
     # endregion
 
+    # region ui update
+    def update_Statusbar_text(self, msg):
+        self.ui.status_bar.setText(msg)
+
     def update_RX_Log(self, OPCODE, list):
+        log_list = []
+
         date_s = (datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])
         numRows = self.ui.rx_table.rowCount()
         self.ui.rx_table.insertRow(numRows)
         # Add text to the row
         self.ui.rx_table.setItem(numRows, 0, QTableWidgetItem(date_s))
         self.ui.rx_table.setItem(numRows, 1, QTableWidgetItem("0x{:02X}".format(ord(OPCODE))))
+        log_list.append(date_s)
+        log_list.append("0x{:02X}".format(ord(OPCODE)))
         # list[0] { 0 : None, 1 : ACK, 2 : NACK}
         if list[0] == 1:
             self.ui.rx_table.setItem(numRows, 2, QTableWidgetItem('ACK'))
+            log_list.append('ACK')
         elif list[0] == 2:
             self.ui.rx_table.setItem(numRows, 2, QTableWidgetItem('NACK'))
+            log_list.append('NACK')
             if list[1] == chr(0x01):
                 self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('System Error'))
+                log_list.append('System Error')
             elif list[1] == chr(0x02):
                 self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Data Length Error'))
+                log_list.append('Data Length Error')
             elif list[1] == chr(0x03):
                 self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('CSN Error'))
+                log_list.append('CSN Error')
             elif list[1] == chr(0x04):
                 self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('OP Code Error'))
+                log_list.append('OP Code Error')
             elif list[1] == chr(0x05):
                 self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Out of Index Error'))
+                log_list.append('Out of Index Error')
             elif list[1] == chr(0x06):
                 self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Not Ready Error'))
+                log_list.append('Not Ready Error')
             elif list[1] == chr(0xFF):
                 self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Error'))
+                log_list.append('Error')
             else:
                 self.ui.rx_table.setItem(numRows, 3, QTableWidgetItem('Reserved'))
+                log_list.append('Reserved')
 
+        if self.m_log_save:
+            self.log.log_save(log_list)
         self.ui.rx_table.scrollToBottom()
 
-
     def update_TX_Log(self, OPCODE, list):
+        log_list = []
+
         date_s = (datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3])
         numRows = self.ui.tx_table.rowCount()
         self.ui.tx_table.insertRow(numRows)
         # Add text to the row
         self.ui.tx_table.setItem(numRows, 0, QTableWidgetItem(date_s))
         self.ui.tx_table.setItem(numRows, 1, QTableWidgetItem("0x{:02X}".format(ord(OPCODE))))
+        log_list.append(date_s)
+        log_list.append("0x{:02X}".format(ord(OPCODE)))
         # list[0] { 0 : None, 1 : ACK, 2 : NACK}
         if list[0] == 1:
             self.ui.tx_table.setItem(numRows, 2, QTableWidgetItem('ACK'))
+            log_list.append('ACK')
         elif list[0] == 2:
             self.ui.tx_table.setItem(numRows, 2, QTableWidgetItem('NACK'))
+            log_list.append('NACK')
             if list[1] == chr(0x01):
                 self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('System Error'))
+                log_list.append('System Error')
             elif list[1] == chr(0x02):
                 self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Data Length Error'))
+                log_list.append('Data Length Error')
             elif list[1] == chr(0x03):
                 self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('CSN Error'))
+                log_list.append('CSN Error')
             elif list[1] == chr(0x04):
                 self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('OP Code Error'))
+                log_list.append('OP Code Error')
             elif list[1] == chr(0x05):
                 self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Out of Index Error'))
+                log_list.append('Out of Index Error')
             elif list[1] == chr(0x06):
                 self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Not Ready Error'))
+                log_list.append('Not Ready Error')
             elif list[1] == chr(0xFF):
                 self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Error'))
+                log_list.append('Error')
             else:
                 self.ui.tx_table.setItem(numRows, 3, QTableWidgetItem('Reserved'))
+                log_list.append('Reserved')
 
+        if self.m_log_save:
+            self.log.log_save(log_list)
         self.ui.tx_table.scrollToBottom()
+
+    # endregion

@@ -647,7 +647,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Status bar</string>
+            <string>Hbrain VDS</string>
            </property>
           </widget>
          </item>
@@ -657,6 +657,12 @@
             <font>
              <family>Consolas</family>
             </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: blue;</string>
            </property>
            <property name="text">
             <string>Log Save</string>
