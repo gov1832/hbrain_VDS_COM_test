@@ -105,10 +105,10 @@ class Socket_function:
         frame_num = frame
         lane_num = chr(lane)
 
-        # traffic data => [[차량수, 속도],[차량수, 속도]]
+        # traffic data => [[차량수, 속도, 점유율],[차량수, 속도, 점유율]]
         lane_data = ''
         for i in traffic_data:
-            lane_data = lane_data + chr(i[0]) + chr(i[1])
+            lane_data = lane_data + chr(i[0]) + chr(i[1]) + chr(i[2])
         data = frame_num + lane_num + lane_data
         length = self.ot.length_calc(2 + len(data))
 

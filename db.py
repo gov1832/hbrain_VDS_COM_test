@@ -8,7 +8,8 @@ class DB_function:
     def __init__(self):
         super().__init__()
         self.distlong_diff = 20
-
+        self.get_traffic_data(30, sync_time=1, lane=2, host='183.99.41.239', port=23306, user='root',
+                         password='hbrain0372!', db='hbrain_vds', charset='utf8')
     def db_connection_check(self, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         try:
             db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
@@ -58,14 +59,14 @@ class DB_function:
             else:
                 db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
                 cur = db_connect.cursor()
-                temp = time.localtime(sync_time - cycle)
-                data_start = time.strftime("%Y-%m-%d %H:%M:%S", temp)
-                # data_start = '2022-07-25 20:17:00'
+                #temp = time.localtime(sync_time - cycle)
+                #data_start = time.strftime("%Y-%m-%d %H:%M:%S", temp)
+                data_start = '2022-08-29 20:05:41.350'
 
                 sql = "SELECT * FROM obj_info WHERE time >='" + data_start + "' ORDER BY ID asc, time asc;"
                 cur.execute(sql)
                 result = cur.fetchall()
-                # print(result)
+                #print(result)
                 temp = []
                 num = []
                 for i in range(lane):
@@ -85,20 +86,48 @@ class DB_function:
                                 temp[j][0] += 1
                                 temp[j][1] += result[i][4]
 
+                sql = "SELECT * FROM obj_info WHERE time >='" + data_start + "' and (DistLong BETWEEN '30' AND '33') ORDER BY ID asc, time desc;"
 
+                cur.execute(sql)
+                result = cur.fetchall()
+                ttime = [0]
+                timegap = []
+                timeoc = []
+                coun = []
+                for i in range(lane):
+                    timegap.append(0)
+                    timeoc.append(0)
+                    coun.append(0)
+
+                for i in range(0, len(result)-1):
+                    if result[i][1] != result[i + 1][1] or (result[i][3] - result[i + 1][3]) > 2:
+                        ttime.append(i)
+                        ttime.append((i+1))
+                ttime.append((len(result)-1))
+
+                for i in range(0, len(ttime), 2):
+                    for j in range(lane):
+                        if result[ttime[i]][12] % lane == j:
+                            timegap[j] += ((result[ttime[i]][0] - result[ttime[i+1]][0]).microseconds/1000000) /cycle
+                            coun[j] += 1
+                            #print(timegap[j])
+
+                for j in range(lane):
+                    if coun[j] != 0:
+                        timeoc[j] = timegap[j] * 100 /coun[j]
+                        #print(timeoc[j])
+                    else:
+                        timeoc[j] = 0
                 if lane != 1:
-                    for j in range(1,lane):
+                    for j in range(1, lane):
                         if num[j] != 0:
-                            traffic_temp = [temp[j][0], round(temp[j][1] / num[j])]
-
+                            traffic_temp = [temp[j][0], round(temp[j][1] / num[j]), round(timeoc[j])]
                             traffic_data.append(traffic_temp)
 
                 if num[0] != 0:
-                    traffic_temp = [temp[0][0], round(temp[0][1] / num[0])]
-                    print(traffic_temp[1])
+                    traffic_temp = [temp[0][0], round(temp[0][1] / num[0]), round(timeoc[0])]
                     traffic_data.append(traffic_temp)
-
-
+                #print(traffic_data)
                 db_connect.close()
         except Exception as e:
             print("err: ", e)
