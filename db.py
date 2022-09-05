@@ -99,7 +99,7 @@ class DB_function:
                     coun.append(0)
 
                 for i in range(0, len(result)-1):
-                    if result[i][1] != result[i + 1][1] or (result[i][3] - result[i + 1][3]) > 2:
+                    if result[i][1] != result[i + 1][1] or abs(result[i][3] - result[i + 1][3]) > 2:
                         ttime.append(i)
                         ttime.append((i+1))
                 ttime.append((len(result)-1))
