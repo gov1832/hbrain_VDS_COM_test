@@ -282,7 +282,7 @@ class Socket_function:
         car_count = chr(len(individual_traffic_data) >> 8) + chr(len(individual_traffic_data) & 0xFF)
         data = frame + car_count
         for i in individual_traffic_data:
-            data = data + chr(int(i[0])) + chr(int(i[1])) + chr(int(i[2])) + chr(int(i[3]))
+            data = data + chr(int(i[0])) + chr(int(i[1])) + chr(int(i[2])) + chr(int(i[3])) + chr(int(i[4]))
 
         length = self.ot.length_calc(2 + len(data))
 

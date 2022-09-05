@@ -8,8 +8,7 @@ class DB_function:
     def __init__(self):
         super().__init__()
         self.distlong_diff = 20
-        self.get_traffic_data(30, sync_time=1, lane=2, host='183.99.41.239', port=23306, user='root',
-                         password='hbrain0372!', db='hbrain_vds', charset='utf8')
+
     def db_connection_check(self, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         try:
             db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
@@ -75,16 +74,16 @@ class DB_function:
 
                 for i in range(0, len(result)-1):
                     for j in range(lane):
-                        if result[i][12] % lane == j:
+                        if result[i][14] % lane == j:
                             num[j] += 1
                             if result[i][1] != result[i + 1][1]:
                                 temp[j][0] += 1
-                                temp[j][1] += result[i][4]
+                                temp[j][1] += result[i][6]
                             elif abs(result[i + 1][3] - result[i][3]) < self.distlong_diff:
-                                temp[j][1] += result[i][4]
+                                temp[j][1] += result[i][6]
                             else:
                                 temp[j][0] += 1
-                                temp[j][1] += result[i][4]
+                                temp[j][1] += result[i][6]
 
                 sql = "SELECT * FROM obj_info WHERE time >='" + data_start + "' and (DistLong BETWEEN '30' AND '33') ORDER BY ID asc, time desc;"
 
@@ -107,7 +106,7 @@ class DB_function:
 
                 for i in range(0, len(ttime), 2):
                     for j in range(lane):
-                        if result[ttime[i]][12] % lane == j:
+                        if result[ttime[i]][14] % lane == j:
                             timegap[j] += ((result[ttime[i]][0] - result[ttime[i+1]][0]).microseconds/1000000) /cycle
                             coun[j] += 1
                             #print(timegap[j])
@@ -169,16 +168,17 @@ class DB_function:
                     carid = 0
                     for j in range(count[i - 1], count[i]):
                         carcont += 1
-                        carspeed += result[j][4]
-                        carid += result[j][9]
-                        if (result[j][12] % lane) == 0:
+                        carspeed += result[j][6]
+                        carid += result[j][11]
+                        if (result[j][14] % lane) == 0:
                             carlane += lane
                         else:
-                            carlane += (result[j][12] % lane)
+                            carlane += (result[j][14] % lane)
                     if carcont != 0:
                         cardata.append(round(carlane / carcont))
                         cardata.append((result[count[i - 1]][0] - data_count).seconds)
                         cardata.append(int(carspeed / carcont))
+                        cardata.append(int(carway))
                         cardata.append(round(carid / carcont))
                         individual_traffic_data.append(cardata)
 
@@ -218,7 +218,7 @@ class DB_function:
             cur = db_connect.cursor()
 
             for i in range(lane):
-                sql = "SELECT * FROM cumulative_velocity where Lane=" +str(i+1)+ " order by ID asc"
+                sql = "SELECT * FROM cumulative_velocity where Zone=" +str(i+1)+ " order by ID asc"
 
                 cur.execute(sql)
                 result = cur.fetchall()
@@ -281,8 +281,8 @@ class DB_function:
                             out.append(result[j][1])
                             out.append(result[j][2])
                             out.append(result[j][3])
-                            out.append(result[j][4])
-                            out.append(result[j][5])
+                            out.append(result[j][6])
+                            out.append(result[j][7])
                             outbreak.append(out)
 
                 sql = "truncate outbreak" #초기화 부분, 추후 활성화
