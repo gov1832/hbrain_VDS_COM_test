@@ -66,42 +66,38 @@ class DB_function:
                 cur.execute(sql)
                 result = cur.fetchall()
                 # print(result)
-                temp_1 = [0, 0]
-                temp_2 = [0, 0]
-                num_1 = 0
-                num_2 = 0
+                temp = []
+                num = []
+                for i in range(lane):
+                    temp.append([1,0])
+                    num.append(0)
+
                 for i in range(0, len(result)-1):
-                    if result[i][12] % lane == 1:
-                        num_1 += 1
-                        if result[i][1] != result[i+1][1]:
-                            temp_1[0] += 1
-                            temp_1[1] += result[i][4]
-                        elif abs(result[i+1][3] - result[i][3]) < self.distlong_diff:
-                            temp_1[1] += result[i][4]
-                        else:
-                            temp_1[0] += 1
-                            temp_1[1] += result[i][4]
-                    elif result[i][12] % lane == 0:
-                        num_2 += 1
-                        if result[i][1] != result[i + 1][1]:
-                            temp_2[0] += 1
-                            temp_2[1] += result[i][4]
-                        elif abs(result[i + 1][3] - result[i][3]) < self.distlong_diff:
-                            temp_2[1] += result[i][4]
-                        else:
-                            temp_2[0] += 1
-                            temp_2[1] += result[i][4]
-                    if (i+1) == (len(result)-1):
-                        if result[i+1][12] % lane == 1:
-                            num_1 += 1
-                        if result[i+1][12] % lane == 0:
-                            num_2 += 1
-                if num_1 != 0:
-                    traffic_temp = [temp_1[0], round(temp_1[1] / num_1)]
+                    for j in range(lane):
+                        if result[i][12] % lane == j:
+                            num[j] += 1
+                            if result[i][1] != result[i + 1][1]:
+                                temp[j][0] += 1
+                                temp[j][1] += result[i][4]
+                            elif abs(result[i + 1][3] - result[i][3]) < self.distlong_diff:
+                                temp[j][1] += result[i][4]
+                            else:
+                                temp[j][0] += 1
+                                temp[j][1] += result[i][4]
+
+
+                if lane != 1:
+                    for j in range(1,lane):
+                        if num[j] != 0:
+                            traffic_temp = [temp[j][0], round(temp[j][1] / num[j])]
+
+                            traffic_data.append(traffic_temp)
+
+                if num[0] != 0:
+                    traffic_temp = [temp[0][0], round(temp[0][1] / num[0])]
+                    print(traffic_temp[1])
                     traffic_data.append(traffic_temp)
-                if num_2 != 0:
-                    traffic_temp = [temp_2[0], round(temp_2[1] / num_2)]
-                    traffic_data.append(traffic_temp)
+
 
                 db_connect.close()
         except Exception as e:
