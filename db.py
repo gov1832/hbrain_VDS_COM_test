@@ -163,12 +163,14 @@ class DB_function:
                 for i in range(1, len(count)):
                     cardata = []
                     carspeed = 0
+                    carway = 0
                     carlane = 0
                     carcont = 0
                     carid = 0
                     for j in range(count[i - 1], count[i]):
                         carcont += 1
                         carspeed += result[j][6]
+                        carway += result[j][5]
                         carid += result[j][11]
                         if (result[j][14] % lane) == 0:
                             carlane += lane
@@ -178,7 +180,10 @@ class DB_function:
                         cardata.append(round(carlane / carcont))
                         cardata.append((result[count[i - 1]][0] - data_count).seconds)
                         cardata.append(int(carspeed / carcont))
-                        cardata.append(int(carway))
+                        if (int(carway)/carcont) >= 0:
+                            cardata.append(0)
+                        else:
+                            cardata.append(1)
                         cardata.append(round(carid / carcont))
                         individual_traffic_data.append(cardata)
 
