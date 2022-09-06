@@ -321,6 +321,7 @@ class DB_function:
         return parameter_list
 
     # endregion
+
     # region set data
     # S/W 파라미터 저장
     def set_paramete_data(self, parameter_list=[], host=None, port=None, user=None, password=None, db=None, charset='utf8'):
@@ -357,7 +358,28 @@ class DB_function:
                 db_connect.close()
         except Exception as e:
             print("err: ", e)
+    # endregion
 
+    # region save
+    def save_Log_data(self, msg_list=[], host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+        try:
+            if msg_list == '':
+                print("parameter in none")
+            else:
+                db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset, autocommit=True)
+                cur = db_connect.cursor()
+                sql = ''
 
+                if len(msg_list) == 4:
+                    sql = "INSERT INTO Log_communication value('" + msg_list[0] + "', '" + msg_list[1] + "', '" + msg_list[2] + "', '" + msg_list[3] + "');"
+                elif len(msg_list) == 3:
+                    sql = "INSERT INTO Log_communication value('" + msg_list[0] + "', '" + msg_list[1] + "', '" + msg_list[2] + "', '');"
+                elif len(msg_list) == 2:
+                    sql = "INSERT INTO Log_communication value('" + msg_list[0] + "', '" + msg_list[1] + "', '', '');"
+
+                cur.execute(sql)
+                db_connect.close()
+        except Exception as e:
+            print("err: ", e)
     # endregion
 

@@ -107,7 +107,7 @@ class main_function(QWidget):
         self.use_ntraffic = 1
         self.use_category_speed = 1
         self.use_unexpected = 1
-        self.m_log_save = False
+        self.m_log_save = True
 
     def time_bar_timeout(self):
         now = time.localtime()
@@ -746,6 +746,7 @@ class main_function(QWidget):
 
         if self.m_log_save:
             self.log.log_save(log_list)
+            self.db.save_Log_data(msg_list=log_list, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
         self.ui.rx_table.scrollToBottom()
 
     def update_TX_Log(self, OPCODE, list):
@@ -793,6 +794,7 @@ class main_function(QWidget):
 
         if self.m_log_save:
             self.log.log_save(log_list)
+            self.db.save_Log_data(msg_list=log_list, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
         self.ui.tx_table.scrollToBottom()
 
     # endregion
