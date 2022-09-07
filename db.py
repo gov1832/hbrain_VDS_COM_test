@@ -84,9 +84,6 @@ class DB_function:
                             else:
                                 temp[j][0] += 1
                                 temp[j][1] += result[i][6]
-                # 상/하행
-                if lane > 0:
-                    lane_half = lane / 2
 
                 # 점유율
                 sql = "SELECT * FROM obj_info WHERE time >='" + data_start + "' and (DistLong BETWEEN '30' AND '33') ORDER BY ID asc, time desc;"
@@ -121,14 +118,25 @@ class DB_function:
                         #print(timeoc[j])
                     else:
                         timeoc[j] = 0
+
+                        # 상/하행
+                if lane > 0:
+                    lane_half = lane / 2
+
+
                 if lane != 1:
                     for j in range(1, lane):
+                        if j <= lane_half:
+                            laneway = 0
+                        else:
+                            laneway = 1
                         if num[j] != 0:
-                            traffic_temp = [temp[j][0], round(temp[j][1] / num[j]), round(timeoc[j])]
+                            traffic_temp = [temp[j][0], round(temp[j][1] / num[j]), round(timeoc[j]), laneway]
                             traffic_data.append(traffic_temp)
 
                 if num[0] != 0:
-                    traffic_temp = [temp[0][0], round(temp[0][1] / num[0]), round(timeoc[0])]
+                    laneway = 1
+                    traffic_temp = [temp[0][0], round(temp[0][1] / num[0]), round(timeoc[0]), laneway]
                     traffic_data.append(traffic_temp)
 
                 #print(traffic_data)
