@@ -101,7 +101,7 @@ class main_function(QWidget):
         self.controller_type = 'VD'
         self.controller_index = self.ot.get_controller_number(self.ui.cont_num_edit.text())
         self.controller_station = self.controller_type + self.controller_index
-        self.lane_num = 2
+        self.lane_num = 6
         self.collect_cycle = 30
         self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
         self.use_ntraffic = 1
@@ -119,15 +119,15 @@ class main_function(QWidget):
         self.ui.sock_ip_input.setText("127.0.0.1")
         self.ui.sock_port_input.setText("30100")
         # self.ui.dp_ip_input.setText("input")
-        # self.ui.db_ip_input.setText("183.98.24.70")
-        # self.ui.db_port_input.setText("53307")
-        # self.ui.db_id_input.setText("admin")
-        # self.ui.db_name_input.setText("hbrain_vds")
-        self.ui.db_ip_input.setText("183.99.41.239")
-        self.ui.db_port_input.setText("23306")
-        self.ui.db_id_input.setText("root")
+        self.ui.db_ip_input.setText("183.98.24.70")
+        self.ui.db_port_input.setText("53307")
+        self.ui.db_id_input.setText("admin")
         self.ui.db_name_input.setText("hbrain_vds")
-        self.ui.db_pw_input.setText("hbrain0372!")
+        # self.ui.db_ip_input.setText("183.99.41.239")
+        # self.ui.db_port_input.setText("23306")
+        # self.ui.db_id_input.setText("root")
+        # self.ui.db_name_input.setText("hbrain_vds")
+        # self.ui.db_pw_input.setText("hbrain0372!")
         # self.ui.db_name_input.setText("vds")
         self.ui.db_name_input.setEnabled(False)
 
@@ -276,7 +276,7 @@ class main_function(QWidget):
                 self.use_category_speed = parameter_list[4]
                 self.use_unexpected = parameter_list[5]
             else:
-                self.lane_num = 2
+                self.lane_num = 6
                 self.collect_cycle = 30
                 self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
                 self.use_ntraffic = 1
@@ -561,7 +561,7 @@ class main_function(QWidget):
         # if op == chr(0x01):
         #     self.frame_number_set = msg[44]
         if op == chr(0x0C):
-            self.lane_num = 2
+            self.lane_num = 6
             self.collect_cycle = 30
             self.category_num = [0, 11, 21, 31, 41, 51, 61, 71, 81, 91, 101, 111]
             self.use_ntraffic = 1

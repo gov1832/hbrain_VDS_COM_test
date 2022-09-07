@@ -76,7 +76,7 @@ class Socket_function:
             # print(self.client_socket)
         except Exception as e:
             # self.client_socket = None
-            print("err: read/ ", e)
+            print("err socket_read : ", e)
 
         return msg
 
@@ -105,10 +105,13 @@ class Socket_function:
         frame_num = frame
         lane_num = chr(lane)
 
-        # traffic data => [[차량수, 속도, 점유율],[차량수, 속도, 점유율]]
+        # traffic data => [[차량수, 속도, 점유율, 상/하행],[차량수, 속도, 점유율, 상/하행]]
+        print(traffic_data)
         lane_data = ''
         for i in traffic_data:
+            # 차량수 + 속도 + 점유율 + 상/하행
             lane_data = lane_data + chr(i[0]) + chr(i[1]) + chr(i[2])
+
         data = frame_num + lane_num + lane_data
         length = self.ot.length_calc(2 + len(data))
 

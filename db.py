@@ -20,7 +20,7 @@ class DB_function:
             return True
         except Exception as e:
             return False
-            print("err: ", e)
+            print("err db_connection_check : ", e)
 
     # region get data
     # 버전
@@ -44,12 +44,12 @@ class DB_function:
 
             db_connect.close()
         except Exception as e:
-            print("err: ", e)
+            print("err get_version_num : ", e)
 
         return version_list
 
     # 교통량 데이터
-    def get_traffic_data(self, cycle=30, sync_time=None, lane=2, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+    def get_traffic_data(self, cycle=30, sync_time=None, lane=6, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         traffic_data = []
 
         try:
@@ -58,9 +58,9 @@ class DB_function:
             else:
                 db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
                 cur = db_connect.cursor()
-                #temp = time.localtime(sync_time - cycle)
-                #data_start = time.strftime("%Y-%m-%d %H:%M:%S", temp)
-                data_start = '2022-08-29 20:05:41.350'
+                temp = time.localtime(sync_time - cycle)
+                data_start = time.strftime("%Y-%m-%d %H:%M:%S", temp)
+                # data_start = '2022-08-29 20:05:41.350'
 
                 sql = "SELECT * FROM obj_info WHERE time >='" + data_start + "' ORDER BY ID asc, time asc;"
                 cur.execute(sql)
@@ -84,7 +84,11 @@ class DB_function:
                             else:
                                 temp[j][0] += 1
                                 temp[j][1] += result[i][6]
+                # 상/하행
+                if lane > 0:
+                    lane_half = lane / 2
 
+                # 점유율
                 sql = "SELECT * FROM obj_info WHERE time >='" + data_start + "' and (DistLong BETWEEN '30' AND '33') ORDER BY ID asc, time desc;"
 
                 cur.execute(sql)
@@ -126,10 +130,11 @@ class DB_function:
                 if num[0] != 0:
                     traffic_temp = [temp[0][0], round(temp[0][1] / num[0]), round(timeoc[0])]
                     traffic_data.append(traffic_temp)
+
                 #print(traffic_data)
                 db_connect.close()
         except Exception as e:
-            print("err: ", e)
+            print("err get_traffic_data : ", e)
 
         return traffic_data
 
@@ -189,7 +194,7 @@ class DB_function:
 
                 db_connect.close()
         except Exception as e:
-            print("err: ", e)
+            print("err get_individual_traffic_data : ", e)
 
         return individual_traffic_data
 
@@ -241,7 +246,7 @@ class DB_function:
             cur.execute(sql)
             db_connect.close()
         except Exception as e:
-            print("err: ", e)
+            print("err get_ntraffic_data : ", e)
 
         return speed_data
 
@@ -259,7 +264,7 @@ class DB_function:
 
             db_connect.close()
         except Exception as e:
-            print("err: ", e)
+            print("err get_controllerBox_state_data : ", e)
 
         return controllerBox_state_list
 
@@ -286,15 +291,15 @@ class DB_function:
                             out.append(result[j][1])
                             out.append(result[j][2])
                             out.append(result[j][3])
-                            out.append(result[j][6])
-                            out.append(result[j][7])
+                            out.append(result[j][4])
+                            out.append(result[j][5])
                             outbreak.append(out)
 
                 sql = "truncate outbreak" #초기화 부분, 추후 활성화
                 cur.execute(sql)
             db_connect.close()
         except Exception as e:
-            print("err: ", e)
+            print("err get_outbreak : ", e)
         return outbreak
 
     def get_parameter_data(self, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
@@ -347,7 +352,7 @@ class DB_function:
             parameter_list.append(use_category_speed)
             parameter_list.append(use_unexpected)
         except Exception as e:
-            print("err: ", e)
+            print("err get_parameter_data : ", e)
         return parameter_list
 
     # endregion
@@ -387,7 +392,7 @@ class DB_function:
 
                 db_connect.close()
         except Exception as e:
-            print("err: ", e)
+            print("err set_paramete_data : ", e)
     # endregion
 
     # region save
@@ -410,6 +415,6 @@ class DB_function:
                 cur.execute(sql)
                 db_connect.close()
         except Exception as e:
-            print("err: ", e)
+            print("err save_Log_data : ", e)
     # endregion
 
