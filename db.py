@@ -293,6 +293,8 @@ class DB_function:
                             out.append(result[j][3])
                             out.append(result[j][4])
                             out.append(result[j][5])
+                            if result[j][1] < (lane/2):
+
                             outbreak.append(out)
 
                 sql = "truncate outbreak" #초기화 부분, 추후 활성화
