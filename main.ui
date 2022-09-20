@@ -20,7 +20,7 @@
       <number>10</number>
      </property>
      <item>
-      <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0,0" columnstretch="0,0">
+      <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0" columnstretch="0,0">
        <property name="leftMargin">
         <number>20</number>
        </property>
@@ -354,6 +354,9 @@
               <font>
                <family>Consolas</family>
               </font>
+             </property>
+             <property name="echoMode">
+              <enum>QLineEdit::Password</enum>
              </property>
              <property name="placeholderText">
               <string>input DB pw</string>

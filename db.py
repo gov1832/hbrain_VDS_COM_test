@@ -56,6 +56,11 @@ class DB_function:
             if sync_time is None:
                 print('nack')
             else:
+                # print
+                print("lane: ", lane)
+                print("sync_time: ", sync_time)
+                print("cycle: ", cycle)
+
                 db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
                 cur = db_connect.cursor()
                 temp = time.localtime(sync_time - cycle)
@@ -69,9 +74,8 @@ class DB_function:
                 temp = []
                 num = []
                 for i in range(lane):
-                    temp.append([1,0])
+                    temp.append([1, 0])
                     num.append(0)
-
                 for i in range(0, len(result)-1):
                     for j in range(lane):
                         if result[i][14] % lane == j:
@@ -119,13 +123,11 @@ class DB_function:
                     else:
                         timeoc[j] = 0
 
-                        # 상/하행
-                if lane > 0:
+                if lane > 0 and lane != 1:
                     lane_half = lane / 2
-
-
-                if lane != 1:
                     for j in range(1, lane):
+                        print("j: ", j)
+                        # 상/하행
                         if j <= lane_half:
                             laneway = 0
                         else:
@@ -147,7 +149,7 @@ class DB_function:
         return traffic_data
 
     # 개별 차량 데이터
-    def get_individual_traffic_data(self, cycle=30, sync_time=None, lane=2, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+    def get_individual_traffic_data(self, cycle=30, sync_time=None, lane=6, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         individual_traffic_data = []
 
         try:
@@ -207,7 +209,7 @@ class DB_function:
         return individual_traffic_data
 
     # 차선별 누적 교통량 데이터
-    def get_ntraffic_data(self, lane=2, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+    def get_ntraffic_data(self, lane=6, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         ntraffic_data = []
 
         try:
@@ -228,7 +230,7 @@ class DB_function:
         return ntraffic_data
 
     # 카테고리(속도) 기준 차선별 교통량
-    def get_speed_data(self, lane=2, cnum=[],  host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+    def get_speed_data(self, lane=6, cnum=[],  host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         speed_data = []
 
         try:
@@ -278,7 +280,7 @@ class DB_function:
 
         # 돌발 상황 정보
 
-    def get_outbreak(self, lane=2, host=None, port=None, user=None, password=None, db=None,
+    def get_outbreak(self, lane=6, host=None, port=None, user=None, password=None, db=None,
                      charset='utf8'):
         outbreak = []
 
@@ -290,22 +292,32 @@ class DB_function:
             cur.execute(sql)
             result = cur.fetchall()
 
-            if result:
-                for i in range(lane):
-                    for j in range(len(result)):
-                        if result[j][1] == (i + 1):
-                            out = []
-                            out.append(result[j][0])
-                            out.append(result[j][1])
-                            out.append(result[j][2])
-                            out.append(result[j][3])
-                            out.append(result[j][4])
-                            out.append(result[j][5])
-                            if result[j][1] < (lane/2):
+            # 상/하행
+            if lane > 0:
+                lane_half = lane / 2
 
-                            outbreak.append(out)
+                if result:
+                    for i in range(lane):
+                        for j in range(len(result)):
+                            if result[j][1] == (i + 1):
+                                out = []
+                                out.append(result[j][0])
+                                out.append(result[j][1])
+                                out.append(result[j][2])
+                                out.append(result[j][3])
+                                out.append(result[j][4])
+                                out.append(result[j][5])
+                                if result[j][1] <= lane_half:
+                                    out.append(0)
+                                elif lane_half < result[j][1] <= lane:
+                                    out.append(1)
+                                else: # 값 오류
+                                    continue
+                                    # out.append(2)
+                                outbreak.append(out)
 
-                sql = "truncate outbreak" #초기화 부분, 추후 활성화
+                # 초기화 부분, 추후 활성화
+                sql = "truncate outbreak"
                 cur.execute(sql)
             db_connect.close()
         except Exception as e:
