@@ -4,10 +4,14 @@ import time
 import math
 import datetime
 
+from calc import CALC_function
+
 class DB_function:
     def __init__(self):
         super().__init__()
-        self.distlong_diff = 20
+        self.calc = CALC_function()
+
+        self.distlong_diff = 30
 
     def db_connection_check(self, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         try:
@@ -126,7 +130,6 @@ class DB_function:
                 if lane > 0 and lane != 1:
                     lane_half = lane / 2
                     for j in range(1, lane):
-                        print("j: ", j)
                         # 상/하행
                         if j <= lane_half:
                             laneway = 0
@@ -135,10 +138,17 @@ class DB_function:
                         if num[j] != 0:
                             traffic_temp = [temp[j][0], round(temp[j][1] / num[j]), round(timeoc[j]), laneway]
                             traffic_data.append(traffic_temp)
+                        else:
+                            traffic_temp = [temp[j][0], 0, round(timeoc[j]), laneway]
+                            traffic_data.append(traffic_temp)
 
                 if num[0] != 0:
                     laneway = 1
                     traffic_temp = [temp[0][0], round(temp[0][1] / num[0]), round(timeoc[0]), laneway]
+                    traffic_data.append(traffic_temp)
+                else:
+                    laneway = 1
+                    traffic_temp = [temp[0][0], 0, round(timeoc[0]), laneway]
                     traffic_data.append(traffic_temp)
 
                 #print(traffic_data)
@@ -156,6 +166,11 @@ class DB_function:
             if sync_time is None:
                 print('nack')
             else:
+                # print
+                print("lane: ", lane)
+                print("sync_time: ", sync_time)
+                print("cycle: ", cycle)
+
                 db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
                 cur = db_connect.cursor()
                 temp = time.localtime(sync_time - cycle)

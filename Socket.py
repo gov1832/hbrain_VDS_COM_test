@@ -106,7 +106,7 @@ class Socket_function:
         lane_num = chr(lane)
 
         # traffic data => [[차량수, 속도, 점유율, 상/하행],[차량수, 속도, 점유율, 상/하행]]
-        print(traffic_data)
+        # print(traffic_data)
         lane_data = ''
         for i in traffic_data:
             # 차량수 + 속도 + 점유율 + 상/하행

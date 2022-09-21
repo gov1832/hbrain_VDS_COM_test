@@ -346,6 +346,8 @@ class main_function(QWidget):
             # if self.client_connect:
             outbreakdata = self.db.get_outbreak(lane=self.lane_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
             if outbreakdata:
+                # print
+                print("0x19 돌발: ", outbreakdata)
                 if self.use_unexpected:
                     self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, outbreakdata)
                     self.update_TX_Log(chr(0x19), [0])
@@ -396,6 +398,8 @@ class main_function(QWidget):
                 elif msg_op == chr(0x04):
                     self.traffic_data = self.db.get_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
                     if self.traffic_data != [] and self.frame_number_04 is not None:
+                        # print
+                        print("0x04 교통량: ", self.traffic_data)
                         self.sock.send_04_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.frame_number_04, self.lane_num, self.traffic_data)
                         self.update_TX_Log(chr(0x04), [1])
                         # self.frame_number_04 = None
@@ -406,12 +410,16 @@ class main_function(QWidget):
                 elif msg_op == chr(0x05):
                     self.speed_data = self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
                     if self.speed_data:
+                        # print
+                        print("0x05 차로 카테고리별 속도: ", self.speed_data)
                         if self.use_category_speed:
                             self.sock.send_05_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.speed_data)
                             self.update_TX_Log(chr(0x05), [1])
                 elif msg_op == chr(0x07):
                     self.ntraffic_data = self.db.get_ntraffic_data(lane=self.lane_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
                     if self.ntraffic_data:
+                        # print
+                        print("0x07 누적교통량: ", self.ntraffic_data)
                         if self.use_ntraffic:
                             self.sock.send_07_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.ntraffic_data)
                             self.update_TX_Log(chr(0x07), [1])
@@ -463,6 +471,8 @@ class main_function(QWidget):
                 elif msg_op == chr(0x16):
                     self.individual_traffic_data = self.db.get_individual_traffic_data(cycle=self.collect_cycle, sync_time=self.sync_time, lane=self.lane_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
                     if self.individual_traffic_data != [] and self.frame_number_16 is not None:
+                        # print
+                        print("0x16 개별차랑: ", self.individual_traffic_data)
                         self.sock.send_16_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, self.frame_number_16, self.individual_traffic_data)
                         self.update_TX_Log(chr(0x16), [1])
                         # self.frame_number_16 = None
