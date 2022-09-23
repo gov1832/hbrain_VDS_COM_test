@@ -408,7 +408,7 @@ class main_function(QWidget):
                         self.sock.send_nack_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, list)
                         self.update_TX_Log(chr(0x04), [2, list[2]])
                 elif msg_op == chr(0x05):
-                    self.speed_data = self.db.get_speed_data(lane=self.lane_num, cnum=self.category_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
+                    self.speed_data = self.db.get_speed_data(sync_time=self.sync_time, lane=self.lane_num, cnum=self.category_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
                     if self.speed_data:
                         # print
                         print("0x05 차로 카테고리별 속도: ", self.speed_data)
