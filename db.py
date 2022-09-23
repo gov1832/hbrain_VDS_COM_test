@@ -61,99 +61,25 @@ class DB_function:
             if sync_time is None:
                 print('nack')
             else:
-                # print
-                print("lane: ", lane)
-                print("sync_time: ", sync_time)
-                print("cycle: ", cycle)
-
-                db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
-                cur = db_connect.cursor()
                 temp = time.localtime(sync_time - cycle)
                 data_start = time.strftime("%Y-%m-%d %H:%M:%S", temp)
-                # data_start = '2022-08-29 20:05:41.350'
 
-                sql = "SELECT * FROM obj_info WHERE time >='" + data_start + "' ORDER BY ID asc, time asc;"
-                cur.execute(sql)
-                result = cur.fetchall()
-                #print(result)
-                temp = []
-                num = []
-                for i in range(lane):
-                    temp.append([1, 0])
-                    num.append(0)
-                for i in range(0, len(result)-1):
-                    for j in range(lane):
-                        if result[i][14] % lane == j:
-                            num[j] += 1
-                            if result[i][1] != result[i + 1][1]:
-                                temp[j][0] += 1
-                                temp[j][1] += result[i][6]
-                            elif abs(result[i + 1][3] - result[i][3]) < self.distlong_diff:
-                                temp[j][1] += result[i][6]
-                            else:
-                                temp[j][0] += 1
-                                temp[j][1] += result[i][6]
+                # 교통량 및 속도
+                Tspeed_data = self.calc.Tspeed_data(data_start, lane, host, port, user, password, db, charset)
 
                 # 점유율
-                sql = "SELECT * FROM obj_info WHERE time >='" + data_start + "' and (DistLong BETWEEN '30' AND '33') ORDER BY ID asc, time desc;"
+                occu = self.get_occupancy_interval_data(lane, host, port, user, password, db, charset)
+                share_data = self.calc.share_data(occu, data_start,cycle,lane, host, port, user, password, db, charset)
 
-                cur.execute(sql)
-                result = cur.fetchall()
-                ttime = [0]
-                timegap = []
-                timeoc = []
-                coun = []
-                for i in range(lane):
-                    timegap.append(0)
-                    timeoc.append(0)
-                    coun.append(0)
+                #상하행
+                lane_way = self.calc.lane_way(lane)
 
-                for i in range(0, len(result)-1):
-                    if result[i][1] != result[i + 1][1] or abs(result[i][3] - result[i + 1][3]) > 2:
-                        ttime.append(i)
-                        ttime.append((i+1))
-                ttime.append((len(result)-1))
+                #전송 데이터 종합
+                if lane >= 1:
+                    for i in range(lane):
+                        traffic_temp = [ Tspeed_data[0][i], Tspeed_data[1][i], share_data[i], lane_way[i]]
+                        traffic_data.append(traffic_temp)
 
-                for i in range(0, len(ttime), 2):
-                    for j in range(lane):
-                        if result[ttime[i]][14] % lane == j:
-                            timegap[j] += ((result[ttime[i]][0] - result[ttime[i+1]][0]).microseconds/1000000) /cycle
-                            coun[j] += 1
-                            #print(timegap[j])
-
-                for j in range(lane):
-                    if coun[j] != 0:
-                        timeoc[j] = timegap[j] * 100 /coun[j]
-                        #print(timeoc[j])
-                    else:
-                        timeoc[j] = 0
-
-                if lane > 0 and lane != 1:
-                    lane_half = lane / 2
-                    for j in range(1, lane):
-                        # 상/하행
-                        if j <= lane_half:
-                            laneway = 0
-                        else:
-                            laneway = 1
-                        if num[j] != 0:
-                            traffic_temp = [temp[j][0], round(temp[j][1] / num[j]), round(timeoc[j]), laneway]
-                            traffic_data.append(traffic_temp)
-                        else:
-                            traffic_temp = [temp[j][0], 0, round(timeoc[j]), laneway]
-                            traffic_data.append(traffic_temp)
-
-                if num[0] != 0:
-                    laneway = 1
-                    traffic_temp = [temp[0][0], round(temp[0][1] / num[0]), round(timeoc[0]), laneway]
-                    traffic_data.append(traffic_temp)
-                else:
-                    laneway = 1
-                    traffic_temp = [temp[0][0], 0, round(timeoc[0]), laneway]
-                    traffic_data.append(traffic_temp)
-
-                #print(traffic_data)
-                db_connect.close()
         except Exception as e:
             print("err get_traffic_data : ", e)
 
@@ -167,58 +93,12 @@ class DB_function:
             if sync_time is None:
                 print('nack')
             else:
-                # print
-                print("lane: ", lane)
-                print("sync_time: ", sync_time)
-                print("cycle: ", cycle)
-
-                db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
-                cur = db_connect.cursor()
                 temp = time.localtime(sync_time - cycle)
                 data_start = time.strftime("%Y-%m-%d %H:%M:%S", temp)
-                data_count = datetime.datetime.strptime(data_start, '%Y-%m-%d %H:%M:%S')
-                sql = "SELECT * FROM obj_info where time >= '" + data_start + "' order by ID asc, time asc"
-                cur.execute(sql)
 
-                result = cur.fetchall()
+                #개별 차량 데이터
+                individual_traffic_data = self.calc.Icar_data(data_start, lane, host, port, user, password, db, charset)
 
-                count = [0]
-                limit_len = 40
-                for i in range(1, len(result)):
-                    # print(result[i])
-                    if (abs(result[i][3]-result[i-1][3]) >= self.distlong_diff) or (abs(result[i][1]-result[i-1][1]) > 0):
-                        count.append(i)
-                count.append(len(result))
-                #print(len(result))
-
-                for i in range(1, len(count)):
-                    cardata = []
-                    carspeed = 0
-                    carway = 0
-                    carlane = 0
-                    carcont = 0
-                    carid = 0
-                    for j in range(count[i - 1], count[i]):
-                        carcont += 1
-                        carspeed += result[j][6]
-                        carway += result[j][5]
-                        carid += result[j][11]
-                        if (result[j][14] % lane) == 0:
-                            carlane += lane
-                        else:
-                            carlane += (result[j][14] % lane)
-                    if carcont != 0:
-                        cardata.append(round(carlane / carcont))
-                        cardata.append((result[count[i - 1]][0] - data_count).seconds)
-                        cardata.append(int(carspeed / carcont))
-                        if (int(carway)/carcont) >= 0:
-                            cardata.append(0)
-                        else:
-                            cardata.append(1)
-                        cardata.append(round(carid / carcont))
-                        individual_traffic_data.append(cardata)
-
-                db_connect.close()
         except Exception as e:
             print("err get_individual_traffic_data : ", e)
 
@@ -229,20 +109,20 @@ class DB_function:
         ntraffic_data = []
 
         try:
-            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset, autocommit=True)
+            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset,
+                                         autocommit=True)
             cur = db_connect.cursor()
-
             # 차선 오름차순으로 데이터 select
-            sql = "SELECT * FROM cumulative_traffic order by Lane asc"
+            sql = "SELECT * FROM traffic_info order by Lane asc"
             cur.execute(sql)
             result = cur.fetchall()
             for i in range(lane):
                 ntraffic_data.append(result[i][1])
 
             # 초기화 부분
-            sql = "update cumulative_traffic set nTraffic=0"
+            sql = "update traffic_info set nTraffic=0 set totalVelocity=0"
             cur.execute(sql)
-
+            db_connect.commit()
             db_connect.close()
         except Exception as e:
             print("err: ", e)
@@ -250,31 +130,12 @@ class DB_function:
         return ntraffic_data
 
     # 카테고리(속도) 기준 차선별 교통량
-    def get_speed_data(self, lane=6, cnum=[],  host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+    def get_speed_data(self, sync_time=None, lane=6, cnum=[],  host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         speed_data = []
 
         try:
-            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset, autocommit=True)
-            cur = db_connect.cursor()
-
-            for i in range(lane):
-                sql = "SELECT * FROM cumulative_velocity where Zone=" +str(i+1)+ " order by ID asc"
-
-                cur.execute(sql)
-                result = cur.fetchall()
-
-                lane_speed = [0,0,0,0,0,0,0,0,0,0,0,0]
-                for res in result:
-                    for i in reversed(range(len(cnum))):
-                        if res[2] >= cnum[i]:
-                            lane_speed[i] += 1
-                            break
-
-                speed_data.append(lane_speed)
-
-            sql = "truncate cumulative_velocity" #초기화 부분, 추후 활성화
-            cur.execute(sql)
-            db_connect.close()
+            speed_data = self.calc.Cspeed_data(sync_time, cnum, lane, host, port, user, password, db, charset)
+            print(speed_data)
         except Exception as e:
             print("err get_ntraffic_data : ", e)
 
@@ -338,6 +199,7 @@ class DB_function:
                 # 초기화 부분, 추후 활성화
                 sql = "truncate outbreak"
                 cur.execute(sql)
+                db_connect.commit()
             db_connect.close()
         except Exception as e:
             print("err get_outbreak : ", e)
