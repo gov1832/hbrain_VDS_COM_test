@@ -13,6 +13,7 @@ class DB_function:
 
         self.distlong_diff = 30
 
+    # DB 연결 체크 함수
     def db_connection_check(self, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         try:
             db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
@@ -230,12 +231,16 @@ class DB_function:
         try:
             db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset, autocommit=True)
             cur = db_connect.cursor()
+
+            # 차선 오름차순으로 데이터 select
             sql = "SELECT * FROM cumulative_traffic order by Lane asc"
             cur.execute(sql)
             result = cur.fetchall()
             for i in range(lane):
                 ntraffic_data.append(result[i][1])
-            sql = "update cumulative_traffic set nTraffic=0" #초기화 부분
+
+            # 초기화 부분
+            sql = "update cumulative_traffic set nTraffic=0"
             cur.execute(sql)
 
             db_connect.close()
@@ -293,8 +298,7 @@ class DB_function:
 
         return controllerBox_state_list
 
-        # 돌발 상황 정보
-
+    # 돌발 상황 정보
     def get_outbreak(self, lane=6, host=None, port=None, user=None, password=None, db=None,
                      charset='utf8'):
         outbreak = []
@@ -391,6 +395,37 @@ class DB_function:
         except Exception as e:
             print("err get_parameter_data : ", e)
         return parameter_list
+
+    def get_occupancy_interval_data(self, lane=6, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+        occupanvcy_interval_list = []
+        try:
+            db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset, autocommit=True)
+            cur = db_connect.cursor()
+
+            temp_min = []
+            temp_max = []
+            # min 값 입력
+            for i in range(lane):
+                sql = "SELECT * FROM sw_parameter WHERE param LIKE '%occupancy_min' order by param asc;"
+                cur.execute(sql)
+                result = cur.fetchall()
+                # result[1] => parameter value
+                temp_min.append(int((result[i][1])))
+            occupanvcy_interval_list.append(temp_min)
+
+            # max 값 입력
+            for i in range(lane):
+                sql = "SELECT * FROM sw_parameter WHERE param LIKE '%occupancy_max' order by param asc;"
+                cur.execute(sql)
+                result = cur.fetchall()
+                # result[1] => parameter value
+                temp_max.append(int((result[i][1])))
+            occupanvcy_interval_list.append(temp_max)
+
+            db_connect.close()
+        except Exception as e:
+            print("err get_occupancy_interval_data : ", e)
+        return occupanvcy_interval_list
 
     # endregion
 
