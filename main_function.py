@@ -88,7 +88,7 @@ class main_function(QWidget):
         self.value_setting()
 
         # auto start
-        self.auto_initialize()
+        # self.auto_initialize()
 
     def auto_initialize(self):
         db_conn = False
@@ -183,17 +183,17 @@ class main_function(QWidget):
         self.ui.sock_port_input.setText("30100")
 
         # 엠큐닉
-        # self.ui.db_ip_input.setText("183.98.24.70")
-        # self.ui.db_port_input.setText("53307")
-        # self.ui.db_id_input.setText("admin")
-        # self.ui.db_name_input.setText("hbrain_vds")
+        self.ui.db_ip_input.setText("183.98.24.70")
+        self.ui.db_port_input.setText("53307")
+        self.ui.db_id_input.setText("admin")
+        self.ui.db_name_input.setText("hbrain_vds")
 
         # hbrain
-        self.ui.db_ip_input.setText("183.99.41.239")
-        self.ui.db_port_input.setText("23306")
-        self.ui.db_id_input.setText("root")
-        self.ui.db_name_input.setText("hbrain_vds")
-        self.ui.db_pw_input.setText("hbrain0372!")
+        # self.ui.db_ip_input.setText("183.99.41.239")
+        # self.ui.db_port_input.setText("23306")
+        # self.ui.db_id_input.setText("root")
+        # self.ui.db_name_input.setText("hbrain_vds")
+        # self.ui.db_pw_input.setText("hbrain0372!")
 
         # localhost
         # self.ui.db_ip_input.setText("127.0.0.1")
