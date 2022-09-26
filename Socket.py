@@ -312,6 +312,8 @@ class Socket_function:
         img_length = self.ot.length_calc(len(stringData))
         total_length = self.ot.length_calc(6 + len(stringData))
 
+        print('[total length] : ', len(stringData))
+
         send_msg = sender_ip + destination_ip + controller + total_length + opcode + ack + img_length + stringData
 
         self.socket_send_msg(send_msg)
