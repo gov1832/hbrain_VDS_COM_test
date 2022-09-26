@@ -122,7 +122,7 @@ class DB_function:
                 ntraffic_data.append(result[i][1])
 
             # 초기화 부분
-            sql = "update traffic_info set nTraffic=0 set totalVelocity=0"
+            sql = "update traffic_info set nTraffic=0, totalVelocity=0 where Lane;"
             cur.execute(sql)
             db_connect.commit()
             db_connect.close()
@@ -137,7 +137,7 @@ class DB_function:
 
         try:
             speed_data = self.calc.Cspeed_data(sync_time, cnum, lane, host, port, user, password, db, charset)
-            print(speed_data)
+            # print(speed_data)
         except Exception as e:
             print("err get_ntraffic_data : ", e)
 
@@ -269,19 +269,19 @@ class DB_function:
             temp_min = []
             temp_max = []
             # min 값 입력
+            sql = "SELECT * FROM sw_parameter WHERE param LIKE '%occupancy_min' order by param asc;"
+            cur.execute(sql)
+            result = cur.fetchall()
             for i in range(lane):
-                sql = "SELECT * FROM sw_parameter WHERE param LIKE '%occupancy_min' order by param asc;"
-                cur.execute(sql)
-                result = cur.fetchall()
                 # result[1] => parameter value
                 temp_min.append(int((result[i][1])))
             occupanvcy_interval_list.append(temp_min)
 
             # max 값 입력
+            sql = "SELECT * FROM sw_parameter WHERE param LIKE '%occupancy_max' order by param asc;"
+            cur.execute(sql)
+            result = cur.fetchall()
             for i in range(lane):
-                sql = "SELECT * FROM sw_parameter WHERE param LIKE '%occupancy_max' order by param asc;"
-                cur.execute(sql)
-                result = cur.fetchall()
                 # result[1] => parameter value
                 temp_max.append(int((result[i][1])))
             occupanvcy_interval_list.append(temp_max)

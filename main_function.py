@@ -370,7 +370,7 @@ class main_function(QWidget):
         else:
             self.m_log_save = False
 
-        print(self.m_log_save)
+        # print(self.m_log_save)
     # endregion
 
     # region socket_msg

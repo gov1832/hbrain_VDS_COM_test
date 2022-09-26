@@ -35,7 +35,7 @@ class CALC_function:
 
                 for i in range(lane): #속도 종합 값을 차량수로 나눈 평균
                     if traffic[i] != 0 :
-                        speed[i] = round((speed[i]/traffic[i]), 2)
+                        speed[i] = round((speed[i]/traffic[i]))
                     else:
                         speed[i] = 0
 
@@ -90,7 +90,7 @@ class CALC_function:
 
                 for j in range(lane):
                     if coun[j] != 0:
-                        timeoc[j] = round(timegap[j] * 100 / coun[j], 2) # 차선별 개별 점유율 총합하여 종합 차선별 속도점유율 % 변환
+                        timeoc[j] = round(timegap[j] * 100 / coun[j]) # 차선별 개별 점유율 총합하여 종합 차선별 속도점유율 % 변환
                     else:
                         timeoc[j] = 0
 
@@ -181,7 +181,7 @@ class CALC_function:
                 db_connect.commit()
 
                 sql = "SELECT * FROM traffic_detail WHERE category = 0 and time >='" + data_start + "' order by Zone asc, ID asc, time asc;"
-                print(sql)
+                # print(sql)
                 cur.execute(sql)
                 result = cur.fetchall()
 
