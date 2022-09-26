@@ -13,6 +13,8 @@ class DB_function:
 
         self.distlong_diff = 30
 
+    # def create_init_DB(self):
+
     # DB 연결 체크 함수
     def db_connection_check(self, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         try:
