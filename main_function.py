@@ -88,13 +88,11 @@ class main_function(QWidget):
         self.value_setting()
 
         # auto start
-        # self.auto_initialize()
+        self.auto_initialize()
 
     def auto_initialize(self):
-        db_conn = False
-        socket_conn = False
-
         # DB Connect Part
+        db_conn = False
         while not db_conn:
             print("DB connect ...")
             try:
@@ -109,46 +107,54 @@ class main_function(QWidget):
                     self.update_Statusbar_text("DB connect success")
                     db_conn = True
 
+                self.db.create_init_DB(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8')
             except Exception as e:
                 self.update_Statusbar_text("DB connect fail")
             time.sleep(1)
         print("DB connect success")
-
-        # Socket Open Part
-        while not socket_conn:
-            print("Socket open ...")
-            self.local_ip = self.ot.make_16ip(sip=self.ui.sock_ip_input.text())
-            self.controller_index = self.ot.get_controller_number(self.ui.cont_num_edit.text())
-            if self.controller_index != '':
-                sock_ip = self.ui.sock_ip_input.text()
-                sock_port = int(self.ui.sock_port_input.text())
-
-                if sock_ip == '' or sock_port == '':
-                    self.update_Statusbar_text("Socket IP, PORT를 입력해주세요!")
-                else:
-                    self.update_Statusbar_text("Socket server open..")
-                    try:
-                        self.sock.socket_server_open(sock_ip, sock_port)
-                        self.update_Statusbar_text("Socket server '" + sock_ip + "', '" + str(sock_port) + "' open !")
-                        self.ui.socket_open_btn.setEnabled(False)
-                        socket_conn = True
-
-                        t = threading.Thread(target=self.client_accept_check, args=(), daemon=True)
-                        t.start()
-                    except Exception as e:
-                        self.update_Statusbar_text("socket server open fail")
-            else:
-                self.update_Statusbar_text("controller number는 10자로 입력해주세요")
-            print("Socket open success")
-            time.sleep(1)
-
-        self.ui.sock_ip_input.setEnabled(False)
-        self.ui.sock_port_input.setEnabled(False)
         self.ui.db_ip_input.setEnabled(False)
         self.ui.db_port_input.setEnabled(False)
         self.ui.db_id_input.setEnabled(False)
         self.ui.db_name_input.setEnabled(False)
         self.ui.db_pw_input.setEnabled(False)
+        self.ui.db_connect_btn.setEnabled(False)
+
+        # Socket Open Part
+        socket_conn = False
+        socket_info = self.db.get_socket_info(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8')
+        if socket_info[0] is None:
+            self.update_Statusbar_text("Insert socket IP")
+        else:
+            while not socket_conn:
+                print("Socket open ...")
+                # self.local_ip = self.ot.make_16ip(sip=self.ui.sock_ip_input.text())
+                self.local_ip = self.ot.make_16ip(sip=socket_info[0])
+                self.controller_index = self.ot.get_controller_number(self.ui.cont_num_edit.text())
+                if self.controller_index != '':
+                    sock_ip = socket_info[0]
+                    sock_port = socket_info[1]
+
+                    if sock_ip == '' or sock_port == '':
+                        self.update_Statusbar_text("Socket IP, PORT를 입력해주세요!")
+                    else:
+                        self.update_Statusbar_text("Socket server open..")
+                        try:
+                            self.sock.socket_server_open(sock_ip, sock_port)
+                            self.update_Statusbar_text("Socket server '" + sock_ip + "', '" + str(sock_port) + "' open !")
+                            self.ui.socket_open_btn.setEnabled(False)
+                            socket_conn = True
+
+                            t = threading.Thread(target=self.client_accept_check, args=(), daemon=True)
+                            t.start()
+                        except Exception as e:
+                            self.update_Statusbar_text("socket server open fail")
+                else:
+                    self.update_Statusbar_text("controller number는 10자로 입력해주세요")
+            print("Socket open success")
+            self.ui.sock_ip_input.setEnabled(False)
+            self.ui.sock_port_input.setEnabled(False)
+            self.ui.socket_open_btn.setEnabled(False)
+            time.sleep(1)
 
     def value_setting(self):
         # system scenario value
@@ -183,17 +189,18 @@ class main_function(QWidget):
         self.ui.sock_port_input.setText("30100")
 
         # 엠큐닉
-        self.ui.db_ip_input.setText("183.98.24.70")
-        self.ui.db_port_input.setText("53307")
-        self.ui.db_id_input.setText("admin")
-        self.ui.db_name_input.setText("hbrain_vds")
+        # self.ui.db_ip_input.setText("183.98.24.70")
+        # self.ui.db_port_input.setText("53307")
+        # self.ui.db_id_input.setText("admin")
+        # self.ui.db_name_input.setText("hbrain_vds")
 
         # hbrain
-        # self.ui.db_ip_input.setText("183.99.41.239")
-        # self.ui.db_port_input.setText("23306")
-        # self.ui.db_id_input.setText("root")
-        # self.ui.db_name_input.setText("hbrain_vds")
-        # self.ui.db_pw_input.setText("hbrain0372!")
+        self.ui.db_ip_input.setText("127.0.0.1")
+        self.ui.db_port_input.setText("1433")
+        self.ui.db_id_input.setText("sa")
+        self.ui.db_name_input.setText("hbrain_vds")
+        self.ui.db_pw_input.setText("hbrain0372!")
+        self.ui.db_name_input.setEnabled(False)
 
         # localhost
         # self.ui.db_ip_input.setText("127.0.0.1")
@@ -202,8 +209,7 @@ class main_function(QWidget):
         # self.ui.db_name_input.setText("hbrain_vds")
         # self.ui.db_pw_input.setText("hbrain0372!")
 
-        self.ui.db_name_input.setEnabled(False)
-        self.ui.socket_open_btn.setEnabled(False)
+        self.ui.socket_open_btn.setEnabled(True)
 
         self.ui.tx_table.setColumnWidth(0, 180)
         self.ui.tx_table.setColumnWidth(1, 80)
@@ -273,33 +279,10 @@ class main_function(QWidget):
                     self.ui.socket_open_btn.setEnabled(False)
                     t = threading.Thread(target=self.client_accept_check, args=(), daemon=True)
                     t.start()
+
+                    self.db.set_socket_info(socket_info=[sock_ip, sock_port], host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8')
                 except Exception as e:
                     self.update_Statusbar_text("socket server open fail")
-
-                # region test btn true
-                # self.ui.op_FF_btn.setEnabled(False)
-                # self.ui.op_FE_btn.setEnabled(True)
-                # self.ui.op_01_btn.setEnabled(False)
-                # self.ui.op_04_btn.setEnabled(False)
-                # self.ui.op_05_btn.setEnabled(False)
-                # self.ui.op_07_btn.setEnabled(False)
-                # self.ui.op_0C_btn.setEnabled(False)
-                # self.ui.op_0D_btn.setEnabled(False)
-                # self.ui.op_0D_btn.setEnabled(False)
-                # self.ui.op_0E_btn.setEnabled(False)
-                # self.ui.op_0F_btn.setEnabled(False)
-                # self.ui.op_11_btn.setEnabled(False)
-                # self.ui.op_12_btn.setEnabled(False)
-                # self.ui.op_13_btn.setEnabled(False)
-                # self.ui.op_15_btn.setEnabled(False)
-                # self.ui.op_16_btn.setEnabled(False)
-                # self.ui.op_17_btn.setEnabled(False)
-                # self.ui.op_18_btn.setEnabled(False)
-                # self.ui.op_19_btn.setEnabled(True)
-                # self.ui.op_1E_btn.setEnabled(False)
-                # endregion
-
-
         else:
             self.update_Statusbar_text("controller number는 10자로 입력해주세요")
 
@@ -610,10 +593,11 @@ class main_function(QWidget):
                 self.client_connect = False
                 self.fe_num = 0
                 self.fe_check = True
+            self.ui.client_status_bar.setText("Client connecting")
 
         else:
             print("Waiting for Client...")
-            self.update_Statusbar_text("Waiting for Client...")
+            self.ui.client_status_bar.setText("Waiting for Client...")
 
     def device_sync(self, op, msg):
         lane = 1

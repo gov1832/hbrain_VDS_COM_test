@@ -1,4 +1,5 @@
-import pymysql
+# import pymysql
+import pymssql
 import time
 import math
 import datetime
@@ -16,7 +17,7 @@ class CALC_function:
             if data_start is None:
                 print('nack')
             else:
-                db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
+                db_connect = pymssql.connect(server=host, port=port, user=user, password=password, database=db, charset=charset)
                 cur = db_connect.cursor()
                 sql = "SELECT * FROM traffic_detail WHERE category = 0 and time >='" + data_start + "' order by Zone asc, ID asc, time asc;"
 
@@ -55,7 +56,7 @@ class CALC_function:
             if (occu is None) or (data_start is None):
                 print('nack')
             else:
-                db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
+                db_connect = pymssql.connect(server=host, port=port, user=user, password=password, database=db, charset=charset)
                 cur = db_connect.cursor()
                 sql_str = "select *from obj_info where ((Zone= 1 and (DistLong BETWEEN '" + str(occu[0][0]) + "' AND '" + str(occu[1][0]) + "'))"
                 for i in range(1, lane):
@@ -133,7 +134,7 @@ class CALC_function:
                 print('nack')
             else:
                 data_count = datetime.datetime.strptime(data_start, '%Y-%m-%d %H:%M:%S')
-                db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
+                db_connect = pymssql.connect(server=host, port=port, user=user, password=password, database=db, charset=charset)
                 cur = db_connect.cursor()
                 sql = "SELECT * FROM traffic_detail WHERE category = 0 and time >='" + data_start + "' order by Zone asc, ID asc, time asc;"
 
@@ -167,19 +168,21 @@ class CALC_function:
                 print('nack')
             else:
                 now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(sync_time))
-                db_connect = pymysql.connect(host=host, port=port, user=user, password=password, db=db, charset=charset)
+                db_connect = pymssql.connect(server=host, port=port, user=user, password=password, database=db, charset=charset)
                 cur = db_connect.cursor()
+
                 sql1 = "SELECT * FROM sw_parameter WHERE param = 'last_time_Cspeed';"  #이전 동기화 시간 호출
                 cur.execute(sql1)
                 result = cur.fetchall()
-                data_start  = result[0][1]
-                if data_start =='':
+                data_start = result[0][1]
+                if data_start == '':
                     data_start = now_time
-
+                print('now_time type: ', type(now_time))
                 sql2 = "UPDATE sw_parameter SET value = '"+now_time+"' WHERE param = 'last_time_Cspeed';" #동기화 시간 저장
                 cur.execute(sql2)
                 db_connect.commit()
 
+                print('data_start type: ', type(data_start))
                 sql = "SELECT * FROM traffic_detail WHERE category = 0 and time >='" + data_start + "' order by Zone asc, ID asc, time asc;"
                 # print(sql)
                 cur.execute(sql)
@@ -188,9 +191,9 @@ class CALC_function:
                 for i in range(lane):
                     lane_speed = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                     for res in result:
-                        if res[3] == (i+1): #차선 일치 확인
+                        if res[3] == (i+1): # 차선 일치 확인
                             for j in reversed(range(len(cnum))):
-                                if res[2] >= cnum[j]: #속도 범위 확인
+                                if res[2] >= cnum[j]: # 속도 범위 확인
                                     lane_speed[j] += 1
                                     break
 
