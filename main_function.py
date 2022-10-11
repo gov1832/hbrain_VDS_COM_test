@@ -52,11 +52,15 @@ class main_function(QWidget):
         self.fe_check = None
         self.fe_num = None
         self.read_thread = None
-        self.dsocket_thread = None
-        # self.d
+        # self.outbreak_thread = None
+
         self.request_timer = QTimer()
         self.request_timer.start(5000)
         self.request_timer.timeout.connect(self.request_check_timer)
+
+        self.outbreak_timer = QTimer()
+        self.outbreak_timer.start(1000)
+        self.outbreak_timer.timeout.connect(self.read_outbreak_data)
 
         # S/W value
         self.local_ip = None
@@ -73,6 +77,7 @@ class main_function(QWidget):
         self.frame_number_16 = None
         self.connect_time = None
         self.sync_time = None
+        self.outbreak_send_Last_time = None
         self.lane_num = None
         self.collect_cycle = None
         self.category_num = None
@@ -84,11 +89,14 @@ class main_function(QWidget):
         self.ntraffic_data = None
         self.speed_data = None
         self.controllerBox_state_list = None
+        self.congestion_criterion = None
+        self.congestion_cycle = None
+        self.zone_criterion = None
         self.m_log_save = None
         self.value_setting()
 
         # auto start
-        self.auto_initialize()
+        # self.auto_initialize()
 
     def auto_initialize(self):
         # DB Connect Part
@@ -118,6 +126,16 @@ class main_function(QWidget):
         self.ui.db_name_input.setEnabled(False)
         self.ui.db_pw_input.setEnabled(False)
         self.ui.db_connect_btn.setEnabled(False)
+
+        # ui setting
+        temp = self.db.get_congestion_info(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8')
+        # temp = [지정체 기준 값, 간격 기준 값]
+        self.congestion_criterion = int(temp[0])
+        self.zone_criterion = int(temp[1])
+        self.congestion_cycle = int(temp[2])
+        self.ui.congestion_criterion_value.setText(str(self.congestion_criterion))
+        self.ui.zone_criterion_value.setText(str(self.zone_criterion))
+        self.ui.congestion_cycle_value.setText(str(self.congestion_cycle))
 
         # Socket Open Part
         socket_conn = False
@@ -176,6 +194,9 @@ class main_function(QWidget):
         self.use_ntraffic = 1
         self.use_category_speed = 1
         self.use_unexpected = 1
+        self.congestion_criterion = 50
+        self.congestion_cycle = 30
+        self.zone_criterion = 10
         self.m_log_save = True
 
     def time_bar_timeout(self):
@@ -211,6 +232,23 @@ class main_function(QWidget):
 
         self.ui.socket_open_btn.setEnabled(True)
 
+        # congestion
+        self.ui.congestion_criterion_edit.setValue(40)
+        self.ui.congestion_criterion_edit.setSingleStep(5)
+        self.ui.congestion_criterion_edit.setMinimum(1)
+        self.ui.congestion_criterion_edit.setMaximum(100)
+
+        self.ui.zone_criterion_edit.setValue(10)
+        self.ui.zone_criterion_edit.setSingleStep(10)
+        self.ui.zone_criterion_edit.setMinimum(10)
+        self.ui.zone_criterion_edit.setMaximum(50)
+
+        self.ui.congestion_cycle_edit.setValue(30)
+        self.ui.congestion_cycle_edit.setSingleStep(10)
+        self.ui.congestion_cycle_edit.setMinimum(10)
+        self.ui.congestion_cycle_edit.setMaximum(60)
+
+        # RX, TX
         self.ui.tx_table.setColumnWidth(0, 180)
         self.ui.tx_table.setColumnWidth(1, 80)
         self.ui.tx_table.setColumnWidth(2, 90)
@@ -228,6 +266,7 @@ class main_function(QWidget):
         self.ui.socket_open_btn.clicked.connect(self.socket_open_btn_click)
         self.ui.db_connect_btn.clicked.connect(self.db_connect_btn_click)
         self.ui.cont_num_change_btn.clicked.connect(self.cont_num_change_btn_click)
+        self.ui.congestion_change_btn.clicked.connect(self.congestion_change_btn_click)
         # endregion
 
         # region ui event
@@ -279,7 +318,7 @@ class main_function(QWidget):
                     self.ui.socket_open_btn.setEnabled(False)
                     t = threading.Thread(target=self.client_accept_check, args=(), daemon=True)
                     t.start()
-
+                    # Socket ip,port DB update
                     self.db.set_socket_info(socket_info=[sock_ip, sock_port], host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8')
                 except Exception as e:
                     self.update_Statusbar_text("socket server open fail")
@@ -296,7 +335,7 @@ class main_function(QWidget):
                 self.read_thread.pop(0)
             self.read_thread[-1].start()
             # 돌발 thread
-            self.dsocket_thread = threading.Thread(target=self.read_dsocket_msg, args=(), daemon=True)
+            # self.outbreak_thread = threading.Thread(target=self.read_outbreak_data, args=(), daemon=True)
             # dt.start()
             # 파라미터값 초기화
             parameter_list = self.db.get_parameter_data(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8')
@@ -327,9 +366,27 @@ class main_function(QWidget):
                 self.ui.db_connect_btn.setEnabled(False)
                 self.update_Statusbar_text("DB connect success")
 
+                self.db.create_init_DB(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw,
+                                       db=self.db_name, charset='utf8')
         except Exception as e:
             self.update_Statusbar_text("DB connect fail")
 
+        self.ui.db_ip_input.setEnabled(False)
+        self.ui.db_port_input.setEnabled(False)
+        self.ui.db_id_input.setEnabled(False)
+        self.ui.db_name_input.setEnabled(False)
+        self.ui.db_pw_input.setEnabled(False)
+        self.ui.db_connect_btn.setEnabled(False)
+
+        # ui setting
+        temp = self.db.get_congestion_info(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8')
+        # temp = [지정체 기준 값, 간격 기준 값, 지정체 read cycle]
+        self.congestion_criterion = int(temp[0])
+        self.zone_criterion = int(temp[1])
+        self.congestion_cycle = int(temp[2])
+        self.ui.congestion_criterion_value.setText(str(self.congestion_criterion))
+        self.ui.zone_criterion_value.setText(str(self.zone_criterion))
+        self.ui.congestion_cycle_value.setText(str(self.congestion_cycle))
 
     def cont_num_change_btn_click(self):
         cont_num = self.ot.get_controller_number(self.ui.cont_num_edit.text())
@@ -344,6 +401,24 @@ class main_function(QWidget):
                                        str(hex(ord(self.controller_index[2]))) + "/" +
                                        str(hex(ord(self.controller_index[3]))) + "/" +
                                        str(hex(ord(self.controller_index[4]))))
+    def congestion_change_btn_click(self):
+        change_list = []
+        change_list.append(self.ui.congestion_criterion_edit.value())
+        change_list.append(self.ui.zone_criterion_edit.value())
+        change_list.append(self.ui.congestion_cycle_edit.value())
+
+        self.db.set_congestion_info(change_list, host=self.db_ip, port=int(self.db_port), user=self.db_id,
+                                           password=self.db_pw, db=self.db_name, charset='utf8')
+
+        # ui setting
+        temp = self.db.get_congestion_info(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8')
+        # temp = [지정체 기준 값, 간격 기준 값, 지정체 read cycle]
+        self.congestion_criterion = int(temp[0])
+        self.zone_criterion = int(temp[1])
+        self.congestion_cycle = int(temp[2])
+        self.ui.congestion_criterion_value.setText(str(self.congestion_criterion))
+        self.ui.zone_criterion_value.setText(str(self.zone_criterion))
+        self.ui.congestion_cycle_value.setText(str(self.congestion_cycle))
     # endregion
 
     # region ui click function
@@ -374,16 +449,31 @@ class main_function(QWidget):
         print("client close")
 
     # 돌발
-    def read_dsocket_msg(self):
-        while self.client_connect:
-            # if self.client_connect:
-            outbreakdata = self.db.get_outbreak(lane=self.lane_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
-            if outbreakdata:
-                # print
-                print("0x19 돌발: ", outbreakdata)
-                if self.use_unexpected:
-                    self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, outbreakdata)
-                    self.update_TX_Log(chr(0x19), [0])
+    def read_outbreak_data(self):
+        # while self.client_connect:
+        if self.client_connect:
+            zone_num = 0 # 차선별 구역 수
+            if 200 % self.zone_criterion == 0:
+                zone_num = int(200 / self.zone_criterion)
+            else:
+                zone_num = int(200 / self.zone_criterion) + 1
+            if self.client_connect:
+                sync_time = time.time()
+                congestion_list = self.db.get_congestion_data(cycle=self.congestion_cycle, congestion=self.congestion_criterion, zone=self.zone_criterion, sync_time=sync_time, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
+                if congestion_list:
+                    outbreak_time = datetime.now()
+                    self.db.insert_outbreak(congestion_list=congestion_list, input_time=outbreak_time, zone=self.zone_criterion, zone_num=zone_num, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
+
+                # Table read & send
+                outbreakdata = self.db.get_outbreak(lane=self.lane_num, zone_num=zone_num, last_time=self.outbreak_send_Last_time, host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name)
+                self.outbreak_send_Last_time = datetime.now()
+                if outbreakdata:
+                    # print
+                    print("0x19 돌발: ", outbreakdata)
+                    if self.use_unexpected:
+                        location = self.db.get_location_data(host=self.db_ip, port=int(self.db_port), user=self.db_id, password=self.db_pw, db=self.db_name, charset='utf8')
+                        self.sock.send_19_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index, outbreakdata, location)
+                        self.update_TX_Log(chr(0x19), [0])
 
     def parsing_msg(self, recv_msg):
         print("---------------------------------------------------------------------------")
@@ -391,9 +481,9 @@ class main_function(QWidget):
         # for i in range(len(d_recv_msg)):
         #     print(i,": ", ord(d_recv_msg[i]))
         if (d_recv_msg[43] == chr(0xFE)) or (d_recv_msg[43] == chr(0x19)):
-            if d_recv_msg[44] == chr(0x06):
+            if d_recv_msg[44] == chr(0x06): # ack
                 self.update_RX_Log(d_recv_msg[43], [1])
-            elif d_recv_msg[44] == chr(0x15):
+            elif d_recv_msg[44] == chr(0x15): # nack
                 self.update_RX_Log(d_recv_msg[43], [2, d_recv_msg[45]])
         else:
             self.update_RX_Log(d_recv_msg[43], [0])
@@ -416,8 +506,8 @@ class main_function(QWidget):
                                               self.controller_index)
                     self.update_TX_Log(chr(0xFF), [1])
                     self.client_connect = True
-                    if not self.dsocket_thread.is_alive():
-                        self.dsocket_thread.start()
+                    # if not self.outbreak_thread.is_alive():
+                    #     self.outbreak_thread.start()
                     self.connect_time = time.time()
                 elif msg_op == chr(0xFE):
                     self.fe_check = True
@@ -458,17 +548,14 @@ class main_function(QWidget):
                             self.update_TX_Log(chr(0x07), [1])
                 elif msg_op == chr(0x0C):
                     self.device_sync(msg_op, d_recv_msg)
-                    self.sock.send_0C_res_msg(self.local_ip, self.center_ip, self.controller_type,
-                                              self.controller_index)
+                    self.sock.send_0C_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                     self.update_TX_Log(chr(0x0C), [1])
                 elif msg_op == chr(0x0D):
-                    self.sock.send_0D_res_msg(self.local_ip, self.center_ip, self.controller_type,
-                                              self.controller_index)
+                    self.sock.send_0D_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                     self.update_TX_Log(chr(0x0D), [1])
                 elif msg_op == chr(0x0E):
                     self.device_sync(msg_op, d_recv_msg)
-                    self.sock.send_0E_res_msg(self.local_ip, self.center_ip, self.controller_type,
-                                              self.controller_index)
+                    self.sock.send_0E_res_msg(self.local_ip, self.center_ip, self.controller_type, self.controller_index)
                     self.update_TX_Log(chr(0x0E), [1])
                 elif msg_op == chr(0x0F):
                     index = int(ord(d_recv_msg[44]))

@@ -160,7 +160,7 @@ class CALC_function:
         return Icar_data
 
     # 카테고리(속도) 기준 차선별 교통량
-    def Cspeed_data(self, sync_time=None, cnum=[],lane=6, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+    def Cspeed_data(self, sync_time=None, cnum=[], lane=6, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
         Cspeed_data = []
 
         try:
@@ -205,3 +205,82 @@ class CALC_function:
         except Exception as e:
             print("err Cspeed_data : ", e)
         return Cspeed_data
+
+    def congestion_data(self, zone=10, data_start=None, host=None, port=None, user=None, password=None, db=None, charset='utf8'):
+        # 전체 차선 zone별 평균속도 list [[1차선 1구역 평균속도, 1차선 2구역 평균속도 ..] ...[6차선 1구역 평균속도, 6차선 2구역 평균속도 ..]]
+        lane_zone_list = []
+
+        try:
+            if (data_start is None) or (zone is None):
+                print('nack')
+            else:
+                # now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(data_start))
+                db_connect = pymssql.connect(server=host, port=port, user=user, password=password, database=db,
+                                             charset=charset)
+                cur = db_connect.cursor()
+
+                sql = "SELECT * FROM obj_info WHERE time>'" + data_start + "'"
+                cur.execute(sql)
+                result = cur.fetchall()
+                # result
+                # [time, ID, Distlat, Distlong, VrelLat, VrelLong, Velocity, RCS, Prob, ArelLat, ArelLong, Class, Length, Width. zone, lane]
+
+                # region 필요한 변수 선언
+                # obj_info 차선별 구분
+                lane_1_data = []
+                lane_2_data = []
+                lane_3_data = []
+                lane_4_data = []
+                lane_5_data = []
+                lane_6_data = []
+                # 차선별 zone 개수
+                zone_num = 0
+                if 200 % zone == 0:
+                    zone_num = int(200/zone)
+                else:
+                    zone_num = int(200/zone) + 1
+
+                # endregion
+                for data in result:
+                    # 차선 비교
+                    if data[15] == 1:
+                        # [data[3], data[6]] = [DistLong, Velocity]
+                        lane_1_data.append([data[3], data[6]])
+                    elif data[15] == 2:
+                        lane_2_data.append([data[3], data[6]])
+                    elif data[15] == 3:
+                        lane_3_data.append([data[3], data[6]])
+                    elif data[15] == 4:
+                        lane_4_data.append([data[3], data[6]])
+                    elif data[15] == 5:
+                        lane_5_data.append([data[3], data[6]])
+                    elif data[15] == 6:
+                        lane_6_data.append([data[3], data[6]])
+
+                lane_data = [lane_1_data, lane_2_data, lane_3_data, lane_4_data, lane_5_data, lane_6_data]
+                for lane_num, data in enumerate(lane_data):
+                    # temp = 차선 zone별 평균속도 list
+                    temp = []
+                    temp_num = []
+                    for i in range(zone_num):
+                        temp.append(0)
+                        temp_num.append(0)
+                    for lane_data in data:
+                        for i in range(1, zone_num+1):
+                            # lane_data[0] = 거리 / lane_data[1] = 속도
+                            if lane_data[0] > zone * (zone_num - i):
+                                temp[zone_num - i] += lane_data[1]
+                                temp_num[zone_num - i] += 1
+                                break
+                    for i in range(zone_num):
+                        if temp_num[i] != 0:
+                            temp[i] = int(temp[i] / temp_num[i])
+
+                    lane_zone_list.append(temp)
+
+                # print("lane_zone_list", lane_zone_list)
+
+                db_connect.close()
+        except Exception as e:
+            print("err congestion_data : ", e)
+        return lane_zone_list

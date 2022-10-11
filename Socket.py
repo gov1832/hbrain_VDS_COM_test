@@ -331,19 +331,23 @@ class Socket_function:
         self.socket_send_msg(send_msg)
 
     # 돌발 상황 정보
-    def send_19_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, outbreak):
+    def send_19_res_msg(self, sender_ip, destination_ip, controller_kind, controller_number, outbreak, location):
         point = chr(0x2D)
         opcode = chr(0x19)
         breaktime = chr(len(outbreak))
         stringdata = ''
-        for bre in outbreak:
-            dt = bre[0]
+        for data in outbreak:
+            dt = data[0]
             daytime = chr(int(dt.strftime("%Y")[:2])) + chr(int(dt.strftime("%y"))) + chr(int(dt.strftime("%m"))) + chr(int(dt.strftime("%d"))) + chr(int(dt.strftime("%H"))) + chr(int(dt.strftime("%M"))) + chr(int(dt.strftime("%S")))
-
-            stringdata = stringdata + daytime + chr(bre[1]) + chr(bre[2]) + bre[3] + bre[4] + chr(round(bre[5]))
-        datafield = breaktime + stringdata
+            temp1 = data[2] & 0xFF
+            temp2 = (data[2] >> 8) & 0xFF
+            outbreak_class = chr(temp2) + chr(temp1)
+            # 감지ID + 차로정보 + 돌발종류 +
+            stringdata = stringdata + daytime + chr(data[1]) + outbreak_class + chr(round(data[3])) + chr(data[4])
+            #################################
+        datafield = breaktime + location[0] + location[1] + stringdata
         length = self.ot.length_calc(1 + len(datafield))
-
+        print("total_length: ", len(datafield))
         send_msg = sender_ip + point + destination_ip + point + controller_kind + controller_number + length + opcode + datafield
         # print(send_msg)
         self.socket_send_msg(send_msg)

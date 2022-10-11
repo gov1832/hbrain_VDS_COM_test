@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1337</width>
+    <width>1376</width>
     <height>1087</height>
    </rect>
   </property>
@@ -15,12 +15,12 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_6">
    <item>
-    <layout class="QHBoxLayout" name="main_layout" stretch="5">
+    <layout class="QHBoxLayout" name="main_layout" stretch="0">
      <property name="spacing">
       <number>10</number>
      </property>
      <item>
-      <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0,0" columnstretch="5,5">
+      <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0,0,0,0,0" columnstretch="1,1">
        <property name="leftMargin">
         <number>20</number>
        </property>
@@ -30,7 +30,7 @@
        <property name="bottomMargin">
         <number>20</number>
        </property>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QTableWidget" name="rx_table">
          <property name="font">
           <font>
@@ -71,7 +71,7 @@
          </column>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QTableWidget" name="tx_table">
          <property name="font">
           <font>
@@ -112,7 +112,53 @@
          </column>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="1" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="2,2,1">
+         <item>
+          <widget class="QLabel" name="label_11">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>CONTROLLER NUMBER : </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="cont_num_edit">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>0000000000</string>
+           </property>
+           <property name="placeholderText">
+            <string>input CSN (10)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cont_num_change_btn">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>change</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="5" column="0">
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0">
           <widget class="QLabel" name="status_bar">
@@ -147,65 +193,6 @@
          </item>
         </layout>
        </item>
-       <item row="1" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="2,2,1">
-         <item>
-          <widget class="QLabel" name="label_11">
-           <property name="font">
-            <font>
-             <family>Consolas</family>
-            </font>
-           </property>
-           <property name="text">
-            <string>CONTROLLER NUMBER : </string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="cont_num_edit">
-           <property name="font">
-            <font>
-             <family>Consolas</family>
-            </font>
-           </property>
-           <property name="text">
-            <string>0000000000</string>
-           </property>
-           <property name="placeholderText">
-            <string>input CSN (10)</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="cont_num_change_btn">
-           <property name="font">
-            <font>
-             <family>Consolas</family>
-            </font>
-           </property>
-           <property name="text">
-            <string>change</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="font">
-          <font>
-           <family>Consolas</family>
-           <pointsize>18</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>RX</string>
-         </property>
-         <property name="margin">
-          <number>10</number>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="1">
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
@@ -224,6 +211,7 @@
              <property name="font">
               <font>
                <family>Consolas</family>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="text">
@@ -239,6 +227,7 @@
              <property name="font">
               <font>
                <family>Consolas</family>
+               <pointsize>12</pointsize>
               </font>
              </property>
              <property name="text">
@@ -253,6 +242,294 @@
             </widget>
            </item>
           </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="client_status_bar">
+         <property name="font">
+          <font>
+           <family>Consolas</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>client</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <layout class="QGridLayout" name="parameter_setting" rowstretch="0,0">
+         <property name="topMargin">
+          <number>6</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>10</number>
+         </property>
+         <item row="1" column="6">
+          <widget class="QLabel" name="label_16">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Change Value</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="7">
+          <widget class="QSpinBox" name="congestion_cycle_edit">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="6">
+          <widget class="QLabel" name="label_18">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>cycle</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="7">
+          <widget class="QLabel" name="congestion_cycle_value">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Change Value</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QLabel" name="label_14">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Change Value</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="8">
+          <widget class="QPushButton" name="congestion_change_btn">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Change</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_15">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Congestion</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QLabel" name="zone_criterion_value">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="congestion_criterion_value">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="margin">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QLabel" name="label_17">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Zone</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="congestion_criterion_edit">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="4">
+          <widget class="QSpinBox" name="zone_criterion_edit">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_20">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Km/h</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="5">
+          <widget class="QLabel" name="label_21">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>m</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="8">
+          <widget class="QLabel" name="label_22">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>sec</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="5" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="9,1">
+         <item>
+          <widget class="QLabel" name="time_bar">
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+            </font>
+           </property>
+           <property name="text">
+            <string>Time</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="hbrain_icon">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>150</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Consolas</family>
+             <pointsize>9</pointsize>
+             <underline>true</underline>
+            </font>
+           </property>
+           <property name="text">
+            <string>Image</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -494,6 +771,13 @@
          </item>
         </layout>
        </item>
+       <item row="6" column="1">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
         <layout class="QVBoxLayout" name="socket_layout" stretch="5,5,3">
          <property name="spacing">
@@ -619,7 +903,23 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="font">
+          <font>
+           <family>Consolas</family>
+           <pointsize>18</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>RX</string>
+         </property>
+         <property name="margin">
+          <number>10</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
         <widget class="QLabel" name="label_9">
          <property name="font">
           <font>
@@ -632,65 +932,6 @@
          </property>
          <property name="margin">
           <number>10</number>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="9,1">
-         <item>
-          <widget class="QLabel" name="time_bar">
-           <property name="font">
-            <font>
-             <family>Consolas</family>
-            </font>
-           </property>
-           <property name="text">
-            <string>Time</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="hbrain_icon">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>150</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Consolas</family>
-             <pointsize>9</pointsize>
-             <underline>true</underline>
-            </font>
-           </property>
-           <property name="text">
-            <string>Image</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="client_status_bar">
-         <property name="font">
-          <font>
-           <family>Consolas</family>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>client</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLabel" name="label_13">
-         <property name="text">
-          <string>TextLabel</string>
          </property>
         </widget>
        </item>
